@@ -44,7 +44,7 @@ class SocietyBase(BaseModel):
 
 class TruckBase(BaseModel):
     truck_number: int
-    transpoter: str
+    transporter_name: str
 
 
 class TransporterBase(BaseModel):
@@ -116,7 +116,7 @@ db_dependency = Annotated[Session, Depends(get_db)]
 async def add_dhan_awak(dhanawak: DhanAwakBase, db: db_dependency):
     db_dhan_awak = models.Dhan_Awak(**dhanawak.dict())
     db.add(db_dhan_awak)
-    db.commit()
+    db.commit
 
 
 # Add New Agreement

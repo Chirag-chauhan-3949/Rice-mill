@@ -1,4 +1,13 @@
-from sqlalchemy import Column, Integer, String, DateTime, func, VARCHAR
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    DateTime,
+    func,
+    VARCHAR,
+    Float,
+    ForeignKey,
+)
 from database import Base
 
 
@@ -27,21 +36,21 @@ class Society(Base):
     created_at = Column(DateTime, default=func.now())
 
 
+class Transporter(Base):
+    __tablename__ = "transporter"
+
+    id = Column(Integer, primary_key=True, index=True)
+    transporter_name = Column(String(50), primary_key=True)
+    transporter_phone_number = Column(Integer)
+    created_at = Column(DateTime, default=func.now())
+
+
 class Truck(Base):
     __tablename__ = "trucks"
 
     id = Column(Integer, primary_key=True, index=True)
     truck_number = Column(Integer)
-    transpoter = Column(String(50))
-    created_at = Column(DateTime, default=func.now())
-
-
-class Transporter(Base):
-    __tablename__ = "transporter"
-
-    id = Column(Integer, primary_key=True, index=True)
-    transporter_name = Column(String(50))
-    transporter_phone_number = Column(Integer)
+    transporter_name = Column(String(50), ForeignKey("transporter.transporter_name"))
     created_at = Column(DateTime, default=func.now())
 
 
@@ -99,3 +108,14 @@ class Dhan_Awak(Base):
     bags_put_in_hopper = Column(Integer)
     total_hopper_weight = Column(VARCHAR(50))
     created_at = Column(DateTime, default=func.now())
+
+
+# class About_Rice_Mill(Base):
+#     __tablename__ = "ricemill"
+
+#     id = Column(Integer, primary_key=True, index=True)
+#     rice_mill_name = Column(String(50), index=True)
+#     gst_number = Column(Integer, index=True)
+#     mill_address = Column(String(150))
+#     phone_number = Column(Integer)
+#     rice_mill_capacity = Column(float)
