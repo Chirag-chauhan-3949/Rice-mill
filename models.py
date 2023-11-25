@@ -5,8 +5,8 @@ from sqlalchemy import (
     DateTime,
     func,
     VARCHAR,
-    Float,
     ForeignKey,
+    Float,
 )
 from database import Base
 
@@ -110,12 +110,13 @@ class Dhan_Awak(Base):
     created_at = Column(DateTime, default=func.now())
 
 
-# class About_Rice_Mill(Base):
-#     __tablename__ = "ricemill"
+class About_Rice_Mill(Base):
+    __tablename__ = "aboutricemill"
 
-#     id = Column(Integer, primary_key=True, index=True)
-#     rice_mill_name = Column(String(50), index=True)
-#     gst_number = Column(Integer, index=True)
-#     mill_address = Column(String(150))
-#     phone_number = Column(Integer)
-#     rice_mill_capacity = Column(float)
+    id = Column(Integer, primary_key=True, index=True)
+    rice_mill_name = Column(String(50), index=True)
+    gst_number = Column(Integer, index=True)
+    mill_address = Column(String(150))
+    phone_number = Column(Integer)
+    rice_mill_capacity = Column(Float)
+    created_at = Column(DateTime, default=func.now())

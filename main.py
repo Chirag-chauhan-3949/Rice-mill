@@ -100,6 +100,14 @@ class DhanAwakBase(BaseModel):
     total_hopper_weight: str
 
 
+class AboutRiceMillBase(BaseModel):
+    rice_mill_name: str
+    gst_number: int
+    mill_address: str
+    phone_number: int
+    rice_mill_capacity: float
+
+
 def get_db():
     db = sessionlocal()
     try:
@@ -111,12 +119,30 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 
 
+# About Rice Mill
+@app.post("/about-rice-mill/", status_code=status.HTTP_201_CREATED)
+async def add_rice_mill(aboutricemill: AboutRiceMillBase, db: db_dependency):
+    db_about_rice_mill = models.About_Rice_Mill(**aboutricemill.dict())
+    db.add(db_about_rice_mill)
+    db.commit()
+
+
+@app.get(
+    "/rice-mill/",
+    response_model=List[AboutRiceMillBase],
+    status_code=status.HTTP_200_OK,
+)
+async def rice_mill_data(db: db_dependency):
+    db_rice_mill_data = db.query(models.About_Rice_Mill).distinct().all()
+    return db_rice_mill_data
+
+
 # Dhan Awak
 @app.post("/dhan-awak/", status_code=status.HTTP_201_CREATED)
 async def add_dhan_awak(dhanawak: DhanAwakBase, db: db_dependency):
     db_dhan_awak = models.Dhan_Awak(**dhanawak.dict())
     db.add(db_dhan_awak)
-    db.commit
+    db.commit()
 
 
 # Add New Agreement
@@ -161,7 +187,7 @@ async def get_all_society_data(db: db_dependency):
 
 
 # Get all society name for dropdown options
-@app.get("/societies-names", response_model=List[str], status_code=status.HTTP_200_OK)
+@app.get("/societies-names/", response_model=List[str], status_code=status.HTTP_200_OK)
 async def get_all_societyes_names(db: db_dependency):
     db_get_all_societyes_names = db.query(models.Society.society_name).distinct().all()
     return [all_society_name[0] for all_society_name in db_get_all_societyes_names]
