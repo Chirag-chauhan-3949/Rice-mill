@@ -9,6 +9,7 @@ from sqlalchemy import (
     Float,
 )
 from database import Base
+from sqlalchemy.orm import relationship
 
 
 class Agreement(Base):
@@ -39,8 +40,8 @@ class Society(Base):
 class Transporter(Base):
     __tablename__ = "transporter"
 
-    id = Column(Integer, primary_key=True, index=True)
-    transporter_name = Column(String(50), primary_key=True)
+    transporter_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    transporter_name = Column(String(50))
     transporter_phone_number = Column(Integer)
     created_at = Column(DateTime, default=func.now())
 
@@ -50,7 +51,8 @@ class Truck(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     truck_number = Column(Integer)
-    transporter_name = Column(String(50), ForeignKey("transporter.transporter_name"))
+    transporter_name = Column(String(50))
+    truck_transport_id = Column(Integer, ForeignKey("transporter.transporter_id"))
     created_at = Column(DateTime, default=func.now())
 
 

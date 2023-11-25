@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Annotated, List
+from typing import Annotated, List, Optional
 import models
 from database import engine, sessionlocal
 from sqlalchemy.orm import Session
@@ -45,9 +45,11 @@ class SocietyBase(BaseModel):
 class TruckBase(BaseModel):
     truck_number: int
     transporter_name: str
+    truck_transport_id: int
 
 
 class TransporterBase(BaseModel):
+    transporter_id: int
     transporter_name: str
     transporter_phone_number: int
 
@@ -143,6 +145,16 @@ async def add_dhan_awak(dhanawak: DhanAwakBase, db: db_dependency):
     db_dhan_awak = models.Dhan_Awak(**dhanawak.dict())
     db.add(db_dhan_awak)
     db.commit()
+
+
+@app.get(
+    "/dhan-awak-data/",
+    response_model=List[DhanAwakBase],
+    status_code=status.HTTP_200_OK,
+)
+async def get_dhan_awak(db: db_dependency):
+    db_dhan_awak_data = db.query(models.Dhan_Awak).distinct().all()
+    return db_dhan_awak_data
 
 
 # Add New Agreement
