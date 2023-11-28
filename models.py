@@ -121,3 +121,80 @@ class Dhan_Awak(Base):
     bags_put_in_hopper = Column(Integer)
     total_hopper_weight = Column(VARCHAR(50))
     created_at = Column(DateTime, default=func.now())
+
+
+
+class Do_panding(Base):
+    __tablename__ = "dopanding"
+
+    do_panding_id = Column(Integer, primary_key=True, index=True)
+    date = Column(Integer)
+    mota = Column(VARCHAR(50))
+    patla = Column(VARCHAR(50))
+    Total = Column(Integer)
+
+
+class Sauda_patrak(Base):
+    __tablename__ = "saudapatrak"
+
+    sauda_patrak_id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(50))
+    address = Column(String(150))
+    vechicle_number = Column(VARCHAR(50))
+    paddy = Column(String(50))
+    bags = Column(Integer)
+    weight = Column(VARCHAR(50))
+    Rate   = Column(Integer)
+    amount = Column(Integer)
+
+
+class Paddy_sale(Base):
+    __tablename__ = "paddysale"
+
+    paddy_sale_id = Column(Integer, primary_key=True, index=True)
+    rst_number = Column(Integer)
+    party = Column(String(50))
+    broker = Column(String(50))
+    loading_form = Column("Excel")
+    vehicle_number = Column(VARCHAR(50))
+    paddy_name = Column(String(50))
+    weight = Column(VARCHAR(50))
+    party_weight = Column(VARCHAR(50))
+    rate = Column(Integer)
+    ammount = Column(Integer)
+    plastic = Column(Integer)
+    joot_old = Column(Integer)
+    joot_23_24 = Column(Integer)
+    joot_22_23 = Column(Integer)
+    average_bag_wt = Column(Float)
+
+
+class Frk(Base):
+    __tablename__ = "frk"
+
+    frk_id = Column(Integer, primary_key=True, index=True)
+    date = Column(Integer)
+    party = Column(String(50))
+    bags = Column(Integer)
+    weight = Column(VARCHAR(50))
+    truck_number = Column(VARCHAR(50))
+    mill_name = Column(String(50))
+    bill_number = Column(Integer)
+    rate = Column(Float)
+
+
+class Dhan_rice_societies_rate(Base):
+    __tablename__ = "dhanricesocietiesrate"
+
+    dhan_rice_societies_rate_id = Column(Integer, primary_key=True, index=True)
+    distance = Column(Float)
+    new = Column(Integer)
+
+
+
+class Lot_number_master(Base):
+    __tablename__ = "lotnumbermaster"
+
+    lot_number_master_id = Column(Integer, primary_key=True, index=True)
+    mill_name = Column(String)
+    lot_number = Column(Integer) 

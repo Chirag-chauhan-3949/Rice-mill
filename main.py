@@ -114,6 +114,63 @@ class DhanAwakBase(BaseModel):
     total_hopper_weight: str
 
 
+class DoPandingBase(BaseModel):
+    date = int
+    mota = str
+    patla = str
+    Total : int
+    do_panding_id : Optional[int] = None
+
+class SaudaPatrakBase(BaseModel):
+    name : str
+    address : str
+    vechicle_number: str
+    paddy : str
+    bags : int
+    weight : str
+    Rate   : int
+    amount : int    
+    sauda_patrak_id : Optional[int] = None
+
+class PaddySaleBase(BaseModel):
+    rst_number : int
+    party : str
+    broker : str
+    loading_form = Column("Excel")
+    vehicle_number : str
+    paddy_name : str
+    weight : str
+    party_weight : str
+    rate : int
+    ammount : int
+    plastic : int
+    joot_old : int
+    joot_23_24 : int
+    joot_22_23 : int    
+    average_bag_wt : float
+    paddy_sale_id : Optional[int] = None
+
+class FrkBase(BaseModel):
+    date : int
+    party : str
+    bags : int
+    weight : str
+    truck_number : str
+    mill_name : str
+    bill_number : int
+    rate : float
+    frk_id : Optional[int]= None
+
+class DhanRiceSocietiesRateBase(BaseModel):
+    distance = float
+    new : int
+    dhan_rice_societies_rate_id : Optional[int]=None
+
+class LotNumberMasterBase(BaseModel):
+    mill_name = str
+    lot_number = int
+    lot_number_master_id : Optional[int]= None
+
 def get_db():
     db = sessionlocal()
     try:
@@ -123,6 +180,83 @@ def get_db():
 
 
 db_dependency = Annotated[Session, Depends(get_db)]
+
+
+# Do Panding
+@app.post("/do-panding/",status_code=status.HTTP_201_CREATED)
+async def do_panding(dopanding: DoPandingBase, db: db_dependency):
+    db_do_panding = models.Do_panding(**dopanding.dict())
+    db.add(db_do_panding)
+    db.commit()
+
+@app.get("/do-panding-data/",response_model=List[DoPandingBase],status_code=status.HTTP_200_OK)
+async def do_panding_data(db: db_dependency):
+    db_do_panding_data = db.query(models.Do_panding).distinct().all()
+    return db_do_panding_data
+
+
+#Sauda patrak
+@app.post("/sauda-patrak/",status_code=status.HTTP_201_CREATED)
+async def sauda_patrak(saudapatrak: SaudaPatrakBase, db: db_dependency):
+    db_sauda_patrak = models.Do_panding(**saudapatrak.dict())
+    db.add(db_sauda_patrak)
+    db.commit()
+
+@app.get("/sauda-patrak-data/",response_model=List[SaudaPatrakBase],status_code=status.HTTP_200_OK)
+async def sauda_patrak_data(db: db_dependency):
+    db_sauda_patrak_data = db.query(models.Sauda_patrak).distinct().all()
+    return db_sauda_patrak_data
+
+#paddy sale
+@app.post("/paddy-sale/",status_code=status.HTTP_201_CREATED)
+async def paddy_sale(paddysale: PaddySaleBase, db: db_dependency):
+    db_paddy_sale = models.Do_panding(**paddysale.dict())
+    db.add(db_paddy_sale)
+    db.commit()
+
+@app.get("/paddy-sale-data/",response_model=List[PaddySaleBase],status_code=status.HTTP_200_OK)
+async def paddy_sale_data(db: db_dependency):
+    db_paddy_sale_data = db.query(models.Paddy_sale).distinct().all()
+    return db_paddy_sale_data
+
+# FRk
+@app.post("/frk/",status_code=status.HTTP_201_CREATED)
+async def frk(frk: FrkBase, db: db_dependency):
+    db_frk = models.Do_panding(**frk.dict())
+    db.add(db_frk)
+    db.commit()
+
+@app.get("/frk-data/",response_model=List[FrkBase],status_code=status.HTTP_200_OK)
+async def frk_data(db: db_dependency):
+    db_frk_data = db.query(models.Frk).distinct().all()
+    return db_frk_data
+
+
+# Dhan rice societies rate
+@app.post("/dhan-rice-societies-rate/",status_code=status.HTTP_201_CREATED)
+async def dhan_rice_societies_rate(dhansocietiesrate: DhanRiceSocietiesRateBase, db: db_dependency):
+    db_dhan_rice_societies_rate = models.Dhan_rice_societies_rate(**frk.dict())
+    db.add(db_dhan_rice_societies_rate)
+    db.commit()
+
+@app.get("/dhan-rice-societies-rate-data/",response_model=List[DhanRiceSocietiesRateBase],status_code=status.HTTP_200_OK)
+async def dhan_rice_societies_rate_data(db: db_dependency):
+    db_dhan_rice_societies_rate = db.query(models.Dhan_rice_societies_rate).distinct().all()
+    return db_dhan_rice_societies_rate
+
+
+# lot number master
+@app.post("/lot-number-master/",status_code=status.HTTP_201_CREATED)
+async def lot_number_master(lotnumbermaster: LotNumberMasterBase, db: db_dependency):
+    db_lot_number_master = models.Lot_number_master(**lotnumbermaster.dict())
+    db.add(db_lot_number_master)
+    db.commit()
+
+@app.get("/lot-number-master-data/",response_model=List[LotNumberMasterBase],status_code=status.HTTP_200_OK)
+async def lot_number_master_data(db: db_dependency):
+    db_lot_number_master = db.query(models.Lot_number_master).distinct().all()
+    return db_lot_number_master
+
 
 
 # About Rice Mill
