@@ -25,8 +25,40 @@ app.add_middleware(
 )
 
 
+class AboutRiceMillBase(BaseModel):
+    rice_mill_name: str
+    gst_number: int
+    mill_address: str
+    phone_number: int
+    rice_mill_capacity: float
+    about_rice_mill_id: Optional[int] = None
+
+
+class TransporterBase(BaseModel):
+    transporter_name: str
+    transporter_phone_number: int
+    transporter_id: Optional[
+        int
+    ] = None  # This id will help me in add truck for relative data base
+
+
+class TruckBase(BaseModel):
+    truck_number: int
+    transporter_name: str
+    truck_transport_id: int
+    truck_id: Optional[int] = None
+
+
+class SocietyBase(BaseModel):
+    society_name: str
+    distance_from_mill: int
+    transporting_rate: int
+    society_id: Optional[int] = None
+
+
 class AgreementBase(BaseModel):
     mill: str
+    # Create Add rice mill form
     agreement_number: int
     mota: int
     patla: int
@@ -34,24 +66,7 @@ class AgreementBase(BaseModel):
     lot_from: int
     lot_to: int
     total: int
-
-
-class SocietyBase(BaseModel):
-    society_name: str
-    distance_from_mill: int
-    transporting_rate: int
-
-
-class TruckBase(BaseModel):
-    truck_number: int
-    transporter_name: str
-    truck_transport_id: int
-
-
-class TransporterBase(BaseModel):
-    transporter_id: int
-    transporter_name: str
-    transporter_phone_number: int
+    agremennt_id: Optional[int] = None
 
 
 class AdddoBase(BaseModel):
@@ -59,6 +74,7 @@ class AdddoBase(BaseModel):
     date: str
     do_number: int
     select_agreement: str
+    select_argeement_id: int
     moto_weight: str
     mota_Bardana: int
     patla_weight: str
@@ -68,30 +84,39 @@ class AdddoBase(BaseModel):
     total_weight: int
     total_bardana: int
     society: str
+    society_id: int
     truck_number: int
+    truck_number_id: int
+    do_id: Optional[int] = None
 
 
 class DhanAwakBase(BaseModel):
     rst_number: int
     select_mill: str
+    rice_mill_id: int
     date: int
     do_number: int
+    do_id: int
     society: str
+    society_id: int
     society_hidden_name: int
     dm_weight: str
     number_of_bags: int
     truck_number: int
+    truck_id: int
     transporter: str
+    transporter_id: int
     transporting_rate: int
+    transporting_rate_society_id: int
     transporting_total: int
     jama_jute_22_23: int
-    ek_bharti_22_23: int
+    ek_bharti_21_22: int
     pds: int
     miller_purana: int
     kisan: int
     bardana_society: int
     hdpe_22_23: int
-    hdpe_21_23: int
+    hdpe_21_22: int
     hdpe_21_22_one_use: int
     total_bag_weight: str
     type_of_paddy: str
@@ -100,14 +125,6 @@ class DhanAwakBase(BaseModel):
     shortage: int
     bags_put_in_hopper: int
     total_hopper_weight: str
-
-
-class AboutRiceMillBase(BaseModel):
-    rice_mill_name: str
-    gst_number: int
-    mill_address: str
-    phone_number: int
-    rice_mill_capacity: float
 
 
 def get_db():
