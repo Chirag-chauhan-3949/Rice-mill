@@ -7,19 +7,19 @@ from sqlalchemy import (
     VARCHAR,
     ForeignKey,
     Float,
+    BigInteger,
 )
 from database import Base
-from sqlalchemy.orm import relationship
 
 
-class About_Rice_Mill(Base):
-    __tablename__ = "aboutricemill"
+class Add_Rice_Mill(Base):
+    __tablename__ = "addricemill"
 
-    about_rice_mill_id = Column(Integer, primary_key=True, index=True)
+    rice_mill_id = Column(Integer, primary_key=True, index=True)
     rice_mill_name = Column(String(50), index=True)
-    gst_number = Column(Integer, index=True)
-    mill_address = Column(String(150))
-    phone_number = Column(Integer)
+    gst_number = Column(VARCHAR(50))
+    mill_address = Column(String(200))
+    phone_number = Column(BigInteger)
     rice_mill_capacity = Column(Float)
     created_at = Column(DateTime, default=func.now())
 
@@ -29,7 +29,7 @@ class Transporter(Base):
 
     transporter_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     transporter_name = Column(String(50))
-    transporter_phone_number = Column(Integer)
+    transporter_phone_number = Column(BigInteger)
     created_at = Column(DateTime, default=func.now())
 
 
@@ -37,9 +37,8 @@ class Truck(Base):
     __tablename__ = "trucks"
 
     truck_id = Column(Integer, primary_key=True, index=True)
-    truck_number = Column(Integer)
-    transporter_name = Column(String(50))
-    truck_transport_id = Column(Integer, ForeignKey("transporter.transporter_id"))
+    truck_number = Column(VARCHAR(50))
+    transport_id = Column(Integer, ForeignKey("transporter.transporter_id"))
     created_at = Column(DateTime, default=func.now())
 
 
@@ -57,8 +56,8 @@ class Agreement(Base):
     __tablename__ = "agreement"
 
     agremennt_id = Column(Integer, primary_key=True, index=True)
-    mill = Column(VARCHAR(255))
-    agreement_number = Column(Integer)
+    rice_mill_id = Column(Integer)
+    agreement_number = Column(VARCHAR(15))
     mota = Column(Integer)
     patla = Column(Integer)
     sarna = Column(Integer)
@@ -72,10 +71,9 @@ class Add_Do(Base):
     __tablename__ = "addDo"
 
     do_id = Column(Integer, primary_key=True, index=True)
-    select_mill = Column(String(50))
+    select_mill_id = Column(Integer)
     date = Column(String(50))
-    do_number = Column(Integer)
-    select_agreement = Column(String(50))
+    do_number = Column(BigInteger)
     select_argeement_id = Column(Integer, ForeignKey("agreement.agremennt_id"))
     moto_weight = Column(VARCHAR(50))
     mota_Bardana = Column(Integer)
@@ -85,9 +83,7 @@ class Add_Do(Base):
     sarna_bardana = Column(Integer)
     total_weight = Column(Integer)
     total_bardana = Column(Integer)
-    society = Column(String(50))
     society_id = Column(Integer, ForeignKey("society.society_id"))
-    truck_number = Column(Integer)
     truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
     created_at = Column(DateTime, default=func.now())
 
@@ -97,21 +93,15 @@ class Dhan_Awak(Base):
 
     dhan_awak_id = Column(Integer, primary_key=True, index=True)
     rst_number = Column(Integer, index=True)
-    select_mill = Column(String(50), index=True)
     rice_mill_id = Column(Integer, ForeignKey("aboutricemill.about_rice_mill_id"))
     date = Column(Integer)
-    do_number = Column(Integer)
     do_id = Column(Integer, ForeignKey("addDo.do_id"))
-    society = Column(String(50))
     society_id = Column(Integer, ForeignKey("society.society_id"))
     society_hidden_name = Column(Integer)
     dm_weight = Column(VARCHAR(50))
     number_of_bags = Column(Integer)
-    truck_number = Column(Integer)
     truck_id = Column(Integer, ForeignKey("trucks.truck_id"))
-    transporter = Column(String(50))
     transporter_id = Column(Integer, ForeignKey("transporter.transporter_id"))
-    transporting_rate = Column(Integer)
     transporting_rate_society_id = Column(Integer, ForeignKey("society.society_id"))
     transporting_total = Column(Integer)
     jama_jute_22_23 = Column(Integer)

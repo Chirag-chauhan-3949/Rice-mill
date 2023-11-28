@@ -8,3 +8,12 @@ async def get_truck_data(truck_number: int, db: db_dependency):
     if truck_data is None:
         raise HTTPException(status_code=404, detail="Truck Number Not Found")
     return truck_data
+
+
+
+@app.get(
+    "/transporters-name/", response_model=List[str], status_code=status.HTTP_200_OK
+)
+async def get_all_transporters(db: db_dependency):
+    transporters_names = db.query(models.Transporter.transporter_name).distinct().all()
+    return [transporter[0] for transporter in transporters_names]
