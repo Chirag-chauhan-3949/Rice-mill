@@ -44,7 +44,6 @@ class TransporterBase(BaseModel):
 
 class TruckBase(BaseModel):
     truck_number: str
-    transporter_name: str
     transport_id: int
     truck_id: Optional[int] = None
 
@@ -57,7 +56,6 @@ class SocietyBase(BaseModel):
 
 
 class AgreementBase(BaseModel):
-    rice_mill_name: str
     rice_mill_id: int
     agreement_number: str
     mota: int
@@ -70,43 +68,34 @@ class AgreementBase(BaseModel):
 
 
 class AdddoBase(BaseModel):
-    rice_mill_name: str
     select_mill_id: int
     date: date
-    # do_number: int
-    # agreement_number: int
-    # select_argeement_id: int
-    # moto_weight: str
-    # mota_Bardana: int
-    # patla_weight: str
-    # patla_bardana: int
-    # sarna_weight: str
-    # sarna_bardana: int
-    # total_weight: int
-    # total_bardana: int
-    # society_name: str
-    # society_id: int
-    # truck_number: int
-    # truck_number_id: int
+    do_number: int
+    select_argeement_id: int
+    moto_weight: str
+    mota_Bardana: int
+    patla_weight: str
+    patla_bardana: int
+    sarna_weight: str
+    sarna_bardana: int
+    total_weight: int
+    total_bardana: int
+    society_name_id: int
+    truck_number_id: int
     do_id: Optional[int] = None
 
 
 class DhanAwakBase(BaseModel):
     rst_number: int
-    rice_mill_name: str
     rice_mill_id: int
     date: int
-    do_number: int
     do_id: int
-    society_name: str
     society_id: int
     society_hidden_name: int
     dm_weight: str
     number_of_bags: int
-    truck_number: str
-    truck_id: int
-    transporter_name: str
-    transporter_id: int
+    truck_number_id: int
+    transporter_name_id: str
     transporting_rate: int
     transporting_rate_society_id: int
     transporting_total: int
@@ -129,7 +118,6 @@ class DhanAwakBase(BaseModel):
 
 
 class DoPandingBase(BaseModel):
-    do_number: int
     do_number_id: int
     date: int
     mota: str
@@ -141,23 +129,20 @@ class DoPandingBase(BaseModel):
 class SaudaPatrakBase(BaseModel):
     name: str
     address: str
-    vechicle_number: int
     vechicle_number_id: int
     paddy: str
     bags: int
     weight: str
-    Rate: int
+    rate: int
     amount: int
     sauda_patrak_id: Optional[int] = None
 
 
 class PaddySaleBase(BaseModel):
-    rst_number: int
     rst_number_id: int
     party: str
     broker: str
     loading_form: str
-    vechicle_number: str
     vehicle_number_id: int
     paddy_name: str
     weight: str
@@ -173,40 +158,34 @@ class PaddySaleBase(BaseModel):
 
 
 class FrkBase(BaseModel):
-    date: int
+    date: date
     party: str
     bags: int
     weight: str
-    truck_number: str
     truck_number_id: int
-    rice_mill_name: str
-    rice_mill_id: int
+    rice_mill_name_id: int
     bill_number: int
     rate: float
     frk_id: Optional[int] = None
 
 
 class DhanRiceSocietiesRateBase(BaseModel):
-    society_name: str
-    society_id: int
+    society_name_id: int
     distance: float
     new: int
     dhan_rice_societies_rate_id: Optional[int] = None
 
 
 class LotNumberMasterBase(BaseModel):
-    rice_mill_name: str
-    rice_mill_name_id: str
+    rice_mill_name_id: int
     lot_number: int
     lot_number_master_id: Optional[int] = None
 
 
 class DalaliDhaanBase(BaseModel):
-    rst_number: int
-    rst: int
+    rst_number_id: int
     date: int
     kocia: str
-    truck_number: str
     vehicale_number_id: int
     white_sarna_bags: int
     white_sarna_weight: int
@@ -232,18 +211,14 @@ class DalaliDhaanBase(BaseModel):
 
 
 class MohanFoodPaddyBase(BaseModel):
-    do_number: int
     do_number_id: int
     samiti: str
-    rice_mill_name: str
-    rice_mill_id: int
+    rice_mill_name_id: int
     weight: int
-    truck_number: str
     vehicle_number_id: int
     bags: int
     transporting_total: int
-    transporter_name: str
-    transporter_id: int
+    transporter_name_id: int
     transporter_type: str
     transporter_status: str
     rate: int
@@ -258,33 +233,26 @@ class MohanFoodPaddyBase(BaseModel):
 
 
 class DhanTransportingBase(BaseModel):
-    rst_number: int
     rst_number_id: int
     date: int
     do_number_id: int
-    society_name: str
-    society_id: int
-    rice_mill_name: str
-    rice_mill_id: int
+    society_name_id: int
+    rice_mill_name_id: int
     dm_weight: int
-    truck_number: str
     truck_number_id: int
     numbers_of_bags: int
     transporting_total: int
-    transporter_name: str
-    transporter_id: int
+    transporter_name_id: int
     status: str
     Dhan_transporting_id: Optional[int] = None
 
 
 class TransporterMasterBase(BaseModel):
-    truck_number: str
     vehicle_number_id: int
     name: str
     phone_number: int
     date: int
-    transporter_name: str
-    transporter_id: int
+    transporter_name_id: int
     advance_payment: int
     transporter_master_id: int
 
@@ -321,7 +289,7 @@ async def do_panding_data(db: db_dependency):
 # Sauda patrak
 @app.post("/sauda-patrak/", status_code=status.HTTP_201_CREATED)
 async def sauda_patrak(saudapatrak: SaudaPatrakBase, db: db_dependency):
-    db_sauda_patrak = models.Do_panding(**saudapatrak.dict())
+    db_sauda_patrak = models.Sauda_patrak(**saudapatrak.dict())
     db.add(db_sauda_patrak)
     db.commit()
 
@@ -357,7 +325,7 @@ async def paddy_sale_data(db: db_dependency):
 # FRk
 @app.post("/frk/", status_code=status.HTTP_201_CREATED)
 async def frk(frk: FrkBase, db: db_dependency):
-    db_frk = models.Do_panding(**frk.dict())
+    db_frk = models.Frk(**frk.dict())
     db.add(db_frk)
     db.commit()
 
@@ -373,7 +341,9 @@ async def frk_data(db: db_dependency):
 async def dhan_rice_societies_rate(
     dhansocietiesrate: DhanRiceSocietiesRateBase, db: db_dependency
 ):
-    db_dhan_rice_societies_rate = models.Dhan_rice_societies_rate(**frk.dict())
+    db_dhan_rice_societies_rate = models.Dhan_rice_societies_rate(
+        **dhansocietiesrate.dict()
+    )
     db.add(db_dhan_rice_societies_rate)
     db.commit()
 
