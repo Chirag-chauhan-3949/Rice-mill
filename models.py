@@ -8,6 +8,7 @@ from sqlalchemy import (
     ForeignKey,
     Float,
     BigInteger,
+    DATE,
 )
 from database import Base
 
@@ -38,6 +39,7 @@ class Truck(Base):
 
     truck_id = Column(Integer, primary_key=True, index=True)
     truck_number = Column(VARCHAR(50))
+    transporter_name = Column(String(50))
     transport_id = Column(Integer, ForeignKey("transporter.transporter_id"))
     created_at = Column(DateTime, default=func.now())
 
@@ -56,7 +58,8 @@ class Agreement(Base):
     __tablename__ = "agreement"
 
     agremennt_id = Column(Integer, primary_key=True, index=True)
-    rice_mill_id = Column(Integer)
+    rice_mill_name = Column(String(50))
+    rice_mill_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
     agreement_number = Column(VARCHAR(15))
     mota = Column(Integer)
     patla = Column(Integer)
@@ -71,20 +74,24 @@ class Add_Do(Base):
     __tablename__ = "addDo"
 
     do_id = Column(Integer, primary_key=True, index=True)
-    select_mill_id = Column(Integer)
-    date = Column(String(50))
-    do_number = Column(BigInteger)
-    select_argeement_id = Column(Integer, ForeignKey("agreement.agremennt_id"))
-    moto_weight = Column(VARCHAR(50))
-    mota_Bardana = Column(Integer)
-    patla_weight = Column(VARCHAR(50))
-    patla_bardana = Column(Integer)
-    sarna_weight = Column(VARCHAR(50))
-    sarna_bardana = Column(Integer)
-    total_weight = Column(Integer)
-    total_bardana = Column(Integer)
-    society_id = Column(Integer, ForeignKey("society.society_id"))
-    truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
+    rice_mill_name = Column(String(50))
+    select_mill_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    date = Column(DATE)
+    # do_number = Column(BigInteger)
+    # agreement_number = Column(VARCHAR(15))
+    # select_argeement_id = Column(Integer, ForeignKey("agreement.agremennt_id"))
+    # moto_weight = Column(VARCHAR(50))
+    # mota_Bardana = Column(Integer)
+    # patla_weight = Column(VARCHAR(50))
+    # patla_bardana = Column(Integer)
+    # sarna_weight = Column(VARCHAR(50))
+    # sarna_bardana = Column(Integer)
+    # total_weight = Column(Integer)
+    # total_bardana = Column(Integer)
+    # society_name = Column(String(50))
+    # society_id = Column(Integer, ForeignKey("society.society_id"))
+    # truck_number = Column(Integer)
+    # truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
     created_at = Column(DateTime, default=func.now())
 
 
@@ -93,15 +100,21 @@ class Dhan_Awak(Base):
 
     dhan_awak_id = Column(Integer, primary_key=True, index=True)
     rst_number = Column(Integer, index=True)
-    rice_mill_id = Column(Integer, ForeignKey("aboutricemill.about_rice_mill_id"))
+    rice_mill_name = Column(String(50))
+    rice_mill_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
     date = Column(Integer)
+    do_number = Column(BigInteger)
     do_id = Column(Integer, ForeignKey("addDo.do_id"))
+    society_name = Column(String(50))
     society_id = Column(Integer, ForeignKey("society.society_id"))
     society_hidden_name = Column(Integer)
     dm_weight = Column(VARCHAR(50))
     number_of_bags = Column(Integer)
+    truck_number = Column(VARCHAR(50))
     truck_id = Column(Integer, ForeignKey("trucks.truck_id"))
+    transporter_name = Column(String(50))
     transporter_id = Column(Integer, ForeignKey("transporter.transporter_id"))
+    transporting_rate = Column(Integer)
     transporting_rate_society_id = Column(Integer, ForeignKey("society.society_id"))
     transporting_total = Column(Integer)
     jama_jute_22_23 = Column(Integer)
@@ -123,11 +136,12 @@ class Dhan_Awak(Base):
     created_at = Column(DateTime, default=func.now())
 
 
-
 class Do_panding(Base):
     __tablename__ = "dopanding"
 
     do_panding_id = Column(Integer, primary_key=True, index=True)
+    do_number = Column(BigInteger)
+    do_number_id = Column(Integer, ForeignKey("addDo.do_id"))
     date = Column(Integer)
     mota = Column(VARCHAR(50))
     patla = Column(VARCHAR(50))
@@ -141,10 +155,11 @@ class Sauda_patrak(Base):
     name = Column(String(50))
     address = Column(String(150))
     vechicle_number = Column(VARCHAR(50))
+    vechicle_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
     paddy = Column(String(50))
     bags = Column(Integer)
     weight = Column(VARCHAR(50))
-    Rate   = Column(Integer)
+    Rate = Column(Integer)
     amount = Column(Integer)
 
 
@@ -152,11 +167,13 @@ class Paddy_sale(Base):
     __tablename__ = "paddysale"
 
     paddy_sale_id = Column(Integer, primary_key=True, index=True)
-    rst_number = Column(Integer)
+    rst_number = Column(Integer, index=True)
+    rst_number_id = Column(Integer, ForeignKey("dhanawak.dhan_awak_id"))
     party = Column(String(50))
     broker = Column(String(50))
-    loading_form = Column("Excel")
-    vehicle_number = Column(VARCHAR(50))
+    loading_form_address = Column(String(50))
+    vechicle_number = Column(VARCHAR(50))
+    vehicle_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
     paddy_name = Column(String(50))
     weight = Column(VARCHAR(50))
     party_weight = Column(VARCHAR(50))
@@ -178,7 +195,9 @@ class Frk(Base):
     bags = Column(Integer)
     weight = Column(VARCHAR(50))
     truck_number = Column(VARCHAR(50))
-    mill_name = Column(String(50))
+    truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
+    rice_mill_name = Column(String(50))
+    rice_mill_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
     bill_number = Column(Integer)
     rate = Column(Float)
 
@@ -187,14 +206,113 @@ class Dhan_rice_societies_rate(Base):
     __tablename__ = "dhanricesocietiesrate"
 
     dhan_rice_societies_rate_id = Column(Integer, primary_key=True, index=True)
+    society_name = Column(String(50))
+    society_id = Column(Integer, ForeignKey("society.society_id"))
     distance = Column(Float)
     new = Column(Integer)
-
 
 
 class Lot_number_master(Base):
     __tablename__ = "lotnumbermaster"
 
     lot_number_master_id = Column(Integer, primary_key=True, index=True)
-    mill_name = Column(String)
-    lot_number = Column(Integer) 
+    rice_mill_name = Column(String(50))
+    rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    lot_number = Column(Integer)
+
+
+class Dalali_dhaan(Base):
+    __tablename__ = "dalalidhaan"
+
+    dalali_dhaan_id = Column(Integer, primary_key=True, index=True)
+    rst_number = Column(Integer, index=True)
+    rst = Column(Integer, ForeignKey("dhanawak.dhan_awak_id"))
+    date = Column(Integer)
+    kocia = Column(String(50))
+    truck_number = Column(VARCHAR(50))
+    vehicale_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
+    white_sarna_bags = Column(Integer)
+    white_sarna_weight = Column(Integer)
+    ir_bags = Column(Integer)
+    ir_weight = Column(Integer)
+    rb_gold_bags = Column(Integer)
+    rb_gold_weight = Column(Integer)
+    sarna_bags = Column(Integer)
+    sarna_weight = Column(Integer)
+    sambha_new_bag = Column(Integer)
+    sambha_new_weight = Column(Integer)
+    paddy_type = Column(String(50))
+    total_bags = Column(Integer)
+    total_weight = Column(Integer)
+    hamali = Column(Integer)
+    weight_less_plastic = Column(Integer)
+    weight_less_jute = Column(Integer)
+    weight_less_kata_difference = Column(Float)
+    net_weight = Column(Float)
+    rate = Column(Integer)
+    ammount = Column(Float)
+
+
+class Mohan_food_paddy(Base):
+    __tablename__ = "mohanfoodpaddy"
+
+    mohan_food_paddy_id = Column(Integer, primary_key=True, index=True)
+    do_number = Column(BigInteger)
+    do_number_id = Column(Integer, ForeignKey("addDo.do_id"))
+    samiti = Column(String(50))
+    rice_mill_name = Column(String(50))
+    rice_mill_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    weight = Column(Integer)
+    truck_number = Column(VARCHAR(50))
+    vehicle_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
+    bags = Column(Integer)
+    transporting_total = Column(Integer)
+    transporter_name = Column(String(50))
+    transporter_id = Column(Integer, ForeignKey("transporter.transporter_id"))
+    transporter_type = Column(String(50))
+    transporter_status = Column(String(50))
+    rate = Column(Integer)
+    type_1 = Column(String(50))
+    years_22_23 = Column(Integer)
+    years_21_22 = Column(Integer)
+    hdpe_one = Column(Integer)
+    hdpe_new = Column(Integer)
+    purana = Column(Integer)
+    pds = Column(Integer)
+
+
+class Dhan_transporting(Base):
+    __tablename__ = "dhantransporting"
+
+    Dhan_transporting_id = Column(Integer, primary_key=True, index=True)
+    rst_number = Column(Integer, index=True)
+    rst_number_id = Column(Integer, ForeignKey("dhanawak.dhan_awak_id"))
+    date = Column(Integer)
+    do_number = Column(BigInteger)
+    do_number_id = Column(Integer, ForeignKey("addDo.do_id"))
+    society_name = Column(String(50))
+    society_id = Column(Integer, ForeignKey("society.society_id"))
+    rice_mill_name = Column(String(50))
+    rice_mill_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    dm_weight = Column(Integer)
+    truck_number = Column(VARCHAR(50))
+    truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
+    numbers_of_bags = Column(Integer)
+    transporting_total = Column(Integer)
+    transporter_name = Column(String(50))
+    transporter_id = Column(Integer, ForeignKey("transporter.transporter_id"))
+    status = Column(String(50))
+
+
+class Transporter_master(Base):
+    __tablename__ = "transportermaster"
+
+    transporter_master_id = Column(Integer, primary_key=True, index=True)
+    truck_number = Column(VARCHAR(50))
+    vehicle_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
+    name = Column(String(50))
+    phone_number = Column(BigInteger)
+    date = Column(Integer)
+    transporter_name = Column(String(50))
+    transporter_id = Column(Integer, ForeignKey("transporter.transporter_id"))
+    advance_payment = Column(Integer)

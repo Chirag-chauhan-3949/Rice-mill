@@ -5,6 +5,7 @@ from typing import Annotated, List, Optional
 import models
 from database import engine, sessionlocal
 from sqlalchemy.orm import Session
+from datetime import date
 
 
 app = FastAPI()
@@ -37,11 +38,13 @@ class AddRiceMillBase(BaseModel):
 class TransporterBase(BaseModel):
     transporter_name: str
     transporter_phone_number: int
+    transporter_name: str
     transporter_id: Optional[int] = None
 
 
 class TruckBase(BaseModel):
     truck_number: str
+    transporter_name: str
     transport_id: int
     truck_id: Optional[int] = None
 
@@ -54,6 +57,7 @@ class SocietyBase(BaseModel):
 
 
 class AgreementBase(BaseModel):
+    rice_mill_name: str
     rice_mill_id: int
     agreement_number: str
     mota: int
@@ -66,34 +70,44 @@ class AgreementBase(BaseModel):
 
 
 class AdddoBase(BaseModel):
+    rice_mill_name: str
     select_mill_id: int
-    date: str
-    do_number: int
-    select_argeement_id: int
-    moto_weight: str
-    mota_Bardana: int
-    patla_weight: str
-    patla_bardana: int
-    sarna_weight: str
-    sarna_bardana: int
-    total_weight: int
-    total_bardana: int
-    society_id: int
-    truck_number_id: int
+    date: date
+    # do_number: int
+    # agreement_number: int
+    # select_argeement_id: int
+    # moto_weight: str
+    # mota_Bardana: int
+    # patla_weight: str
+    # patla_bardana: int
+    # sarna_weight: str
+    # sarna_bardana: int
+    # total_weight: int
+    # total_bardana: int
+    # society_name: str
+    # society_id: int
+    # truck_number: int
+    # truck_number_id: int
     do_id: Optional[int] = None
 
 
 class DhanAwakBase(BaseModel):
     rst_number: int
+    rice_mill_name: str
     rice_mill_id: int
     date: int
+    do_number: int
     do_id: int
+    society_name: str
     society_id: int
     society_hidden_name: int
     dm_weight: str
     number_of_bags: int
+    truck_number: str
     truck_id: int
+    transporter_name: str
     transporter_id: int
+    transporting_rate: int
     transporting_rate_society_id: int
     transporting_total: int
     jama_jute_22_23: int
@@ -115,61 +129,165 @@ class DhanAwakBase(BaseModel):
 
 
 class DoPandingBase(BaseModel):
-    date = int
-    mota = str
-    patla = str
-    Total : int
-    do_panding_id : Optional[int] = None
+    do_number: int
+    do_number_id: int
+    date: int
+    mota: str
+    patla: str
+    Total: int
+    do_panding_id: Optional[int] = None
+
 
 class SaudaPatrakBase(BaseModel):
-    name : str
-    address : str
-    vechicle_number: str
-    paddy : str
-    bags : int
-    weight : str
-    Rate   : int
-    amount : int    
-    sauda_patrak_id : Optional[int] = None
+    name: str
+    address: str
+    vechicle_number: int
+    vechicle_number_id: int
+    paddy: str
+    bags: int
+    weight: str
+    Rate: int
+    amount: int
+    sauda_patrak_id: Optional[int] = None
+
 
 class PaddySaleBase(BaseModel):
-    rst_number : int
-    party : str
-    broker : str
-    loading_form = Column("Excel")
-    vehicle_number : str
-    paddy_name : str
-    weight : str
-    party_weight : str
-    rate : int
-    ammount : int
-    plastic : int
-    joot_old : int
-    joot_23_24 : int
-    joot_22_23 : int    
-    average_bag_wt : float
-    paddy_sale_id : Optional[int] = None
+    rst_number: int
+    rst_number_id: int
+    party: str
+    broker: str
+    loading_form: str
+    vechicle_number: str
+    vehicle_number_id: int
+    paddy_name: str
+    weight: str
+    party_weight: str
+    rate: int
+    ammount: int
+    plastic: int
+    joot_old: int
+    joot_23_24: int
+    joot_22_23: int
+    average_bag_wt: float
+    paddy_sale_id: Optional[int] = None
+
 
 class FrkBase(BaseModel):
-    date : int
-    party : str
-    bags : int
-    weight : str
-    truck_number : str
-    mill_name : str
-    bill_number : int
-    rate : float
-    frk_id : Optional[int]= None
+    date: int
+    party: str
+    bags: int
+    weight: str
+    truck_number: str
+    truck_number_id: int
+    rice_mill_name: str
+    rice_mill_id: int
+    bill_number: int
+    rate: float
+    frk_id: Optional[int] = None
+
 
 class DhanRiceSocietiesRateBase(BaseModel):
-    distance = float
-    new : int
-    dhan_rice_societies_rate_id : Optional[int]=None
+    society_name: str
+    society_id: int
+    distance: float
+    new: int
+    dhan_rice_societies_rate_id: Optional[int] = None
+
 
 class LotNumberMasterBase(BaseModel):
-    mill_name = str
-    lot_number = int
-    lot_number_master_id : Optional[int]= None
+    rice_mill_name: str
+    rice_mill_name_id: str
+    lot_number: int
+    lot_number_master_id: Optional[int] = None
+
+
+class DalaliDhaanBase(BaseModel):
+    rst_number: int
+    rst: int
+    date: int
+    kocia: str
+    truck_number: str
+    vehicale_number_id: int
+    white_sarna_bags: int
+    white_sarna_weight: int
+    ir_bags: int
+    ir_weight: int
+    rb_gold_bags: int
+    rb_gold_weight: int
+    sarna_bags: int
+    sarna_weight: int
+    sambha_new_bag: int
+    sambha_new_weight: int
+    paddy_type: str
+    total_bags: int
+    total_weight: int
+    hamali: int
+    weight_less_plastic: int
+    weight_less_jute: int
+    weight_less_kata_difference: float
+    net_weight: float
+    rate: int
+    ammount: float
+    dalali_dhaan_id: Optional[int] = None
+
+
+class MohanFoodPaddyBase(BaseModel):
+    do_number: int
+    do_number_id: int
+    samiti: str
+    rice_mill_name: str
+    rice_mill_id: int
+    weight: int
+    truck_number: str
+    vehicle_number_id: int
+    bags: int
+    transporting_total: int
+    transporter_name: str
+    transporter_id: int
+    transporter_type: str
+    transporter_status: str
+    rate: int
+    type_1: str
+    years_22_23: int
+    years_21_22: int
+    hdpe_one: int
+    hdpe_new: int
+    purana: int
+    pds: int
+    mohan_food_paddy_id: Optional[int] = None
+
+
+class DhanTransportingBase(BaseModel):
+    rst_number: int
+    rst_number_id: int
+    date: int
+    do_number_id: int
+    society_name: str
+    society_id: int
+    rice_mill_name: str
+    rice_mill_id: int
+    dm_weight: int
+    truck_number: str
+    truck_number_id: int
+    numbers_of_bags: int
+    transporting_total: int
+    transporter_name: str
+    transporter_id: int
+    status: str
+    Dhan_transporting_id: Optional[int] = None
+
+
+class TransporterMasterBase(BaseModel):
+    truck_number: str
+    vehicle_number_id: int
+    name: str
+    phone_number: int
+    date: int
+    transporter_name: str
+    transporter_id: int
+    advance_payment: int
+    transporter_master_id: int
+
 
 def get_db():
     db = sessionlocal()
@@ -183,80 +301,185 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 
 # Do Panding
-@app.post("/do-panding/",status_code=status.HTTP_201_CREATED)
+@app.post("/do-panding/", status_code=status.HTTP_201_CREATED)
 async def do_panding(dopanding: DoPandingBase, db: db_dependency):
     db_do_panding = models.Do_panding(**dopanding.dict())
     db.add(db_do_panding)
     db.commit()
 
-@app.get("/do-panding-data/",response_model=List[DoPandingBase],status_code=status.HTTP_200_OK)
+
+@app.get(
+    "/do-panding-data/",
+    response_model=List[DoPandingBase],
+    status_code=status.HTTP_200_OK,
+)
 async def do_panding_data(db: db_dependency):
     db_do_panding_data = db.query(models.Do_panding).distinct().all()
     return db_do_panding_data
 
 
-#Sauda patrak
-@app.post("/sauda-patrak/",status_code=status.HTTP_201_CREATED)
+# Sauda patrak
+@app.post("/sauda-patrak/", status_code=status.HTTP_201_CREATED)
 async def sauda_patrak(saudapatrak: SaudaPatrakBase, db: db_dependency):
     db_sauda_patrak = models.Do_panding(**saudapatrak.dict())
     db.add(db_sauda_patrak)
     db.commit()
 
-@app.get("/sauda-patrak-data/",response_model=List[SaudaPatrakBase],status_code=status.HTTP_200_OK)
+
+@app.get(
+    "/sauda-patrak-data/",
+    response_model=List[SaudaPatrakBase],
+    status_code=status.HTTP_200_OK,
+)
 async def sauda_patrak_data(db: db_dependency):
     db_sauda_patrak_data = db.query(models.Sauda_patrak).distinct().all()
     return db_sauda_patrak_data
 
-#paddy sale
-@app.post("/paddy-sale/",status_code=status.HTTP_201_CREATED)
+
+# paddy sale
+@app.post("/paddy-sale/", status_code=status.HTTP_201_CREATED)
 async def paddy_sale(paddysale: PaddySaleBase, db: db_dependency):
     db_paddy_sale = models.Do_panding(**paddysale.dict())
     db.add(db_paddy_sale)
     db.commit()
 
-@app.get("/paddy-sale-data/",response_model=List[PaddySaleBase],status_code=status.HTTP_200_OK)
+
+@app.get(
+    "/paddy-sale-data/",
+    response_model=List[PaddySaleBase],
+    status_code=status.HTTP_200_OK,
+)
 async def paddy_sale_data(db: db_dependency):
     db_paddy_sale_data = db.query(models.Paddy_sale).distinct().all()
     return db_paddy_sale_data
 
+
 # FRk
-@app.post("/frk/",status_code=status.HTTP_201_CREATED)
+@app.post("/frk/", status_code=status.HTTP_201_CREATED)
 async def frk(frk: FrkBase, db: db_dependency):
     db_frk = models.Do_panding(**frk.dict())
     db.add(db_frk)
     db.commit()
 
-@app.get("/frk-data/",response_model=List[FrkBase],status_code=status.HTTP_200_OK)
+
+@app.get("/frk-data/", response_model=List[FrkBase], status_code=status.HTTP_200_OK)
 async def frk_data(db: db_dependency):
     db_frk_data = db.query(models.Frk).distinct().all()
     return db_frk_data
 
 
 # Dhan rice societies rate
-@app.post("/dhan-rice-societies-rate/",status_code=status.HTTP_201_CREATED)
-async def dhan_rice_societies_rate(dhansocietiesrate: DhanRiceSocietiesRateBase, db: db_dependency):
+@app.post("/dhan-rice-societies-rate/", status_code=status.HTTP_201_CREATED)
+async def dhan_rice_societies_rate(
+    dhansocietiesrate: DhanRiceSocietiesRateBase, db: db_dependency
+):
     db_dhan_rice_societies_rate = models.Dhan_rice_societies_rate(**frk.dict())
     db.add(db_dhan_rice_societies_rate)
     db.commit()
 
-@app.get("/dhan-rice-societies-rate-data/",response_model=List[DhanRiceSocietiesRateBase],status_code=status.HTTP_200_OK)
+
+@app.get(
+    "/dhan-rice-societies-rate-data/",
+    response_model=List[DhanRiceSocietiesRateBase],
+    status_code=status.HTTP_200_OK,
+)
 async def dhan_rice_societies_rate_data(db: db_dependency):
-    db_dhan_rice_societies_rate = db.query(models.Dhan_rice_societies_rate).distinct().all()
+    db_dhan_rice_societies_rate = (
+        db.query(models.Dhan_rice_societies_rate).distinct().all()
+    )
     return db_dhan_rice_societies_rate
 
 
 # lot number master
-@app.post("/lot-number-master/",status_code=status.HTTP_201_CREATED)
+@app.post("/lot-number-master/", status_code=status.HTTP_201_CREATED)
 async def lot_number_master(lotnumbermaster: LotNumberMasterBase, db: db_dependency):
     db_lot_number_master = models.Lot_number_master(**lotnumbermaster.dict())
     db.add(db_lot_number_master)
     db.commit()
 
-@app.get("/lot-number-master-data/",response_model=List[LotNumberMasterBase],status_code=status.HTTP_200_OK)
+
+@app.get(
+    "/lot-number-master-data/",
+    response_model=List[LotNumberMasterBase],
+    status_code=status.HTTP_200_OK,
+)
 async def lot_number_master_data(db: db_dependency):
     db_lot_number_master = db.query(models.Lot_number_master).distinct().all()
     return db_lot_number_master
 
+
+# Dalali dhaan
+@app.post("/dalali-dhaan/", status_code=status.HTTP_201_CREATED)
+async def dalali_dhaan(dalalidhaan: DalaliDhaanBase, db: db_dependency):
+    db_dalali_dhaan = models.Dalali_dhaan(**dalalidhaan.dict())
+    db.add(db_dalali_dhaan)
+    db.commit()
+
+
+@app.get(
+    "/dalali-dhaan-data/",
+    response_model=List[DalaliDhaanBase],
+    status_code=status.HTTP_200_OK,
+)
+async def dalali_dhaan_data_data(db: db_dependency):
+    db_dalali_dhaan_data_data = db.query(models.Dalali_dhaan).distinct().all()
+    return db_dalali_dhaan_data_data
+
+
+# Mohan food paddy
+@app.post("/mohan-food-paddy/", status_code=status.HTTP_201_CREATED)
+async def mohan_food_paddy(mohanfoodpaddy: MohanFoodPaddyBase, db: db_dependency):
+    db_mohan_food_paddy = models.Dalali_dhaan(**mohanfoodpaddy.dict())
+    db.add(db_mohan_food_paddy)
+    db.commit()
+
+
+@app.get(
+    "/mohan-food-paddy-data/",
+    response_model=List[MohanFoodPaddyBase],
+    status_code=status.HTTP_200_OK,
+)
+async def mohan_food_paddy_data(db: db_dependency):
+    db_mohan_food_paddy_data = db.query(models.Mohan_food_paddy).distinct().all()
+    return db_mohan_food_paddy_data
+
+
+# Dhan Transporting
+@app.post("/dhan-transporting/", status_code=status.HTTP_201_CREATED)
+async def dhan_transporting(dhantransporting: DhanTransportingBase, db: db_dependency):
+    db_dhan_transporting = models.Dalali_dhaan(**dhantransporting.dict())
+    db.add(db_dhan_transporting)
+    db.commit()
+
+
+@app.get(
+    "/dhan-transporting-data/",
+    response_model=List[DhanTransportingBase],
+    status_code=status.HTTP_200_OK,
+)
+async def dhan_transporting_data(db: db_dependency):
+    db_dhan_transporting_data = db.query(models.Dhan_transporting).distinct().all()
+    return db_dhan_transporting_data
+
+
+# Transporter master
+@app.post("/transporter-master/", status_code=status.HTTP_201_CREATED)
+async def transporter_master(
+    transportermaster: TransporterMasterBase, db: db_dependency
+):
+    db_transporter_master = models.Dalali_dhaan(**transportermaster.dict())
+    db.add(db_transporter_master)
+    db.commit()
+
+
+@app.get(
+    "/transporter-master-data/",
+    response_model=List[TransporterMasterBase],
+    status_code=status.HTTP_200_OK,
+)
+async def transporter_master_data(db: db_dependency):
+    db_transporter_master_data = db.query(models.Transporter_master).distinct().all()
+    return db_transporter_master_data
 
 
 # About Rice Mill
@@ -364,35 +587,35 @@ async def get_all_agreements_number(db: db_dependency):
     return [agreement_number[0] for agreement_number in db_agreements_number]
 
 
-# # Dhan Awak
-# @app.post("/dhan-awak/", status_code=status.HTTP_201_CREATED)
-# async def add_dhan_awak(dhanawak: DhanAwakBase, db: db_dependency):
-#     db_dhan_awak = models.Dhan_Awak(**dhanawak.dict())
-#     db.add(db_dhan_awak)
-#     db.commit()
+# Dhan Awak
+@app.post("/dhan-awak/", status_code=status.HTTP_201_CREATED)
+async def add_dhan_awak(dhanawak: DhanAwakBase, db: db_dependency):
+    db_dhan_awak = models.Dhan_Awak(**dhanawak.dict())
+    db.add(db_dhan_awak)
+    db.commit()
 
 
-# @app.get(
-#     "/dhan-awak-data/",
-#     response_model=List[DhanAwakBase],
-#     status_code=status.HTTP_200_OK,
-# )
-# async def get_dhan_awak(db: db_dependency):
-#     db_dhan_awak_data = db.query(models.Dhan_Awak).distinct().all()
-#     return db_dhan_awak_data
+@app.get(
+    "/dhan-awak-data/",
+    response_model=List[DhanAwakBase],
+    status_code=status.HTTP_200_OK,
+)
+async def get_dhan_awak(db: db_dependency):
+    db_dhan_awak_data = db.query(models.Dhan_Awak).distinct().all()
+    return db_dhan_awak_data
 
 
-# # Add Do
-# @app.post("/add-do/", status_code=status.HTTP_201_CREATED)
-# async def add_do(adddo: AdddoBase, db: db_dependency):
-#     db_add_do = models.Add_Do(**adddo.dict())
-#     db.add(db_add_do)
-#     db.commit()
+# Add Do
+@app.post("/add-do/", status_code=status.HTTP_201_CREATED)
+async def add_do(adddo: AdddoBase, db: db_dependency):
+    db_add_do = models.Add_Do(**adddo.dict())
+    db.add(db_add_do)
+    db.commit()
 
 
-# @app.get(
-#     "/add-do-data/", response_model=List[AdddoBase], status_code=status.HTTP_200_OK
-# )
-# async def get_all_add_do_data(db: db_dependency):
-#     add_do = db.query(models.Add_Do).distinct().all()
-#     return add_do
+@app.get(
+    "/add-do-data/", response_model=List[AdddoBase], status_code=status.HTTP_200_OK
+)
+async def get_all_add_do_data(db: db_dependency):
+    add_do = db.query(models.Add_Do).distinct().all()
+    return add_do
