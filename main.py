@@ -72,11 +72,11 @@ class AdddoBase(BaseModel):
     date: date
     do_number: int
     select_argeement_id: int
-    moto_weight: str
+    moto_weight: int
     mota_Bardana: int
-    patla_weight: str
+    patla_weight: int
     patla_bardana: int
-    sarna_weight: str
+    sarna_weight: int
     sarna_bardana: int
     total_weight: int
     total_bardana: int
@@ -92,7 +92,7 @@ class DhanAwakBase(BaseModel):
     do_id: int
     society_id: int
     society_hidden_name: int
-    dm_weight: str
+    dm_weight: int
     number_of_bags: int
     truck_number_id: int
     transporter_name_id: int
@@ -108,13 +108,13 @@ class DhanAwakBase(BaseModel):
     hdpe_22_23: int
     hdpe_21_22: int
     hdpe_21_22_one_use: int
-    total_bag_weight: str
+    total_bag_weight: int
     type_of_paddy: str
     actual_paddy: str
-    mill_weight_quintals: str
+    mill_weight_quintals: int
     shortage: int
     bags_put_in_hopper: int
-    total_hopper_weight: str
+    total_hopper_weight: int
     dhan_awak_id: Optional[int] = None
 
 
@@ -134,7 +134,7 @@ class SaudaPatrakBase(BaseModel):
     vechicle_number_id: int
     paddy: str
     bags: int
-    weight: str
+    weight: int
     rate: int
     amount: int
     sauda_patrak_id: Optional[int] = None
@@ -148,8 +148,8 @@ class PaddySaleBase(BaseModel):
     loading_form_address: str
     vehicle_number_id: int
     paddy_name: str
-    weight: str
-    party_weight: str
+    weight: int
+    party_weight: int
     rate: int
     ammount: int
     plastic: int
@@ -164,7 +164,7 @@ class FrkBase(BaseModel):
     date: date
     party: str
     bags: int
-    weight: str
+    weight: int
     truck_number_id: int
     rice_mill_name_id: int
     bill_number: int
@@ -191,23 +191,23 @@ class DalaliDhaanBase(BaseModel):
     kocia: str
     vehicale_number_id: int
     white_sarna_bags: int
-    white_sarna_weight: str
+    white_sarna_weight: int
     ir_bags: int
-    ir_weight: str
+    ir_weight: int
     rb_gold_bags: int
-    rb_gold_weight: str
+    rb_gold_weight: int
     sarna_bags: int
-    sarna_weight: str
+    sarna_weight: int
     sambha_new_bag: int
-    sambha_new_weight: str
+    sambha_new_weight: int
     paddy_type: str
     total_bags: int
-    total_weight: str
+    total_weight: int
     hamali: int
-    weight_less_plastic: str
-    weight_less_jute: str
-    weight_less_kata_difference: str
-    net_weight: str
+    weight_less_plastic: int
+    weight_less_jute: int
+    weight_less_kata_difference: int
+    net_weight: int
     rate: int
     ammount: float
     dalali_dhaan_id: Optional[int] = None
