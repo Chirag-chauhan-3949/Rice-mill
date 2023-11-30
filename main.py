@@ -88,16 +88,16 @@ class AdddoBase(BaseModel):
 class DhanAwakBase(BaseModel):
     rst_number: int
     rice_mill_id: int
-    date: int
+    date: date
     do_id: int
     society_id: int
     society_hidden_name: int
     dm_weight: str
     number_of_bags: int
     truck_number_id: int
-    transporter_name_id: str
+    transporter_name_id: int
     transporting_rate: int
-    transporting_rate_society_id: int
+    # transporting_rate_society_id: int ->> REMEMBER
     transporting_total: int
     jama_jute_22_23: int
     ek_bharti_21_22: int
@@ -115,13 +115,15 @@ class DhanAwakBase(BaseModel):
     shortage: int
     bags_put_in_hopper: int
     total_hopper_weight: str
+    dhan_awak_id: Optional[int] = None
 
 
 class DoPandingBase(BaseModel):
     do_number_id: int
-    date: int
+    date: date
     mota: str
     patla: str
+    sarna: str
     Total: int
     do_panding_id: Optional[int] = None
 
@@ -140,9 +142,10 @@ class SaudaPatrakBase(BaseModel):
 
 class PaddySaleBase(BaseModel):
     rst_number_id: int
+    date: date
     party: str
     broker: str
-    loading_form: str
+    loading_form_address: str
     vehicle_number_id: int
     paddy_name: str
     weight: str
@@ -184,33 +187,34 @@ class LotNumberMasterBase(BaseModel):
 
 class DalaliDhaanBase(BaseModel):
     rst_number_id: int
-    date: int
+    date: date
     kocia: str
     vehicale_number_id: int
     white_sarna_bags: int
-    white_sarna_weight: int
+    white_sarna_weight: str
     ir_bags: int
-    ir_weight: int
+    ir_weight: str
     rb_gold_bags: int
-    rb_gold_weight: int
+    rb_gold_weight: str
     sarna_bags: int
-    sarna_weight: int
+    sarna_weight: str
     sambha_new_bag: int
-    sambha_new_weight: int
+    sambha_new_weight: str
     paddy_type: str
     total_bags: int
-    total_weight: int
+    total_weight: str
     hamali: int
-    weight_less_plastic: int
-    weight_less_jute: int
-    weight_less_kata_difference: float
-    net_weight: float
+    weight_less_plastic: str
+    weight_less_jute: str
+    weight_less_kata_difference: str
+    net_weight: str
     rate: int
     ammount: float
     dalali_dhaan_id: Optional[int] = None
 
 
 class MohanFoodPaddyBase(BaseModel):
+    date: date
     do_number_id: int
     samiti: str
     rice_mill_name_id: int
@@ -234,7 +238,7 @@ class MohanFoodPaddyBase(BaseModel):
 
 class DhanTransportingBase(BaseModel):
     rst_number_id: int
-    date: int
+    date: date
     do_number_id: int
     society_name_id: int
     rice_mill_name_id: int
@@ -244,6 +248,8 @@ class DhanTransportingBase(BaseModel):
     transporting_total: int
     transporter_name_id: int
     status: str
+    total_pending: int
+    total_paid: int
     Dhan_transporting_id: Optional[int] = None
 
 
@@ -251,10 +257,10 @@ class TransporterMasterBase(BaseModel):
     vehicle_number_id: int
     name: str
     phone_number: int
-    date: int
+    date: date
     transporter_name_id: int
     advance_payment: int
-    transporter_master_id: int
+    transporter_master_id: Optional[int] = None
 
 
 def get_db():
@@ -307,7 +313,7 @@ async def sauda_patrak_data(db: db_dependency):
 # paddy sale
 @app.post("/paddy-sale/", status_code=status.HTTP_201_CREATED)
 async def paddy_sale(paddysale: PaddySaleBase, db: db_dependency):
-    db_paddy_sale = models.Do_panding(**paddysale.dict())
+    db_paddy_sale = models.Paddy_sale(**paddysale.dict())
     db.add(db_paddy_sale)
     db.commit()
 
@@ -399,7 +405,7 @@ async def dalali_dhaan_data_data(db: db_dependency):
 # Mohan food paddy
 @app.post("/mohan-food-paddy/", status_code=status.HTTP_201_CREATED)
 async def mohan_food_paddy(mohanfoodpaddy: MohanFoodPaddyBase, db: db_dependency):
-    db_mohan_food_paddy = models.Dalali_dhaan(**mohanfoodpaddy.dict())
+    db_mohan_food_paddy = models.Mohan_food_paddy(**mohanfoodpaddy.dict())
     db.add(db_mohan_food_paddy)
     db.commit()
 
@@ -417,7 +423,7 @@ async def mohan_food_paddy_data(db: db_dependency):
 # Dhan Transporting
 @app.post("/dhan-transporting/", status_code=status.HTTP_201_CREATED)
 async def dhan_transporting(dhantransporting: DhanTransportingBase, db: db_dependency):
-    db_dhan_transporting = models.Dalali_dhaan(**dhantransporting.dict())
+    db_dhan_transporting = models.Dhan_transporting(**dhantransporting.dict())
     db.add(db_dhan_transporting)
     db.commit()
 
@@ -437,7 +443,7 @@ async def dhan_transporting_data(db: db_dependency):
 async def transporter_master(
     transportermaster: TransporterMasterBase, db: db_dependency
 ):
-    db_transporter_master = models.Dalali_dhaan(**transportermaster.dict())
+    db_transporter_master = models.Transporter_master(**transportermaster.dict())
     db.add(db_transporter_master)
     db.commit()
 
