@@ -29,6 +29,7 @@ class Transporter(Base):
     __tablename__ = "transporter"
 
     transporter_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
     transporter_name = Column(String(50))
     transporter_phone_number = Column(BigInteger)
     created_at = Column(DateTime, default=func.now())
@@ -123,7 +124,7 @@ class Add_Do(Base):
     do_id = Column(Integer, primary_key=True, index=True)
     select_mill_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
     date = Column(DATE)
-    do_number = Column(BigInteger)
+    do_number = Column(String(15))
     select_argeement_id = Column(Integer, ForeignKey("agreement.agremennt_id"))
     moto_weight = Column(Integer)
     mota_Bardana = Column(Integer)
@@ -298,3 +299,40 @@ class Transporter_master(Base):
     transporter_name_id = Column(Integer, ForeignKey("transporter.transporter_id"))
     advance_payment = Column(Integer)
     created_at = Column(DateTime, default=func.now())
+
+
+class Kochia(Base):
+    __tablename__ = "kochia"
+
+    kochia_id = Column(Integer, primary_key=True, index=True)
+    rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    kochia_name = Column(String(50))
+    kochia_phone_number = Column(Integer)
+
+
+class Rice_deposite(Base):
+    __tablename__ = "ricedeposite"
+
+    rice_depostie_id = Column(Integer, primary_key=True, index=True)
+    rst_number = Column(Integer)
+    date = Column(DATE)
+    lot_number = Column(Integer)
+    ware_house = Column(String(50))
+    rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    weight = Column(Integer)
+    truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
+    bags = Column(Integer)
+    transporting_total = Column(Integer)
+    transporter_name_id = Column(Integer, ForeignKey("transporter.transporter_id"))
+    transporting_type = Column(String(50))
+    transporting_status = Column(String(50))
+    rate = Column(Integer)
+    variety = Column(String(50))
+    halting = Column(Integer)
+    rrga_wt = Column(Integer)
+    data_2022_23 = Column(Integer)
+    data_2021_22 = Column(Integer)
+    pds = Column(Integer)
+    old = Column(Integer)
+    amount = Column(Integer)
+    status = Column(String(50))

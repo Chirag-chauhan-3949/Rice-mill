@@ -37,6 +37,7 @@ class AddRiceMillBase(BaseModel):
 
 class TransporterBase(BaseModel):
     transporter_name: str
+    rice_mill_name_id: int
     transporter_phone_number: int
     transporter_name: str
     transporter_id: Optional[int] = None
@@ -70,7 +71,7 @@ class AgreementBase(BaseModel):
 class AdddoBase(BaseModel):
     select_mill_id: int
     date: date
-    do_number: int
+    do_number: str
     select_argeement_id: int
     moto_weight: int
     mota_Bardana: int
@@ -263,6 +264,51 @@ class TransporterMasterBase(BaseModel):
     transporter_master_id: Optional[int] = None
 
 
+class KochiaBase(BaseModel):
+    rice_mill_name_id: int
+    kochia_name: str
+    kochia_phone_number: int
+    kochia_id: Optional[int] = None
+
+
+class RiceDepositeBase(BaseModel):
+    rst_number: int
+    date: date
+    lot_number: int
+    ware_house: str
+    rice_mill_name_id: int
+    weight: int
+    truck_number_id: int
+    bags: int
+    transporting_total: int
+    transporter_name_id: int
+    transporting_type: str
+    transporting_status: str
+    rate: int
+    variety: str
+    halting: int
+    rrga_wt: int
+    data_2022_23: int
+    data_2021_22: int
+    pds: int
+    old: int
+    amount: int
+    status: str
+    rice_depostie_id: Optional[int] = None
+
+
+class RiceMillData(BaseModel):
+    rice_mill_data: List[AddRiceMillBase]
+    agreement_data: List[AgreementBase]
+    truck_data: List[TruckBase]
+    society_data: List[SocietyBase]
+
+
+class AddDoData(BaseModel):
+    rice_mill_data: List[AddRiceMillBase]
+    agreement_data: List[AgreementBase]
+
+
 def get_db():
     db = sessionlocal()
     try:
@@ -272,6 +318,85 @@ def get_db():
 
 
 db_dependency = Annotated[Session, Depends(get_db)]
+
+
+@app.get(
+    "/rice-agreement-data/{rice_mill_id}",
+    response_model=AddDoData,
+    status_code=status.HTTP_200_OK,
+)
+async def adddodata(rice_mill_id: int, db: db_dependency):
+    rice_mill_data = (
+        db.query(models.Add_Rice_Mill).filter_by(rice_mill_id=rice_mill_id).all()
+    )
+
+    agreement_data = (
+        db.query(models.Agreement).filter_by(rice_mill_id=rice_mill_id).all()
+    )
+
+    adddo_data = {
+        "rice_mill_data": [AddRiceMillBase(**row.__dict__) for row in rice_mill_data],
+        "agreement_data": [AgreementBase(**row.__dict__) for row in agreement_data],
+    }
+
+    return adddo_data
+
+
+@app.get(
+    "/rice-agreement-transporter-truck-society-data/",
+    response_model=RiceMillData,
+    status_code=status.HTTP_200_OK,
+)
+async def get_data(db: db_dependency):
+    # Fetch data from different tables
+    rice_mill_data = db.query(models.Add_Rice_Mill).all()
+    agreement_data = db.query(models.Agreement).all()
+    truck_data = db.query(models.Truck).all()
+    society_data = db.query(models.Society).all()
+
+    # Return the result as a custom response model
+    response_data = {
+        "rice_mill_data": [AddRiceMillBase(**row.__dict__) for row in rice_mill_data],
+        "agreement_data": [AgreementBase(**row.__dict__) for row in agreement_data],
+        "truck_data": [TruckBase(**row.__dict__) for row in truck_data],
+        "society_data": [SocietyBase(**row.__dict__) for row in society_data],
+    }
+
+    return response_data
+
+
+# Rice Deposite
+@app.post("/rice-deposite/", status_code=status.HTTP_201_CREATED)
+async def rice_deposite(ricedeposite: RiceDepositeBase, db: db_dependency):
+    db_rice_depostie = models.Rice_deposite(**ricedeposite.dict())
+    db.add(db_rice_depostie)
+    db.commit()
+
+
+@app.get(
+    "/rice-deposite-data/",
+    response_model=List[RiceDepositeBase],
+    status_code=status.HTTP_200_OK,
+)
+async def rice_deposite_data(db: db_dependency):
+    db_rice_deposite_data = db.query(models.Rice_deposite).distinct().all()
+    return db_rice_deposite_data
+
+
+# Kochia
+@app.post("/kochia/", status_code=status.HTTP_201_CREATED)
+async def add_kochia(addkochia: KochiaBase, db: db_dependency):
+    db_kochia = models.Kochia(**addkochia.dict())
+    db.add(db_kochia)
+    db.commit()
+
+
+@app.get(
+    "/kochia-data/", response_model=List[KochiaBase], status_code=status.HTTP_200_OK
+)
+async def kochia_data(db: db_dependency):
+    db_kochia_data = db.query(models.Kochia).distinct().all()
+    return db_kochia_data
 
 
 # Do Panding
