@@ -340,7 +340,7 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 # Dhan Awak
 @app.get(
-    "/truck-transporter/{transport_id}",
+    "/truck-transporter/{transport_id}",  # Here will go my truck ID
     response_model=DhanAwakTruckTransporter,
     status_code=status.HTTP_200_OK,
 )
@@ -684,11 +684,34 @@ async def rice_mill_data(db: db_dependency):
 
 
 # Add New Transporters
-@app.post("/transporter/", status_code=status.HTTP_201_CREATED)
+# @app.post("/transporter/", status_code=status.HTTP_201_CREATED)
+# async def add_new_trasporter(transporters: TransporterBase, db: db_dependency):
+#     db_transporter = models.Transporter(**transporters.dict())
+#     db.add(db_transporter)
+#     db.commit()
+
+
+@app.post(
+    "/transporter/",
+    status_code=status.HTTP_201_CREATED,
+)
 async def add_new_trasporter(transporters: TransporterBase, db: db_dependency):
+    existing_transporter = (
+        db.query(models.Transporter)
+        .filter(models.Transporter.transporter_name == transporters.transporter_name)
+        .first()
+    )
+    if existing_transporter:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Transporter with this name already exists",
+        )
     db_transporter = models.Transporter(**transporters.dict())
     db.add(db_transporter)
     db.commit()
+    db.refresh(db_transporter)
+
+    return db_transporter
 
 
 @app.get(
