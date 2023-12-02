@@ -309,6 +309,24 @@ class AddDoData(BaseModel):
     agreement_data: List[AgreementBase]
 
 
+class DhanAwakRiceDoSocietyTruckTransporter(BaseModel):
+    rice_mill_data: List[AddRiceMillBase]
+    do_number_data: List[AdddoBase]
+    society_data: List[SocietyBase]
+    truck_data: List[TruckBase]
+    transporter_data: List[TransporterBase]
+
+
+class DhanAwakRiceDoNumber(BaseModel):
+    rice_mill_data: List[AddRiceMillBase]
+    do_number_data: List[AdddoBase]
+
+
+class DhanAwakTruckTransporter(BaseModel):
+    truck_data: List[TruckBase]
+    transporter_data: List[TransporterBase]
+
+
 def get_db():
     db = sessionlocal()
     try:
@@ -320,6 +338,70 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 
 
+# Dhan Awak
+@app.get(
+    "/truck-transporter/{transport_id}",
+    response_model=DhanAwakTruckTransporter,
+    status_code=status.HTTP_200_OK,
+)
+async def truck_transporter_data(transport_id: int, db: db_dependency):
+    truck_data = db.query(models.Truck).filter_by(transport_id=transport_id).all()
+    transporter_data = (
+        db.query(models.Transporter).filter_by(transporter_id=transport_id).all()
+    )
+    dhan_awak_truck_transporter = {
+        "truck_data": [TruckBase(**row.__dict__) for row in truck_data],
+        "transporter_data": [
+            TransporterBase(**row.__dict__) for row in transporter_data
+        ],
+    }
+    return dhan_awak_truck_transporter
+
+
+@app.get(
+    "/rice-do-number/{rice_mill_id}",
+    response_model=DhanAwakRiceDoNumber,
+    status_code=status.HTTP_200_OK,
+)
+async def rice_do_number_data(rice_mill_id: int, db: db_dependency):
+    rice_mill_data = (
+        db.query(models.Add_Rice_Mill).filter_by(rice_mill_id=rice_mill_id).all()
+    )
+    do_number_data = (
+        db.query(models.Add_Do).filter_by(select_mill_id=rice_mill_id).all()
+    )
+    dhan_awak = {
+        "rice_mill_data": [AddRiceMillBase(**row.__dict__) for row in rice_mill_data],
+        "do_number_data": [AdddoBase(**row.__dict__) for row in do_number_data],
+    }
+    return dhan_awak
+
+
+@app.get(
+    "/rice-do-society-truck-transporter/",
+    response_model=DhanAwakRiceDoSocietyTruckTransporter,
+    status_code=status.HTTP_200_OK,
+)
+async def Dhan_awak_data(db: db_dependency):
+    rice_mill_data = db.query(models.Add_Rice_Mill).all()
+    do_number_data = db.query(models.Add_Do).all()
+    society_data = db.query(models.Society).all()
+    truck_data = db.query(models.Truck).all()
+    transporter_data = db.query(models.Transporter).all()
+
+    dhan_awak_data = {
+        "rice_mill_data": [AddRiceMillBase(**row.__dict__) for row in rice_mill_data],
+        "do_number_data": [AdddoBase(**row.__dict__) for row in do_number_data],
+        "truck_data": [TruckBase(**row.__dict__) for row in truck_data],
+        "society_data": [SocietyBase(**row.__dict__) for row in society_data],
+        "transporter_data": [
+            TransporterBase(**row.__dict__) for row in transporter_data
+        ],
+    }
+    return dhan_awak_data
+
+
+# ADD DO
 @app.get(
     "/rice-agreement-data/{rice_mill_id}",
     response_model=AddDoData,
