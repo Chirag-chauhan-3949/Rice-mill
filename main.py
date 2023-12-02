@@ -327,6 +327,21 @@ class DhanAwakTruckTransporter(BaseModel):
     transporter_data: List[TransporterBase]
 
 
+class RiceRstSocietyDoTruckTransporter(BaseModel):
+    rice_mill_data: List[AddRiceMillBase]
+    rst_data: List[DhanAwakBase]
+    society_data: List[SocietyBase]
+    do_number_data: List[AdddoBase]
+    truck_data: List[TruckBase]
+    transporter_data: List[TransporterBase]
+
+
+class RiceDepostiRiceTruckTransport(BaseModel):
+    rice_mill_data: List[AddRiceMillBase]
+    truck_data: List[TruckBase]
+    transporter_data: List[TransporterBase]
+
+
 def get_db():
     db = sessionlocal()
     try:
@@ -336,6 +351,54 @@ def get_db():
 
 
 db_dependency = Annotated[Session, Depends(get_db)]
+
+
+# Rice Deposti
+@app.get(
+    "/rice-truck-transporter/",
+    response_model=RiceDepostiRiceTruckTransport,
+    status_code=status.HTTP_200_OK,
+)
+async def rice_deposit_data(db: db_dependency):
+    rice_mill_data = db.query(models.Add_Rice_Mill).all()
+    truck_data = db.query(models.Truck).all()
+    transporter_data = db.query(models.Transporter).all()
+
+    rice_deposit_data = {
+        "rice_mill_data": [AddRiceMillBase(**row.__dict__) for row in rice_mill_data],
+        "truck_data": [TruckBase(**row.__dict__) for row in truck_data],
+        "transporter_data": [
+            TransporterBase(**row.__dict__) for row in transporter_data
+        ],
+    }
+    return rice_deposit_data
+
+
+# Dhan Transporting
+@app.get(
+    "/rice-rst-society-do-truck-transporter/",
+    response_model=RiceRstSocietyDoTruckTransporter,
+    status_code=status.HTTP_200_OK,
+)
+async def dhan_transporting_data(db: db_dependency):
+    rice_mill_data = db.query(models.Add_Rice_Mill).all()
+    rst_data = db.query(models.Dhan_Awak).all()
+    do_number_data = db.query(models.Add_Do).all()
+    society_data = db.query(models.Society).all()
+    truck_data = db.query(models.Truck).all()
+    transporter_data = db.query(models.Transporter).all()
+
+    dhan_transporting_data = {
+        "rice_mill_data": [AddRiceMillBase(**row.__dict__) for row in rice_mill_data],
+        "rst_data": [DhanAwakBase(**row.__dict__) for row in rst_data],
+        "do_number_data": [AdddoBase(**row.__dict__) for row in do_number_data],
+        "truck_data": [TruckBase(**row.__dict__) for row in truck_data],
+        "society_data": [SocietyBase(**row.__dict__) for row in society_data],
+        "transporter_data": [
+            TransporterBase(**row.__dict__) for row in transporter_data
+        ],
+    }
+    return dhan_transporting_data
 
 
 # Dhan Awak
@@ -666,11 +729,31 @@ async def transporter_master_data(db: db_dependency):
 
 
 # About Rice Mill
+# @app.post("/add-rice-mill/", status_code=status.HTTP_201_CREATED)
+# async def add_rice_mill(addricemill: AddRiceMillBase, db: db_dependency):
+#     db_about_rice_mill = models.Add_Rice_Mill(**addricemill.dict())
+#     db.add(db_about_rice_mill)
+#     db.commit()
+
+
 @app.post("/add-rice-mill/", status_code=status.HTTP_201_CREATED)
 async def add_rice_mill(addricemill: AddRiceMillBase, db: db_dependency):
+    existing_rice_mill = (
+        db.query(models.Add_Rice_Mill)
+        .filter(models.Add_Rice_Mill.rice_mill_name == addricemill.rice_mill_name)
+        .first()
+    )
+    if existing_rice_mill:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Rice Mill with this name already exists",
+        )
     db_about_rice_mill = models.Add_Rice_Mill(**addricemill.dict())
     db.add(db_about_rice_mill)
     db.commit()
+    db.refresh(db_about_rice_mill)
+
+    return db_about_rice_mill
 
 
 @app.get(
@@ -746,11 +829,31 @@ async def get_truck_numbers(db: db_dependency):
 
 
 # Add New Society
+# @app.post("/society/", status_code=status.HTTP_201_CREATED)
+# async def add_new_society(society: SocietyBase, db: db_dependency):
+#     db_society = models.Society(**society.dict())
+#     db.add(db_society)
+#     db.commit()
+
+
 @app.post("/society/", status_code=status.HTTP_201_CREATED)
-async def add_new_society(society: SocietyBase, db: db_dependency):
-    db_society = models.Society(**society.dict())
+async def add_society(addsociety: SocietyBase, db: db_dependency):
+    existing_society = (
+        db.query(models.Society)
+        .filter(models.Society.society_name == addsociety.society_name)
+        .first()
+    )
+    if existing_society:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Society with this name already exists",
+        )
+    db_society = models.Society(**addsociety.dict())
     db.add(db_society)
     db.commit()
+    db.refresh(db_society)
+
+    return db_society
 
 
 @app.get(
@@ -769,11 +872,31 @@ async def get_all_societyes_names(db: db_dependency):
 
 
 # Add New Agreement
+# @app.post("/agreement/", status_code=status.HTTP_201_CREATED)
+# async def add_agreement(agreement: AgreementBase, db: db_dependency):
+#     db_agreement = models.Agreement(**agreement.dict())
+#     db.add(db_agreement)
+#     db.commit()
+
+
 @app.post("/agreement/", status_code=status.HTTP_201_CREATED)
-async def add_agreement(agreement: AgreementBase, db: db_dependency):
-    db_agreement = models.Agreement(**agreement.dict())
+async def add_agreement(addagreement: AgreementBase, db: db_dependency):
+    existing_agreement = (
+        db.query(models.Agreement)
+        .filter(models.Agreement.agreement_number == addagreement.agreement_number)
+        .first()
+    )
+    if existing_agreement:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Society with this name already exists",
+        )
+    db_agreement = models.Agreement(**addagreement.dict())
     db.add(db_agreement)
     db.commit()
+    db.refresh(db_agreement)
+
+    return db_agreement
 
 
 @app.get(
