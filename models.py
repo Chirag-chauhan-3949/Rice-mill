@@ -29,7 +29,7 @@ class Transporter(Base):
     __tablename__ = "transporter"
 
     transporter_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    # rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
     transporter_name = Column(String(50))
     transporter_phone_number = Column(BigInteger)
     created_at = Column(DateTime, default=func.now())
@@ -50,8 +50,17 @@ class Society(Base):
     society_id = Column(Integer, primary_key=True, index=True)
     society_name = Column(String(50))
     distance_from_mill = Column(Integer)
+    google_distance = Column(Integer)
     transporting_rate = Column(Integer)
+    actual_distance = Column(Integer)
     created_at = Column(DateTime, default=func.now())
+
+
+class Society_Name(Base):
+    __tablename__ = "societyName"
+
+    society_id = Column(Integer, primary_key=True, index=True)
+    society_name = Column(String(50))
 
 
 class Agreement(Base):
@@ -100,6 +109,7 @@ class Frk(Base):
     rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
     bill_number = Column(Integer)
     rate = Column(Float)
+    batch_number = Column(Integer)
     created_at = Column(DateTime, default=func.now())
 
 

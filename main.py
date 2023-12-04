@@ -37,7 +37,7 @@ class AddRiceMillBase(BaseModel):
 
 class TransporterBase(BaseModel):
     transporter_name: str
-    rice_mill_name_id: int
+    # rice_mill_name_id: int
     transporter_phone_number: int
     transporter_name: str
     transporter_id: Optional[int] = None
@@ -52,7 +52,14 @@ class TruckBase(BaseModel):
 class SocietyBase(BaseModel):
     society_name: str
     distance_from_mill: int
+    google_distance: int
     transporting_rate: int
+    actual_distance: int
+    society_id: Optional[int] = None
+
+
+class SocietyBase(BaseModel):
+    society_name: str
     society_id: Optional[int] = None
 
 
@@ -170,6 +177,7 @@ class FrkBase(BaseModel):
     rice_mill_name_id: int
     bill_number: int
     rate: float
+    batch_number: int
     frk_id: Optional[int] = None
 
 
@@ -342,6 +350,12 @@ class RiceDepostiRiceTruckTransport(BaseModel):
     transporter_data: List[TransporterBase]
 
 
+class RiceMillRstNumber(BaseModel):
+    rice_mill_data: List[AddRiceMillBase]
+    do_number_data: List[AdddoBase]
+    rst_data: List[DhanAwakBase]
+
+
 def get_db():
     db = sessionlocal()
     try:
@@ -419,6 +433,27 @@ async def truck_transporter_data(transport_id: int, db: db_dependency):
         ],
     }
     return dhan_awak_truck_transporter
+
+
+@app.get(
+    "/rice-rst-number-do-number/{rice_mill_id}",
+    response_model=RiceMillRstNumber,
+    status_code=status.HTTP_200_OK,
+)
+async def rice_mill_rst_number(rice_mill_id: int, db: db_dependency):
+    rice_mill_data = (
+        db.query(models.Add_Rice_Mill).filter_by(rice_mill_id=rice_mill_id).all()
+    )
+    rst_data = db.query(models.Dhan_Awak).filter_by(rice_mill_id=rice_mill_id).all()
+    do_number_data = (
+        db.query(models.Add_Do).filter_by(select_mill_id=rice_mill_id).all()
+    )
+    rice_mill_rst_number = {
+        "rice_mill_data": [AddRiceMillBase(**row.__dict__) for row in rice_mill_data],
+        "do_number_data": [AdddoBase(**row.__dict__) for row in do_number_data],
+        "rst_data": [DhanAwakBase(**row.__dict__) for row in rst_data],
+    }
+    return rice_mill_rst_number
 
 
 @app.get(
