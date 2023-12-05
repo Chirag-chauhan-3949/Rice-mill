@@ -80,14 +80,14 @@ class AdddoBase(BaseModel):
     date: date
     do_number: str
     select_argeement_id: int
-    moto_weight: int
-    mota_Bardana: int
-    patla_weight: int
-    patla_bardana: int
-    sarna_weight: int
-    sarna_bardana: int
-    total_weight: int
-    total_bardana: int
+    moto_weight: float
+    mota_Bardana: float
+    patla_weight: float
+    patla_bardana: float
+    sarna_weight: float
+    sarna_bardana: float
+    total_weight: float
+    total_bardana: float
     society_name_id: int
     truck_number_id: int
     do_id: Optional[int] = None
@@ -99,13 +99,11 @@ class DhanAwakBase(BaseModel):
     date: date
     do_id: int
     society_id: int
-    society_hidden_name: int
     dm_weight: int
     number_of_bags: int
     truck_number_id: int
     transporter_name_id: int
     transporting_rate: int
-    # transporting_rate_society_id: int ->> REMEMBER
     transporting_total: int
     jama_jute_22_23: int
     ek_bharti_21_22: int
@@ -116,13 +114,15 @@ class DhanAwakBase(BaseModel):
     hdpe_22_23: int
     hdpe_21_22: int
     hdpe_21_22_one_use: int
-    total_bag_weight: int
+    total_bag_weight: float
     type_of_paddy: str
     actual_paddy: str
     mill_weight_quintals: int
-    shortage: int
+    shortage: float
     bags_put_in_hopper: int
-    total_hopper_weight: int
+    bags_put_in_stack: int
+    hopper_rice_mill_id: int
+    stack_location: str
     dhan_awak_id: Optional[int] = None
 
 
@@ -193,11 +193,18 @@ class LotNumberMasterBase(BaseModel):
     lot_number: int
     lot_number_master_id: Optional[int] = None
 
+class KochiaBase(BaseModel):
+    rice_mill_name_id: int
+    kochia_name: str
+    kochia_phone_number: int
+    kochia_id: Optional[int] = None
+
+
 
 class DalaliDhaanBase(BaseModel):
-    rst_number_id: int
+    rst_number: int
     date: date
-    kocia: str
+    kochia_id: int
     vehicale_number_id: int
     white_sarna_bags: int
     white_sarna_weight: int
@@ -272,11 +279,6 @@ class TransporterMasterBase(BaseModel):
     transporter_master_id: Optional[int] = None
 
 
-class KochiaBase(BaseModel):
-    rice_mill_name_id: int
-    kochia_name: str
-    kochia_phone_number: int
-    kochia_id: Optional[int] = None
 
 
 class RiceDepositeBase(BaseModel):

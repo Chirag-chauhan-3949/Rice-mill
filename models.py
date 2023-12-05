@@ -136,14 +136,14 @@ class Add_Do(Base):
     date = Column(DATE)
     do_number = Column(String(15))
     select_argeement_id = Column(Integer, ForeignKey("agreement.agremennt_id"))
-    moto_weight = Column(Integer)
-    mota_Bardana = Column(Integer)
-    patla_weight = Column(Integer)
-    patla_bardana = Column(Integer)
-    sarna_weight = Column(Integer)
-    sarna_bardana = Column(Integer)
-    total_weight = Column(Integer)
-    total_bardana = Column(Integer)
+    moto_weight = Column(Float)
+    mota_Bardana = Column(Float)
+    patla_weight = Column(Float)
+    patla_bardana = Column(Float)
+    sarna_weight = Column(Float)
+    sarna_bardana = Column(Float)
+    total_weight = Column(Float)
+    total_bardana = Column(Float)
     society_name_id = Column(Integer, ForeignKey("society.society_id"))
     truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
     created_at = Column(DateTime, default=func.now())
@@ -158,13 +158,11 @@ class Dhan_Awak(Base):
     date = Column(DATE)
     do_id = Column(Integer, ForeignKey("addDo.do_id"))
     society_id = Column(Integer, ForeignKey("society.society_id"))
-    society_hidden_name = Column(Integer)
     dm_weight = Column(Integer)
     number_of_bags = Column(Integer)
     truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
     transporter_name_id = Column(Integer, ForeignKey("transporter.transporter_id"))
     transporting_rate = Column(Integer)
-    # transporting_rate_society_id = Column(Integer, ForeignKey("society.society_id"))
     transporting_total = Column(Integer)
     jama_jute_22_23 = Column(Integer)
     ek_bharti_21_22 = Column(Integer)
@@ -175,13 +173,15 @@ class Dhan_Awak(Base):
     hdpe_22_23 = Column(Integer)
     hdpe_21_22 = Column(Integer)
     hdpe_21_22_one_use = Column(Integer)
-    total_bag_weight = Column(Integer)
+    total_bag_weight = Column(Float)
     type_of_paddy = Column(String(50))
     actual_paddy = Column(String(50))
     mill_weight_quintals = Column(Integer)
-    shortage = Column(Integer)
+    shortage = Column(Float)
     bags_put_in_hopper = Column(Integer)
-    total_hopper_weight = Column(Integer)
+    bags_put_in_stack = Column(Integer)
+    hopper_rice_mill_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    stack_location = Column(String(50))
     created_at = Column(DateTime, default=func.now())
 
 
@@ -220,14 +220,22 @@ class Paddy_sale(Base):
     average_bag_wt = Column(Float)
     created_at = Column(DateTime, default=func.now())
 
+class Kochia(Base):
+    __tablename__ = "kochia"
+
+    kochia_id = Column(Integer, primary_key=True, index=True)
+    rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    kochia_name = Column(String(50))
+    kochia_phone_number = Column(Integer)
 
 class Dalali_dhaan(Base):
     __tablename__ = "dalalidhaan"
 
     dalali_dhaan_id = Column(Integer, primary_key=True, index=True)
-    rst_number_id = Column(Integer, ForeignKey("dhanawak.dhan_awak_id"))
+    # rst_number_id = Column(Integer, ForeignKey("dhanawak.dhan_awak_id"))
+    rst_number = Column(Integer)
     date = Column(DATE)
-    kocia = Column(String(50))
+    kochia_id = Column(Integer, ForeignKey("kochia.kochia_id"))
     vehicale_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
     white_sarna_bags = Column(Integer)
     white_sarna_weight = Column(Integer)
@@ -311,13 +319,7 @@ class Transporter_master(Base):
     created_at = Column(DateTime, default=func.now())
 
 
-class Kochia(Base):
-    __tablename__ = "kochia"
 
-    kochia_id = Column(Integer, primary_key=True, index=True)
-    rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
-    kochia_name = Column(String(50))
-    kochia_phone_number = Column(Integer)
 
 
 class Rice_deposite(Base):
