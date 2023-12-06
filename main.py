@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import Annotated, List, Optional
 import models
 from database import engine, sessionlocal
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session,joinedload, relationship
 from datetime import date
 
 
@@ -58,9 +58,9 @@ class SocietyBase(BaseModel):
     society_id: Optional[int] = None
 
 
-class SocietyBase(BaseModel):
-    society_name: str
-    society_id: Optional[int] = None
+# class SocietyBase(BaseModel):
+#     society_name: str
+#     society_id: Optional[int] = None
 
 
 class AgreementBase(BaseModel):
@@ -357,6 +357,16 @@ class RiceMillRstNumber(BaseModel):
     do_number_data: List[AdddoBase]
     rst_data: List[DhanAwakBase]
 
+class SocietyDistanceRate(BaseModel):
+    transporting_rate: int
+
+class WareHouseTransporting(BaseModel):
+    ware_houes_name: str
+    ware_house_transporting_rate: int
+    ware_houes_id: Optional[int] = None
+
+class wareHousetrasportingrate(BaseModel):
+    ware_house_transporting_rate: int
 
 def get_db():
     db = sessionlocal()
@@ -415,6 +425,34 @@ async def dhan_transporting_data(db: db_dependency):
         ],
     }
     return dhan_transporting_data
+
+# Society
+# @app.get(
+#     "/society-data/{society_id}",
+#     response_model=SocietyDistanceRate,
+#     status_code=status.HTTP_200_OK,
+# )
+# async def society_data(society_id: int, db: db_dependency):
+#     society_data = db.query(models.Society).filter_by(society_id=society_id).all()
+#     society_db = {
+#         "society_data": [SocietyBase(**row.__dict__) for row in society_data],
+#     }
+#     return society_db
+
+@app.get(
+    "/society-data/{society_id}",
+    response_model=SocietyDistanceRate,
+    status_code=status.HTTP_200_OK,
+)
+async def society_data(society_id: int, db: db_dependency):
+    society_data = db.query(models.Society).filter_by(society_id=society_id).first()
+
+    if society_data is None:
+        raise HTTPException(status_code=404, detail="Society not found")
+
+    response_data = {"transporting_rate": society_data.transporting_rate}
+    return response_data
+
 
 
 # Dhan Awak
@@ -971,6 +1009,8 @@ async def get_dhan_awak(db: db_dependency):
     return db_dhan_awak_data
 
 
+
+
 # Add Do
 @app.post("/add-do/", status_code=status.HTTP_201_CREATED)
 async def add_do(adddo: AdddoBase, db: db_dependency):
@@ -985,3 +1025,35 @@ async def add_do(adddo: AdddoBase, db: db_dependency):
 async def get_all_add_do_data(db: db_dependency):
     add_do = db.query(models.Add_Do).distinct().all()
     return add_do
+
+
+# Whare House
+@app.post("/ware-house-transporting/", status_code=status.HTTP_201_CREATED)
+async def add_whare_house(warehouse:WareHouseTransporting, db: db_dependency):
+    db_add_ware_house = models.ware_house_transporting(**warehouse.dict())
+    db.add(db_add_ware_house)
+    db.commit()
+
+@app.get("/get-ware-house-data/",response_model=List[WareHouseTransporting],status_code=status.HTTP_200_OK)
+async def get_all_ware_house_data(db:db_dependency):
+    ware_house_db = db.query(models.ware_house_transporting).distinct().all()
+    return ware_house_db
+
+
+@app.get(
+    "/ware-house-data/{warehouse_id}",  # Corrected the path parameter name
+    response_model=wareHousetrasportingrate,
+    status_code=status.HTTP_200_OK,
+)
+async def warehouse_data(warehouse_id: int, db: db_dependency):
+    warehouse_data = db.query(models.ware_house_transporting).filter_by(ware_houes_id=warehouse_id).first()
+
+    if warehouse_data is None:
+        raise HTTPException(status_code=404, detail="Ware House not found")
+
+    response_data = {"ware_house_transporting_rate": warehouse_data.ware_house_transporting_rate}  # Corrected the field name
+    return response_data
+
+
+
+ 

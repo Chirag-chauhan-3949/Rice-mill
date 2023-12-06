@@ -348,3 +348,11 @@ class Rice_deposite(Base):
     old = Column(Integer)
     amount = Column(Integer)
     status = Column(String(50))
+
+
+class ware_house_transporting(Base):
+    __tablename__ = 'warehousetransporting'
+    
+    ware_houes_id = Column(Integer, primary_key=True, index=True)
+    ware_houes_name = Column(String(50))
+    ware_house_transporting_rate = Column(Integer)
