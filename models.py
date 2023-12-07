@@ -329,7 +329,7 @@ class Rice_deposite(Base):
     rst_number = Column(Integer)
     date = Column(DATE)
     lot_number = Column(Integer)
-    ware_house = Column(String(50))
+    ware_house = Column(Integer)
     rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
     weight = Column(Integer)
     truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))

@@ -285,7 +285,7 @@ class RiceDepositeBase(BaseModel):
     rst_number: int
     date: date
     lot_number: int
-    ware_house: str
+    ware_house: int
     rice_mill_name_id: int
     weight: int
     truck_number_id: int
@@ -346,10 +346,19 @@ class RiceRstSocietyDoTruckTransporter(BaseModel):
     transporter_data: List[TransporterBase]
 
 
+class WareHouseTransporting(BaseModel):
+    ware_houes_name: str
+    ware_house_transporting_rate: int
+    ware_houes_id: Optional[int] = None
+
+class wareHousetrasportingrate(BaseModel):
+    ware_house_transporting_rate: int
+
 class RiceDepostiRiceTruckTransport(BaseModel):
     rice_mill_data: List[AddRiceMillBase]
     truck_data: List[TruckBase]
     transporter_data: List[TransporterBase]
+    ware_house_data: List[WareHouseTransporting]
 
 
 class RiceMillRstNumber(BaseModel):
@@ -360,13 +369,6 @@ class RiceMillRstNumber(BaseModel):
 class SocietyDistanceRate(BaseModel):
     transporting_rate: int
 
-class WareHouseTransporting(BaseModel):
-    ware_houes_name: str
-    ware_house_transporting_rate: int
-    ware_houes_id: Optional[int] = None
-
-class wareHousetrasportingrate(BaseModel):
-    ware_house_transporting_rate: int
 
 def get_db():
     db = sessionlocal()
@@ -381,7 +383,7 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 # Rice Deposti
 @app.get(
-    "/rice-truck-transporter/",
+    "/rice-truck-transporter-ware-house/",
     response_model=RiceDepostiRiceTruckTransport,
     status_code=status.HTTP_200_OK,
 )
@@ -389,6 +391,8 @@ async def rice_deposit_data(db: db_dependency):
     rice_mill_data = db.query(models.Add_Rice_Mill).all()
     truck_data = db.query(models.Truck).all()
     transporter_data = db.query(models.Transporter).all()
+    ware_house_data = db.query(models.ware_house_transporting).all()
+
 
     rice_deposit_data = {
         "rice_mill_data": [AddRiceMillBase(**row.__dict__) for row in rice_mill_data],
@@ -396,6 +400,7 @@ async def rice_deposit_data(db: db_dependency):
         "transporter_data": [
             TransporterBase(**row.__dict__) for row in transporter_data
         ],
+        "ware_house_data":[WareHouseTransporting(**row.__dict__) for row in ware_house_data]
     }
     return rice_deposit_data
 
