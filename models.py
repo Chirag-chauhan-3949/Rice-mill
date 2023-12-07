@@ -11,7 +11,7 @@ from sqlalchemy import (
     DATE,
 )
 from database import Base
-
+from sqlalchemy.orm import relationship
 
 class Add_Rice_Mill(Base):
     __tablename__ = "addricemill"
@@ -329,7 +329,7 @@ class Rice_deposite(Base):
     rst_number = Column(Integer)
     date = Column(DATE)
     lot_number = Column(Integer)
-    ware_house = Column(Integer)
+    ware_house_id = Column(Integer)
     rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
     weight = Column(Integer)
     truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
@@ -339,9 +339,10 @@ class Rice_deposite(Base):
     transporting_type = Column(String(50))
     transporting_status = Column(String(50))
     rate = Column(Integer)
+    hamali = Column(Integer)
     variety = Column(String(50))
     halting = Column(Integer)
-    rrga_wt = Column(Integer)
+    variety_weight = Column(Integer)
     data_2022_23 = Column(Integer)
     data_2021_22 = Column(Integer)
     pds = Column(Integer)

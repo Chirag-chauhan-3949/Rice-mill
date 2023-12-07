@@ -126,6 +126,7 @@ class DhanAwakBase(BaseModel):
     dhan_awak_id: Optional[int] = None
 
 
+
 class DoPandingBase(BaseModel):
     do_number_id: int
     date: date
@@ -285,7 +286,7 @@ class RiceDepositeBase(BaseModel):
     rst_number: int
     date: date
     lot_number: int
-    ware_house: int
+    ware_house_id: int
     rice_mill_name_id: int
     weight: int
     truck_number_id: int
@@ -295,9 +296,10 @@ class RiceDepositeBase(BaseModel):
     transporting_type: str
     transporting_status: str
     rate: int
+    hamali: int
     variety: str
     halting: int
-    rrga_wt: int
+    variety_weight: int
     data_2022_23: int
     data_2021_22: int
     pds: int
@@ -430,6 +432,8 @@ async def dhan_transporting_data(db: db_dependency):
         ],
     }
     return dhan_transporting_data
+
+
 
 # Society
 # @app.get(

@@ -35,3 +35,8 @@ async def get_all_ware_house_data(ware_house:int, db:db_dependency):
     responce_data = {"transporting_rate": ware_house_data.ware_house_transporting_rate}
     return responce_data
     
+
+
+
+
+
