@@ -357,3 +357,4 @@ class ware_house_transporting(Base):
     ware_houes_id = Column(Integer, primary_key=True, index=True)
     ware_houes_name = Column(String(50))
     ware_house_transporting_rate = Column(Integer)
+    hamalirate = Column(Integer)

@@ -351,10 +351,15 @@ class RiceRstSocietyDoTruckTransporter(BaseModel):
 class WareHouseTransporting(BaseModel):
     ware_houes_name: str
     ware_house_transporting_rate: int
+    hamalirate: int
     ware_houes_id: Optional[int] = None
+
+# class wareHousetrasportingrate(BaseModel):
+#     ware_house_transporting_rate: int
 
 class wareHousetrasportingrate(BaseModel):
     ware_house_transporting_rate: int
+    hamalirate: int
 
 class RiceDepostiRiceTruckTransport(BaseModel):
     rice_mill_data: List[AddRiceMillBase]
@@ -1060,7 +1065,7 @@ async def warehouse_data(warehouse_id: int, db: db_dependency):
     if warehouse_data is None:
         raise HTTPException(status_code=404, detail="Ware House not found")
 
-    response_data = {"ware_house_transporting_rate": warehouse_data.ware_house_transporting_rate}  # Corrected the field name
+    response_data = {"ware_house_transporting_rate": warehouse_data.ware_house_transporting_rate,"hamalirate": warehouse_data.hamalirate,}  # 
     return response_data
 
 
