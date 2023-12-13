@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import Annotated, List, Optional
 import models
 from database import engine, sessionlocal
-from sqlalchemy.orm import Session,joinedload, relationship
+from sqlalchemy.orm import Session, joinedload, relationship
 from datetime import date
 
 
@@ -13,13 +13,14 @@ models.Base.metadata.create_all(bind=engine)
 
 # CORS (Cross-Origin Resource Sharing) middleware configuration
 origins = [
-    "http://localhost:5173",
-    "http://localhost:5174",  # Update this with the origin of your React app
+    # "http://localhost:5173",
+    # "http://localhost:5174",  # Update this with the origin of your React app
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    # allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -126,8 +127,8 @@ class DhanAwakBase(BaseModel):
     dhan_awak_id: Optional[int] = None
 
 
-
 class DoPandingBase(BaseModel):
+    rice_mill_id: int
     do_number_id: int
     date: date
     mota: str
@@ -182,11 +183,11 @@ class FrkBase(BaseModel):
     frk_id: Optional[int] = None
 
 
-class DhanRiceSocietiesRateBase(BaseModel):
-    society_name_id: int
-    distance: float
-    new: int
-    dhan_rice_societies_rate_id: Optional[int] = None
+# class DhanRiceSocietiesRateBase(BaseModel):
+#     society_name_id: int
+#     distance: float
+#     new: int
+#     dhan_rice_societies_rate_id: Optional[int] = None
 
 
 class LotNumberMasterBase(BaseModel):
@@ -194,12 +195,12 @@ class LotNumberMasterBase(BaseModel):
     lot_number: int
     lot_number_master_id: Optional[int] = None
 
+
 class KochiaBase(BaseModel):
     rice_mill_name_id: int
     kochia_name: str
     kochia_phone_number: int
     kochia_id: Optional[int] = None
-
 
 
 class DalaliDhaanBase(BaseModel):
@@ -280,8 +281,6 @@ class TransporterMasterBase(BaseModel):
     transporter_master_id: Optional[int] = None
 
 
-
-
 class RiceDepositeBase(BaseModel):
     rst_number: int
     date: date
@@ -307,6 +306,134 @@ class RiceDepositeBase(BaseModel):
     amount: int
     status: str
     rice_depostie_id: Optional[int] = None
+
+
+class partyBase(BaseModel):
+    party_name: str
+    party_id: Optional[int] = None
+
+
+class brokenBase(BaseModel):
+    broker_name: str
+    broker_id: Optional[int] = None
+
+
+class BrokenJawak(BaseModel):
+    rst_number: int
+    date: date
+    party: str
+    rice_mill_name_id: int
+    broker: str
+    brokerage_percentage: float
+    weight: float
+    rate: int
+    number_of_bags: int
+    truck_number: int
+    total: int
+    brokerage: float
+    net_recievable: float
+    loading_date: date
+    recieved_date: date
+    payment_recieved: int
+    payment_difference: int
+    remarks: str
+    broken_jawak_id: Optional[int] = None
+
+
+class NakkhiJawakBase(BaseModel):
+    rst_number: int
+    date: date
+    party: str
+    rice_mill_name_id: int
+    broker: str
+    weight: float
+    rate: int
+    number_of_bags: int
+    truck_number: int
+    brokerage: float
+    total: int
+    CD_1_percent: float
+    net_recievable: float
+    payment_recieved: int
+    remarks: str
+    nakkhi_jawak_id: Optional[int] = None
+
+
+class BranJawakBase(BaseModel):
+    rst_number: int
+    date: date
+    party: str
+    rice_mill_name_id: int
+    broker: str
+    brokerage_percentage: float
+    weight: float
+    rate: int
+    number_of_bags: int
+    truck_number: int
+    total: int
+    brokerage: float
+    net_recievable: float
+    payment_recieved: int
+    difference: int
+    remarks: str
+    bran_jawak_id: Optional[int] = None
+
+
+class HuskJawakBase(BaseModel):
+    rst_number: int
+    date: date
+    party: str
+    rice_mill_name_id: int
+    remarks: str
+    broker: str
+    brokerage_percentage: float
+    weight: float
+    rate: int
+    number_of_bags: int
+    truck_number: int
+    total: int
+    brokerage: float
+    net_recievable: float
+    payment_recieved: int
+    husk_jawak_id: Optional[int] = None
+
+
+class BhushiBase(BaseModel):
+    rst_number: int
+    date: date
+    party: str
+    number_of_bags: int
+    weight: float
+    truck_number: int
+    rate: int
+    amount: int
+    bhushi_id: Optional[int] = None
+
+
+class OtherAwakBase(BaseModel):
+    rst_number: int
+    date: date
+    party: str
+    truck_number: int
+    material: str
+    nos: int
+    reason: str
+    weight: float
+    rice_mill_name_id: int
+    other_awak_id: Optional[int] = None
+
+
+class OtherJawakBase(BaseModel):
+    rst_number: int
+    date: date
+    party: str
+    truck_number: int
+    material: str
+    nos: int
+    reason: str
+    weight: float
+    rice_mill_name_id: int
+    other_jawak_id: Optional[int] = None
 
 
 class RiceMillData(BaseModel):
@@ -354,12 +481,15 @@ class WareHouseTransporting(BaseModel):
     hamalirate: int
     ware_houes_id: Optional[int] = None
 
+
 # class wareHousetrasportingrate(BaseModel):
 #     ware_house_transporting_rate: int
+
 
 class wareHousetrasportingrate(BaseModel):
     ware_house_transporting_rate: int
     hamalirate: int
+
 
 class RiceDepostiRiceTruckTransport(BaseModel):
     rice_mill_data: List[AddRiceMillBase]
@@ -372,6 +502,7 @@ class RiceMillRstNumber(BaseModel):
     rice_mill_data: List[AddRiceMillBase]
     do_number_data: List[AdddoBase]
     rst_data: List[DhanAwakBase]
+
 
 class SocietyDistanceRate(BaseModel):
     transporting_rate: int
@@ -400,14 +531,15 @@ async def rice_deposit_data(db: db_dependency):
     transporter_data = db.query(models.Transporter).all()
     ware_house_data = db.query(models.ware_house_transporting).all()
 
-
     rice_deposit_data = {
         "rice_mill_data": [AddRiceMillBase(**row.__dict__) for row in rice_mill_data],
         "truck_data": [TruckBase(**row.__dict__) for row in truck_data],
         "transporter_data": [
             TransporterBase(**row.__dict__) for row in transporter_data
         ],
-        "ware_house_data":[WareHouseTransporting(**row.__dict__) for row in ware_house_data]
+        "ware_house_data": [
+            WareHouseTransporting(**row.__dict__) for row in ware_house_data
+        ],
     }
     return rice_deposit_data
 
@@ -439,7 +571,6 @@ async def dhan_transporting_data(db: db_dependency):
     return dhan_transporting_data
 
 
-
 # Society
 # @app.get(
 #     "/society-data/{society_id}",
@@ -452,6 +583,7 @@ async def dhan_transporting_data(db: db_dependency):
 #         "society_data": [SocietyBase(**row.__dict__) for row in society_data],
 #     }
 #     return society_db
+
 
 @app.get(
     "/society-data/{society_id}",
@@ -466,7 +598,6 @@ async def society_data(society_id: int, db: db_dependency):
 
     response_data = {"transporting_rate": society_data.transporting_rate}
     return response_data
-
 
 
 # Dhan Awak
@@ -700,28 +831,26 @@ async def frk_data(db: db_dependency):
     db_frk_data = db.query(models.Frk).distinct().all()
     return db_frk_data
 
+    # Dhan rice societies rate
+    # @app.post("/dhan-rice-societies-rate/", status_code=status.HTTP_201_CREATED)
+    # async def dhan_rice_societies_rate(
+    #     dhansocietiesrate: DhanRiceSocietiesRateBase, db: db_dependency
+    # ):
+    #     db_dhan_rice_societies_rate = models.Dhan_rice_societies_rate(
+    #         **dhansocietiesrate.dict()
+    #     )
+    #     db.add(db_dhan_rice_societies_rate)
+    #     db.commit()
 
-# Dhan rice societies rate
-@app.post("/dhan-rice-societies-rate/", status_code=status.HTTP_201_CREATED)
-async def dhan_rice_societies_rate(
-    dhansocietiesrate: DhanRiceSocietiesRateBase, db: db_dependency
-):
-    db_dhan_rice_societies_rate = models.Dhan_rice_societies_rate(
-        **dhansocietiesrate.dict()
-    )
-    db.add(db_dhan_rice_societies_rate)
-    db.commit()
-
-
-@app.get(
-    "/dhan-rice-societies-rate-data/",
-    response_model=List[DhanRiceSocietiesRateBase],
-    status_code=status.HTTP_200_OK,
-)
-async def dhan_rice_societies_rate_data(db: db_dependency):
-    db_dhan_rice_societies_rate = (
-        db.query(models.Dhan_rice_societies_rate).distinct().all()
-    )
+    # @app.get(
+    #     "/dhan-rice-societies-rate-data/",
+    #     response_model=List[DhanRiceSocietiesRateBase],
+    #     status_code=status.HTTP_200_OK,
+    # )
+    # async def dhan_rice_societies_rate_data(db: db_dependency):
+    #     db_dhan_rice_societies_rate = (
+    #         db.query(models.Dhan_rice_societies_rate).distinct().all()
+    #     )
     return db_dhan_rice_societies_rate
 
 
@@ -1023,8 +1152,6 @@ async def get_dhan_awak(db: db_dependency):
     return db_dhan_awak_data
 
 
-
-
 # Add Do
 @app.post("/add-do/", status_code=status.HTTP_201_CREATED)
 async def add_do(adddo: AdddoBase, db: db_dependency):
@@ -1043,13 +1170,18 @@ async def get_all_add_do_data(db: db_dependency):
 
 # Whare House
 @app.post("/ware-house-transporting/", status_code=status.HTTP_201_CREATED)
-async def add_whare_house(warehouse:WareHouseTransporting, db: db_dependency):
+async def add_whare_house(warehouse: WareHouseTransporting, db: db_dependency):
     db_add_ware_house = models.ware_house_transporting(**warehouse.dict())
     db.add(db_add_ware_house)
     db.commit()
 
-@app.get("/get-ware-house-data/",response_model=List[WareHouseTransporting],status_code=status.HTTP_200_OK)
-async def get_all_ware_house_data(db:db_dependency):
+
+@app.get(
+    "/get-ware-house-data/",
+    response_model=List[WareHouseTransporting],
+    status_code=status.HTTP_200_OK,
+)
+async def get_all_ware_house_data(db: db_dependency):
     ware_house_db = db.query(models.ware_house_transporting).distinct().all()
     return ware_house_db
 
@@ -1060,14 +1192,109 @@ async def get_all_ware_house_data(db:db_dependency):
     status_code=status.HTTP_200_OK,
 )
 async def warehouse_data(warehouse_id: int, db: db_dependency):
-    warehouse_data = db.query(models.ware_house_transporting).filter_by(ware_houes_id=warehouse_id).first()
+    warehouse_data = (
+        db.query(models.ware_house_transporting)
+        .filter_by(ware_houes_id=warehouse_id)
+        .first()
+    )
 
     if warehouse_data is None:
         raise HTTPException(status_code=404, detail="Ware House not found")
 
-    response_data = {"ware_house_transporting_rate": warehouse_data.ware_house_transporting_rate,"hamalirate": warehouse_data.hamalirate,}  # 
+    response_data = {
+        "ware_house_transporting_rate": warehouse_data.ware_house_transporting_rate,
+        "hamalirate": warehouse_data.hamalirate,
+    }  #
     return response_data
 
 
+# Party
+@app.post("/party/", status_code=status.HTTP_201_CREATED)
+async def add_party(party: partyBase, db: db_dependency):
+    db_add_party = models.party(**party.dict())
+    db.add(db_add_party)
+    db.commit()
 
- 
+
+@app.get(
+    "/party-data/",
+    response_model=List[partyBase],
+    status_code=status.HTTP_200_OK,
+)
+async def get_party_data(db: db_dependency):
+    db_party_data = db.query(models.party).distinct().all()
+    return db_party_data
+
+
+# broker
+@app.post("/broker/", status_code=status.HTTP_201_CREATED)
+async def add_broker(broker: brokenBase, db: db_dependency):
+    db_add_broker = models.brokers(**broker.dict())
+    db.add(db_add_broker)
+    db.commit()
+
+
+@app.get(
+    "/broker-data/",
+    response_model=List[brokenBase],
+    status_code=status.HTTP_200_OK,
+)
+async def get_broker_data(db: db_dependency):
+    db_broker_data = db.query(models.brokers).distinct().all()
+    return db_broker_data
+
+
+# Broken Jawak
+@app.post("/broken-jawak/", status_code=status.HTTP_201_CREATED)
+async def add_broken_jawak(brokenjawak: BrokenJawak, db: db_dependency):
+    db_add_broken_jawak = models.broken_jawak(**brokenjawak.dict())
+    db.add(db_add_broken_jawak)
+    db.commit()
+
+
+# nakkhi_jawak
+@app.post("/nakkhi-jawak/", status_code=status.HTTP_201_CREATED)
+async def add_nakkhi_jawak(nakkhijawak: NakkhiJawakBase, db: db_dependency):
+    db_add_nakkhi_jawak = models.nakkhi_jawak(**nakkhijawak.dict())
+    db.add(db_add_nakkhi_jawak)
+    db.commit()
+
+
+# bran jawak
+@app.post("/bran-jawak/", status_code=status.HTTP_201_CREATED)
+async def add_bran_jawak(branjawak: BranJawakBase, db: db_dependency):
+    db_add_bran_jawak = models.bran_jawak(**branjawak.dict())
+    db.add(db_add_bran_jawak)
+    db.commit()
+
+
+# Husk Jawak
+@app.post("/husk-jawak/", status_code=status.HTTP_201_CREATED)
+async def add_husk_jawak(huskjawak: HuskJawakBase, db: db_dependency):
+    db_add_husk_jawak = models.husk_jawak(**huskjawak.dict())
+    db.add(db_add_husk_jawak)
+    db.commit()
+
+
+# Bhushi
+@app.post("/bhushi/", status_code=status.HTTP_201_CREATED)
+async def add_bhushi(bhushi: BhushiBase, db: db_dependency):
+    db_add_bhushi = models.bhushi(**bhushi.dict())
+    db.add(db_add_bhushi)
+    db.commit()
+
+
+# Other Awak
+@app.post("/other-awak/", status_code=status.HTTP_201_CREATED)
+async def add_other_awak(otherawak: OtherAwakBase, db: db_dependency):
+    db_add_other_awak = models.other_awak(**otherawak.dict())
+    db.add(db_add_other_awak)
+    db.commit()
+
+
+# Other Jawak
+@app.post("/other-jawak/", status_code=status.HTTP_201_CREATED)
+async def add_other_jawak(otherjawak: OtherJawakBase, db: db_dependency):
+    db_add_other_jawak = models.other_jawak(**otherjawak.dict())
+    db.add(db_add_other_jawak)
+    db.commit()
