@@ -321,9 +321,9 @@ class brokenBase(BaseModel):
 class BrokenJawak(BaseModel):
     rst_number: int
     date: date
-    party: str
+    party: int
     rice_mill_name_id: int
-    broker: str
+    broker: int
     brokerage_percentage: float
     weight: float
     rate: int
@@ -335,6 +335,7 @@ class BrokenJawak(BaseModel):
     loading_date: date
     recieved_date: date
     payment_recieved: int
+    number_of_days: int
     payment_difference: int
     remarks: str
     broken_jawak_id: Optional[int] = None
@@ -508,6 +509,13 @@ class SocietyDistanceRate(BaseModel):
     transporting_rate: int
 
 
+class RiceMillTruckNumberPartyBrokers(BaseModel):
+    rice_mill_data: List[AddRiceMillBase]
+    truck_data: List[TruckBase]
+    party_data: List[partyBase]
+    brokers_data: List[brokenBase]
+
+
 def get_db():
     db = sessionlocal()
     try:
@@ -517,6 +525,27 @@ def get_db():
 
 
 db_dependency = Annotated[Session, Depends(get_db)]
+
+
+# Broken jawak
+@app.get(
+    "/rice-truck-party-brokers/",
+    response_model=RiceMillTruckNumberPartyBrokers,
+    status_code=status.HTTP_200_OK,
+)
+async def broken_data(db: db_dependency):
+    rice_mill_data = db.query(models.Add_Rice_Mill).all()
+    truck_data = db.query(models.Truck).all()
+    party_data = db.query(models.party).all()
+    brokers_data = db.query(models.brokers).all()
+
+    broken_data = {
+        "rice_mill_data": [AddRiceMillBase(**row.__dict__) for row in rice_mill_data],
+        "truck_data": [TruckBase(**row.__dict__) for row in truck_data],
+        "party_data": [partyBase(**row.__dict__) for row in party_data],
+        "brokers_data": [brokenBase(**row.__dict__) for row in brokers_data],
+    }
+    return broken_data
 
 
 # Rice Deposti
