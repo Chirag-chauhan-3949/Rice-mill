@@ -49,3 +49,11 @@
 #     )
 #     db.add(create_truck_model)
 #     db.commit()
+
+
+def lot_number(x, y):
+    for i in range(x, y):
+        print(i)
+
+
+lot_number(250, 300)
