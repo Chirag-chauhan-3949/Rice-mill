@@ -87,6 +87,22 @@ class Kochia(Base):
     kochia_phone_number = Column(Integer)
 
 
+class party(Base):
+    __tablename__ = "party"
+
+    party_id = Column(Integer, primary_key=True, index=True)
+    party_name = Column(String(50))
+    party_phone_number = Column(Integer)
+
+
+class brokers(Base):
+    __tablename__ = "brokers"
+
+    broker_id = Column(Integer, primary_key=True, index=True)
+    broker_name = Column(String(50))
+    broker_phone_number = Column(Integer)
+
+
 class Add_Do(Base):
     __tablename__ = "addDo"
 
@@ -144,6 +160,22 @@ class Dhan_Awak(Base):
     created_at = Column(DateTime, default=func.now())
 
 
+class other_awak(Base):
+    __tablename__ = "otherawak"
+
+    other_awak_id = Column(Integer, primary_key=True, index=True)
+    rst_number = Column(Integer)
+    date = Column(DATE)
+    party = Column(Integer, ForeignKey("party.party_id"))
+    truck_number = Column(Integer, ForeignKey("trucks.truck_id"))
+    material = Column(String(50))
+    nos = Column(Integer)
+    reason = Column(String(50))
+    weight = Column(Float)
+    rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    created_at = Column(DateTime, default=func.now())
+
+
 class Rice_deposite(Base):
     __tablename__ = "ricedeposite"
 
@@ -191,16 +223,16 @@ class Dalali_dhaan(Base):
     rb_gold_weight = Column(Integer)
     sarna_bags = Column(Integer)
     sarna_weight = Column(Integer)
-    sambha_new_bag = Column(Integer)
+    sambha_new_bags = Column(Integer)
     sambha_new_weight = Column(Integer)
     paddy_type = Column(String(50))
     total_bags = Column(Integer)
     total_weight = Column(Integer)
     hamali = Column(Integer)
-    weight_less_plastic = Column(Integer)
-    weight_less_jute = Column(Integer)
-    weight_less_kata_difference = Column(Integer)
-    net_weight = Column(Integer)
+    plastic_bag = Column(Integer)
+    jute_bag = Column(Integer)
+    weight_less_kata_difference = Column(Float)
+    net_weight = Column(Float)
     rate = Column(Integer)
     ammount = Column(Float)
     created_at = Column(DateTime, default=func.now())
@@ -248,6 +280,161 @@ class Do_panding(Base):
     patla = Column(VARCHAR(50))
     sarna = Column(VARCHAR(50))
     Total = Column(Integer)
+    created_at = Column(DateTime, default=func.now())
+
+
+class Dhan_transporting(Base):
+    __tablename__ = "dhantransporting"
+
+    Dhan_transporting_id = Column(Integer, primary_key=True, index=True)
+    rst_number_id = Column(Integer, ForeignKey("dhanawak.dhan_awak_id"))
+    date = Column(DATE)
+    do_number_id = Column(Integer, ForeignKey("addDo.do_id"))
+    society_name_id = Column(Integer, ForeignKey("society.society_id"))
+    rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    dm_weight = Column(Integer)
+    truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
+    transporting_rate = Column(Integer)
+    numbers_of_bags = Column(Integer)
+    transporting_total = Column(Integer)
+    transporter_name_id = Column(Integer, ForeignKey("transporter.transporter_id"))
+    status = Column(String(50))
+    total_pending = Column(Integer)
+    total_paid = Column(Integer)
+    created_at = Column(DateTime, default=func.now())
+
+
+class other_jawak(Base):
+    __tablename__ = "other_jawak"
+
+    other_jawak_id = Column(Integer, primary_key=True, index=True)
+    rst_number = Column(Integer)
+    date = Column(DATE)
+    party = Column(Integer, ForeignKey("party.party_id"))
+    truck_number = Column(Integer, ForeignKey("trucks.truck_id"))
+    material = Column(String(50))
+    nos = Column(Integer)
+    reason = Column(String(50))
+    weight = Column(Float)
+    rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    created_at = Column(DateTime, default=func.now())
+
+
+class broken_jawak(Base):
+    __tablename__ = "brokenjawak"
+
+    broken_jawak_id = Column(Integer, primary_key=True, index=True)
+    rst_number = Column(Integer)
+    date = Column(DATE)
+    party = Column(Integer, ForeignKey("party.party_id"))
+    rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    broker = Column(Integer, ForeignKey("brokers.broker_id"))
+    brokerage_percentage = Column(Float)
+    weight = Column(Float)
+    rate = Column(Integer)
+    number_of_bags = Column(Integer)
+    truck_number = Column(Integer, ForeignKey("trucks.truck_id"))
+    total = Column(Integer)
+    brokerage = Column(Float)
+    net_recievable = Column(Float)
+    loading_date = Column(DATE)
+    recieved_date = Column(DATE)
+    payment_recieved = Column(Integer)
+    number_of_days = Column(Integer)
+    payment_difference = Column(Float)
+    remarks = Column(String(100))
+    created_at = Column(DateTime, default=func.now())
+
+
+class husk_jawak(Base):
+    __tablename__ = "huskjawak"
+
+    husk_jawak_id = Column(Integer, primary_key=True, index=True)
+    rst_number = Column(Integer)
+    date = Column(DATE)
+    party = Column(Integer, ForeignKey("party.party_id"))
+    rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    remarks = Column(String(100))
+    broker = Column(Integer, ForeignKey("brokers.broker_id"))
+    brokerage_percentage = Column(Float)
+    weight = Column(Float)
+    rate = Column(Integer)
+    number_of_bags = Column(Integer)
+    truck_number = Column(Integer, ForeignKey("trucks.truck_id"))
+    total = Column(Integer)
+    brokerage = Column(Float)
+    net_receivable = Column(Float)
+    received_date = Column(DATE)
+    loading_date = Column(DATE)
+    payment_received = Column(Integer)
+    number_of_days = Column(Integer)
+    payment_difference = Column(Float)
+    created_at = Column(DateTime, default=func.now())
+
+
+class nakkhi_jawak(Base):
+    __tablename__ = "nakkhijawak"
+
+    nakkhi_jawak_id = Column(Integer, primary_key=True, index=True)
+    rst_number = Column(Integer)
+    date = Column(DATE)
+    party = Column(Integer, ForeignKey("party.party_id"))
+    rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    broker = Column(Integer, ForeignKey("brokers.broker_id"))
+    brokerage_percent = Column(Integer)
+    weight = Column(Float)
+    rate = Column(Integer)
+    number_of_bags = Column(Integer)
+    truck_number = Column(Integer, ForeignKey("trucks.truck_id"))
+    brokerage = Column(Float)
+    total = Column(Integer)
+    net_recievable = Column(Float)
+    loading_date = Column(DATE)
+    recieved_date = Column(DATE)
+    payment_recieved = Column(Integer)
+    number_of_days = Column(Integer)
+    payment_difference = Column(Integer)
+    remarks = Column(String(100))
+    created_at = Column(DateTime, default=func.now())
+
+
+class bran_jawak(Base):
+    __tablename__ = "branjawak"
+
+    bran_jawak_id = Column(Integer, primary_key=True, index=True)
+    rst_number = Column(Integer)
+    date = Column(DATE)
+    party = Column(Integer, ForeignKey("party.party_id"))
+    rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    broker = Column(Integer, ForeignKey("brokers.broker_id"))
+    brokerage_percentage = Column(Float)
+    weight = Column(Float)
+    rate = Column(Integer)
+    number_of_bags = Column(Integer)
+    truck_number = Column(Integer, ForeignKey("trucks.truck_id"))
+    total = Column(Integer)
+    brokerage = Column(Float)
+    net_receivable = Column(Float)
+    payment_received = Column(Integer)
+    payment_difference = Column(Integer)
+    remarks = Column(String(100))
+    oil = Column(Integer)
+    created_at = Column(DateTime, default=func.now())
+
+
+class bhushi(Base):
+    __tablename__ = "bhushi"
+
+    bhushi_id = Column(Integer, primary_key=True, index=True)
+    rst_number = Column(Integer)
+    date = Column(DATE)
+    party = Column(Integer, ForeignKey("party.party_id"))
+    rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    number_of_bags = Column(Integer)
+    weight = Column(Float)
+    truck_number = Column(Integer, ForeignKey("trucks.truck_id"))
+    rate = Column(Integer)
+    amount = Column(Integer)
     created_at = Column(DateTime, default=func.now())
 
 
@@ -327,27 +514,6 @@ class Do_panding(Base):
 #     created_at = Column(DateTime, default=func.now())
 
 
-# class Dhan_transporting(Base):
-#     __tablename__ = "dhantransporting"
-
-#     Dhan_transporting_id = Column(Integer, primary_key=True, index=True)
-#     rst_number_id = Column(Integer, ForeignKey("dhanawak.dhan_awak_id"))
-#     date = Column(DATE)
-#     do_number_id = Column(Integer, ForeignKey("addDo.do_id"))
-#     society_name_id = Column(Integer, ForeignKey("society.society_id"))
-#     rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
-#     dm_weight = Column(Integer)
-#     truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
-#     transporting_rate = Column(Integer)
-#     numbers_of_bags = Column(Integer)
-#     transporting_total = Column(Integer)
-#     transporter_name_id = Column(Integer, ForeignKey("transporter.transporter_id"))
-#     status = Column(String(50))
-#     total_pending = Column(Integer)
-#     total_paid = Column(Integer)
-#     created_at = Column(DateTime, default=func.now())
-
-
 # class Transporter_master(Base):
 #     __tablename__ = "transportermaster"
 
@@ -358,168 +524,4 @@ class Do_panding(Base):
 #     date = Column(DATE)
 #     transporter_name_id = Column(Integer, ForeignKey("transporter.transporter_id"))
 #     advance_payment = Column(Integer)
-#     created_at = Column(DateTime, default=func.now())
-
-
-# class party(Base):
-#     __tablename__ = "party"
-
-#     party_id = Column(Integer, primary_key=True, index=True)
-#     party_name = Column(String(50))
-
-
-# class brokers(Base):
-#     __tablename__ = "brokers"
-
-#     broker_id = Column(Integer, primary_key=True, index=True)
-#     broker_name = Column(String(50))
-
-
-# class broken_jawak(Base):
-#     __tablename__ = "brokenjawak"
-
-#     broken_jawak_id = Column(Integer, primary_key=True, index=True)
-#     rst_number = Column(Integer)
-#     date = Column(DATE)
-#     party = Column(Integer, ForeignKey("party.party_id"))
-#     rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
-#     broker = Column(Integer, ForeignKey("brokers.broker_id"))
-#     brokerage_percentage = Column(Float)
-#     weight = Column(Float)
-#     rate = Column(Integer)
-#     number_of_bags = Column(Integer)
-#     truck_number = Column(Integer, ForeignKey("trucks.truck_id"))
-#     total = Column(Integer)
-#     brokerage = Column(Float)
-#     net_recievable = Column(Float)
-#     loading_date = Column(DATE)
-#     recieved_date = Column(DATE)
-#     payment_recieved = Column(Integer)
-#     number_of_days = Column(Integer)
-#     payment_difference = Column(Integer)
-#     remarks = Column(String(100))
-#     created_at = Column(DateTime, default=func.now())
-
-
-# class nakkhi_jawak(Base):
-#     __tablename__ = "nakkhijawak"
-
-#     nakkhi_jawak_id = Column(Integer, primary_key=True, index=True)
-#     rst_number = Column(Integer)
-#     date = Column(DATE)
-#     party = Column(Integer, ForeignKey("party.party_id"))
-#     rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
-#     broker = Column(Integer, ForeignKey("brokers.broker_id"))
-#     brokerage_percent = Column(Integer)
-#     weight = Column(Float)
-#     rate = Column(Integer)
-#     number_of_bags = Column(Integer)
-#     truck_number = Column(Integer, ForeignKey("trucks.truck_id"))
-#     brokerage = Column(Float)
-#     total = Column(Integer)
-#     net_recievable = Column(Float)
-#     loading_date = Column(DATE)
-#     recieved_date = Column(DATE)
-#     payment_recieved = Column(Integer)
-#     number_of_days = Column(Integer)
-#     payment_difference = Column(Integer)
-#     remarks = Column(String(100))
-#     created_at = Column(DateTime, default=func.now())
-
-
-# class bran_jawak(Base):
-#     __tablename__ = "branjawak"
-
-#     bran_jawak_id = Column(Integer, primary_key=True, index=True)
-#     rst_number = Column(Integer)
-#     date = Column(DATE)
-#     party = Column(Integer, ForeignKey("party.party_id"))
-#     rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
-#     broker = Column(Integer, ForeignKey("brokers.broker_id"))
-#     brokerage_percentage = Column(Float)
-#     weight = Column(Float)
-#     rate = Column(Integer)
-#     number_of_bags = Column(Integer)
-#     truck_number = Column(Integer, ForeignKey("trucks.truck_id"))
-#     total = Column(Integer)
-#     brokerage = Column(Float)
-#     net_receivable = Column(Float)
-#     payment_received = Column(Integer)
-#     payment_difference = Column(Integer)
-#     remarks = Column(String(100))
-#     oil = Column(Integer)
-#     created_at = Column(DateTime, default=func.now())
-
-
-# class husk_jawak(Base):
-#     __tablename__ = "huskjawak"
-
-#     husk_jawak_id = Column(Integer, primary_key=True, index=True)
-#     rst_number = Column(Integer)
-#     date = Column(DATE)
-#     party = Column(Integer, ForeignKey("party.party_id"))
-#     rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
-#     remarks = Column(String(100))
-#     broker = Column(Integer, ForeignKey("brokers.broker_id"))
-#     brokerage_percentage = Column(Float)
-#     weight = Column(Float)
-#     rate = Column(Integer)
-#     number_of_bags = Column(Integer)
-#     truck_number = Column(Integer, ForeignKey("trucks.truck_id"))
-#     total = Column(Integer)
-#     brokerage = Column(Float)
-#     net_receivable = Column(Float)
-#     received_date = Column(DATE)
-#     loading_date = Column(DATE)
-#     payment_received = Column(Integer)
-#     number_of_days = Column(Integer)
-#     payment_difference = Column(Integer)
-#     created_at = Column(DateTime, default=func.now())
-
-
-# class bhushi(Base):
-#     __tablename__ = "bhushi"
-
-#     bhushi_id = Column(Integer, primary_key=True, index=True)
-#     rst_number = Column(Integer)
-#     date = Column(DATE)
-#     party = Column(Integer, ForeignKey("party.party_id"))
-#     rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
-#     number_of_bags = Column(Integer)
-#     weight = Column(Float)
-#     truck_number = Column(Integer, ForeignKey("trucks.truck_id"))
-#     rate = Column(Integer)
-#     amount = Column(Integer)
-#     created_at = Column(DateTime, default=func.now())
-
-
-# class other_awak(Base):
-#     __tablename__ = "otherawak"
-
-#     other_awak_id = Column(Integer, primary_key=True, index=True)
-#     rst_number = Column(Integer)
-#     date = Column(DATE)
-#     party = Column(Integer, ForeignKey("party.party_id"))
-#     truck_number = Column(Integer, ForeignKey("trucks.truck_id"))
-#     material = Column(String(50))
-#     nos = Column(Integer)
-#     reason = Column(String(50))
-#     weight = Column(Float)
-#     rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
-#     created_at = Column(DateTime, default=func.now())
-
-
-# class other_jawak(Base):
-#     __tablename__ = "other_jawak"
-
-#     other_jawak_id = Column(Integer, primary_key=True, index=True)
-#     rst_number = Column(Integer)
-#     date = Column(DATE)
-#     party = Column(Integer, ForeignKey("party.party_id"))
-#     truck_number = Column(Integer, ForeignKey("trucks.truck_id"))
-#     material = Column(String(50))
-#     nos = Column(Integer)
-#     reason = Column(String(50))
-#     weight = Column(Float)
-#     rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
 #     created_at = Column(DateTime, default=func.now())

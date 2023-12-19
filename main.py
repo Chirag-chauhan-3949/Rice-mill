@@ -88,6 +88,25 @@ class AddDoData(BaseModel):
     agreement_data: List[AgreementBase]
 
 
+class KochiaBase(BaseModel):
+    rice_mill_name_id: int
+    kochia_name: str
+    kochia_phone_number: int
+    kochia_id: Optional[int] = None
+
+
+class partyBase(BaseModel):
+    party_name: str
+    party_phone_number: int
+    party_id: Optional[int] = None
+
+
+class brokenBase(BaseModel):
+    broker_name: str
+    broker_phone_number: int
+    broker_id: Optional[int] = None
+
+
 class AdddoBase(BaseModel):
     select_mill_id: int
     date: date
@@ -104,13 +123,6 @@ class AdddoBase(BaseModel):
     society_name_id: int
     truck_number_id: int
     do_id: Optional[int] = None
-
-
-class KochiaBase(BaseModel):
-    rice_mill_name_id: int
-    kochia_name: str
-    kochia_phone_number: int
-    kochia_id: Optional[int] = None
 
 
 # ___________________________________________________________
@@ -163,6 +175,26 @@ class DhanAwakBase(BaseModel):
     hopper_rice_mill_id: int
     stack_location: str
     dhan_awak_id: Optional[int] = None
+
+
+class RiceMillTruckNumberPartyBrokers(BaseModel):
+    rice_mill_data: List[AddRiceMillBase]
+    truck_data: List[TruckBase]
+    party_data: List[partyBase]
+    brokers_data: List[brokenBase]
+
+
+class OtherAwakBase(BaseModel):
+    rst_number: int
+    date: date
+    rice_mill_name_id: int
+    party: int
+    truck_number: int
+    material: str
+    nos: int
+    reason: str
+    weight: float
+    other_awak_id: Optional[int] = None
 
 
 # ___________________________________________________________
@@ -221,16 +253,16 @@ class DalaliDhaanBase(BaseModel):
     rb_gold_weight: int
     sarna_bags: int
     sarna_weight: int
-    sambha_new_bag: int
+    sambha_new_bags: int
     sambha_new_weight: int
     paddy_type: str
     total_bags: int
     total_weight: int
     hamali: int
-    weight_less_plastic: int
-    weight_less_jute: int
-    weight_less_kata_difference: int
-    net_weight: int
+    plastic_bag: int
+    jute_bag: int
+    weight_less_kata_difference: float
+    net_weight: float
     rate: int
     ammount: float
     dalali_dhaan_id: Optional[int] = None
@@ -279,6 +311,154 @@ class DoPandingBase(BaseModel):
 
 
 # ___________________________________________________________
+class RiceRstSocietyDoTruckTransporter(BaseModel):
+    rice_mill_data: List[AddRiceMillBase]
+    rst_data: List[DhanAwakBase]
+    society_data: List[SocietyBase]
+    do_number_data: List[AdddoBase]
+    truck_data: List[TruckBase]
+    transporter_data: List[TransporterBase]
+
+
+class RiceMillRstNumber(BaseModel):
+    rice_mill_data: List[AddRiceMillBase]
+    do_number_data: List[AdddoBase]
+    rst_data: List[DhanAwakBase]
+
+
+class DhanTransportingBase(BaseModel):
+    rst_number_id: int
+    date: date
+    do_number_id: int
+    society_name_id: int
+    rice_mill_name_id: int
+    dm_weight: int
+    truck_number_id: int
+    transporting_rate: int
+    numbers_of_bags: int
+    transporting_total: int
+    transporter_name_id: int
+    status: str
+    total_pending: int
+    total_paid: int
+    Dhan_transporting_id: Optional[int] = None
+
+
+# ___________________________________________________________
+class OtherJawakBase(BaseModel):
+    rst_number: int
+    date: date
+    party: int
+    truck_number: int
+    material: str
+    nos: int
+    reason: str
+    weight: float
+    rice_mill_name_id: int
+    other_jawak_id: Optional[int] = None
+
+
+class BrokenJawak(BaseModel):
+    rst_number: int
+    date: date
+    party: int
+    rice_mill_name_id: int
+    broker: int
+    brokerage_percentage: float
+    weight: float
+    rate: int
+    number_of_bags: int
+    truck_number: int
+    total: int
+    brokerage: float
+    net_recievable: float
+    loading_date: date
+    recieved_date: date
+    payment_recieved: int
+    number_of_days: int
+    payment_difference: float
+    remarks: str
+    broken_jawak_id: Optional[int] = None
+
+
+class HuskJawakBase(BaseModel):
+    rst_number: int
+    date: date
+    party: int
+    rice_mill_name_id: int
+    remarks: str
+    broker: int
+    brokerage_percentage: float
+    weight: float
+    rate: int
+    number_of_bags: int
+    truck_number: int
+    total: int
+    brokerage: float
+    net_receivable: float
+    received_date: date
+    loading_date: date
+    payment_received: int
+    number_of_days: int
+    payment_difference: float
+    husk_jawak_id: Optional[int] = None
+
+
+class NakkhiJawakBase(BaseModel):
+    rst_number: int
+    date: date
+    party: int
+    rice_mill_name_id: int
+    broker: int
+    brokerage_percent: int
+    weight: float
+    rate: int
+    number_of_bags: int
+    truck_number: int
+    brokerage: float
+    total: int
+    net_recievable: float
+    loading_date: date
+    recieved_date: date
+    payment_recieved: int
+    number_of_days: int
+    payment_difference: int
+    remarks: str
+    nakkhi_jawak_id: Optional[int] = None
+
+
+class BranJawakBase(BaseModel):
+    rst_number: int
+    date: date
+    party: int
+    rice_mill_name_id: int
+    broker: int
+    brokerage_percentage: float
+    weight: float
+    rate: int
+    number_of_bags: int
+    truck_number: int
+    total: int
+    brokerage: float
+    net_receivable: float
+    payment_received: int
+    payment_difference: int
+    remarks: str
+    oil: int
+    bran_jawak_id: Optional[int] = None
+
+
+class BhushiBase(BaseModel):
+    rst_number: int
+    date: date
+    party: int
+    rice_mill_name_id: int
+    number_of_bags: int
+    weight: float
+    truck_number: int
+    rate: int
+    amount: int
+    bhushi_id: Optional[int] = None
 
 
 # class SocietyBase(BaseModel):
@@ -342,24 +522,6 @@ class DoPandingBase(BaseModel):
 #     mohan_food_paddy_id: Optional[int] = None
 
 
-# class DhanTransportingBase(BaseModel):
-#     rst_number_id: int
-#     date: date
-#     do_number_id: int
-#     society_name_id: int
-#     rice_mill_name_id: int
-#     dm_weight: int
-#     truck_number_id: int
-#     transporting_rate: int
-#     numbers_of_bags: int
-#     transporting_total: int
-#     transporter_name_id: int
-#     status: str
-#     total_pending: int
-#     total_paid: int
-#     Dhan_transporting_id: Optional[int] = None
-
-
 # class TransporterMasterBase(BaseModel):
 #     vehicle_number_id: int
 #     name: str
@@ -370,173 +532,12 @@ class DoPandingBase(BaseModel):
 #     transporter_master_id: Optional[int] = None
 
 
-# class partyBase(BaseModel):
-#     party_name: str
-#     party_id: Optional[int] = None
-
-
-# class brokenBase(BaseModel):
-#     broker_name: str
-#     broker_id: Optional[int] = None
-
-
-# class BrokenJawak(BaseModel):
-#     rst_number: int
-#     date: date
-#     party: int
-#     rice_mill_name_id: int
-#     broker: int
-#     brokerage_percentage: float
-#     weight: float
-#     rate: int
-#     number_of_bags: int
-#     truck_number: int
-#     total: int
-#     brokerage: float
-#     net_recievable: float
-#     loading_date: date
-#     recieved_date: date
-#     payment_recieved: int
-#     number_of_days: int
-#     payment_difference: int
-#     remarks: str
-#     broken_jawak_id: Optional[int] = None
-
-
-# class NakkhiJawakBase(BaseModel):
-#     rst_number: int
-#     date: date
-#     party: int
-#     rice_mill_name_id: int
-#     broker: int
-#     brokerage_percent: int
-#     weight: float
-#     rate: int
-#     number_of_bags: int
-#     truck_number: int
-#     brokerage: float
-#     total: int
-#     net_recievable: float
-#     loading_date: date
-#     recieved_date: date
-#     payment_recieved: int
-#     number_of_days: int
-#     payment_difference: int
-#     remarks: str
-#     nakkhi_jawak_id: Optional[int] = None
-
-
-# class BranJawakBase(BaseModel):
-#     rst_number: int
-#     date: date
-#     party: int
-#     rice_mill_name_id: int
-#     broker: int
-#     brokerage_percentage: float
-#     weight: float
-#     rate: int
-#     number_of_bags: int
-#     truck_number: int
-#     total: int
-#     brokerage: float
-#     net_receivable: float
-#     payment_received: int
-#     payment_difference: int
-#     remarks: str
-#     oil: int
-#     bran_jawak_id: Optional[int] = None
-
-
-# class HuskJawakBase(BaseModel):
-#     rst_number: int
-#     date: date
-#     party: int
-#     rice_mill_name_id: int
-#     remarks: str
-#     broker: int
-#     brokerage_percentage: float
-#     weight: float
-#     rate: int
-#     number_of_bags: int
-#     truck_number: int
-#     total: int
-#     brokerage: float
-#     net_receivable: float
-#     received_date: date
-#     loading_date: date
-#     payment_received: int
-#     number_of_days: int
-#     payment_difference: int
-#     husk_jawak_id: Optional[int] = None
-
-
-# class BhushiBase(BaseModel):
-#     rst_number: int
-#     date: date
-#     party: int
-#     rice_mill_name_id: int
-#     number_of_bags: int
-#     weight: float
-#     truck_number: int
-#     rate: int
-#     amount: int
-#     bhushi_id: Optional[int] = None
-
-
-# class OtherAwakBase(BaseModel):
-#     rst_number: int
-#     date: date
-#     party: str
-#     truck_number: int
-#     material: str
-#     nos: int
-#     reason: str
-#     weight: float
-#     rice_mill_name_id: int
-#     other_awak_id: Optional[int] = None
-
-
-# class OtherJawakBase(BaseModel):
-#     rst_number: int
-#     date: date
-#     party: str
-#     truck_number: int
-#     material: str
-#     nos: int
-#     reason: str
-#     weight: float
-#     rice_mill_name_id: int
-#     other_jawak_id: Optional[int] = None
-
-
-# class RiceRstSocietyDoTruckTransporter(BaseModel):
-#     rice_mill_data: List[AddRiceMillBase]
-#     rst_data: List[DhanAwakBase]
-#     society_data: List[SocietyBase]
-#     do_number_data: List[AdddoBase]
-#     truck_data: List[TruckBase]
-#     transporter_data: List[TransporterBase]
-
-
 # # class wareHousetrasportingrate(BaseModel):
 # #     ware_house_transporting_rate: int
 
 
-# class RiceMillRstNumber(BaseModel):
-#     rice_mill_data: List[AddRiceMillBase]
-#     do_number_data: List[AdddoBase]
-#     rst_data: List[DhanAwakBase]
-
-
 # class SocietyDistanceRate(BaseModel):
 #     transporting_rate: int
-
-
-# class RiceMillTruckNumberPartyBrokers(BaseModel):
-#     rice_mill_data: List[AddRiceMillBase]
-#     truck_data: List[TruckBase]
-#     party_data: List[partyBase]
-#     brokers_data: List[brokenBase]
 
 
 def get_db():
@@ -749,6 +750,42 @@ async def kochia_data(db: db_dependency):
     return db_kochia_data
 
 
+# Party
+@app.post("/party/", status_code=status.HTTP_201_CREATED)
+async def add_party(party: partyBase, db: db_dependency):
+    db_add_party = models.party(**party.dict())
+    db.add(db_add_party)
+    db.commit()
+
+
+@app.get(
+    "/party-data/",
+    response_model=List[partyBase],
+    status_code=status.HTTP_200_OK,
+)
+async def get_party_data(db: db_dependency):
+    db_party_data = db.query(models.party).distinct().all()
+    return db_party_data
+
+
+# broker
+@app.post("/broker/", status_code=status.HTTP_201_CREATED)
+async def add_broker(broker: brokenBase, db: db_dependency):
+    db_add_broker = models.brokers(**broker.dict())
+    db.add(db_add_broker)
+    db.commit()
+
+
+@app.get(
+    "/broker-data/",
+    response_model=List[brokenBase],
+    status_code=status.HTTP_200_OK,
+)
+async def get_broker_data(db: db_dependency):
+    db_broker_data = db.query(models.brokers).distinct().all()
+    return db_broker_data
+
+
 # _______________________________________________________
 @app.get(
     "/rice-agreement-transporter-truck-society-data/",
@@ -813,6 +850,8 @@ async def get_all_add_do_data(db: db_dependency):
 
 
 # ________________________________________________________
+
+
 @app.get(
     "/rice-do-number/{rice_mill_id}",
     response_model=DhanAwakRiceDoNumber,
@@ -892,6 +931,45 @@ async def add_dhan_awak(dhanawak: DhanAwakBase, db: db_dependency):
 async def get_dhan_awak(db: db_dependency):
     db_dhan_awak_data = db.query(models.Dhan_Awak).distinct().all()
     return db_dhan_awak_data
+
+
+# ________________________________________________________
+@app.get(
+    "/rice-truck-party-brokers/",
+    response_model=RiceMillTruckNumberPartyBrokers,
+    status_code=status.HTTP_200_OK,
+)
+async def broken_data(db: db_dependency):
+    rice_mill_data = db.query(models.Add_Rice_Mill).all()
+    truck_data = db.query(models.Truck).all()
+    party_data = db.query(models.party).all()
+    brokers_data = db.query(models.brokers).all()
+
+    broken_data = {
+        "rice_mill_data": [AddRiceMillBase(**row.__dict__) for row in rice_mill_data],
+        "truck_data": [TruckBase(**row.__dict__) for row in truck_data],
+        "party_data": [partyBase(**row.__dict__) for row in party_data],
+        "brokers_data": [brokenBase(**row.__dict__) for row in brokers_data],
+    }
+    return broken_data
+
+
+# Other Awak
+@app.post("/other-awak/", status_code=status.HTTP_201_CREATED)
+async def add_other_awak(otherawak: OtherAwakBase, db: db_dependency):
+    db_add_other_awak = models.other_awak(**otherawak.dict())
+    db.add(db_add_other_awak)
+    db.commit()
+
+
+@app.get(
+    "/other-awak-data/",
+    response_model=List[OtherAwakBase],
+    status_code=status.HTTP_200_OK,
+)
+async def get_other_awak_data(db: db_dependency):
+    db_get_other_awak_data = db.query(models.other_awak).distinct().all()
+    return db_get_other_awak_data
 
 
 # ________________________________________________________
@@ -1037,54 +1115,195 @@ async def do_panding_data(db: db_dependency):
 
 
 # ________________________________________________________
+# Dhan Transporting
+@app.get(
+    "/rice-rst-society-do-truck-transporter/",
+    response_model=RiceRstSocietyDoTruckTransporter,
+    status_code=status.HTTP_200_OK,
+)
+async def dhan_transporting_data(db: db_dependency):
+    rice_mill_data = db.query(models.Add_Rice_Mill).all()
+    rst_data = db.query(models.Dhan_Awak).all()
+    do_number_data = db.query(models.Add_Do).all()
+    society_data = db.query(models.Society).all()
+    truck_data = db.query(models.Truck).all()
+    transporter_data = db.query(models.Transporter).all()
 
-# # Broken jawak
-# @app.get(
-#     "/rice-truck-party-brokers/",
-#     response_model=RiceMillTruckNumberPartyBrokers,
-#     status_code=status.HTTP_200_OK,
-# )
-# async def broken_data(db: db_dependency):
-#     rice_mill_data = db.query(models.Add_Rice_Mill).all()
-#     truck_data = db.query(models.Truck).all()
-#     party_data = db.query(models.party).all()
-#     brokers_data = db.query(models.brokers).all()
-
-#     broken_data = {
-#         "rice_mill_data": [AddRiceMillBase(**row.__dict__) for row in rice_mill_data],
-#         "truck_data": [TruckBase(**row.__dict__) for row in truck_data],
-#         "party_data": [partyBase(**row.__dict__) for row in party_data],
-#         "brokers_data": [brokenBase(**row.__dict__) for row in brokers_data],
-#     }
-#     return broken_data
+    dhan_transporting_data = {
+        "rice_mill_data": [AddRiceMillBase(**row.__dict__) for row in rice_mill_data],
+        "rst_data": [DhanAwakBase(**row.__dict__) for row in rst_data],
+        "do_number_data": [AdddoBase(**row.__dict__) for row in do_number_data],
+        "truck_data": [TruckBase(**row.__dict__) for row in truck_data],
+        "society_data": [SocietyBase(**row.__dict__) for row in society_data],
+        "transporter_data": [
+            TransporterBase(**row.__dict__) for row in transporter_data
+        ],
+    }
+    return dhan_transporting_data
 
 
-# # Dhan Transporting
-# @app.get(
-#     "/rice-rst-society-do-truck-transporter/",
-#     response_model=RiceRstSocietyDoTruckTransporter,
-#     status_code=status.HTTP_200_OK,
-# )
-# async def dhan_transporting_data(db: db_dependency):
-#     rice_mill_data = db.query(models.Add_Rice_Mill).all()
-#     rst_data = db.query(models.Dhan_Awak).all()
-#     do_number_data = db.query(models.Add_Do).all()
-#     society_data = db.query(models.Society).all()
-#     truck_data = db.query(models.Truck).all()
-#     transporter_data = db.query(models.Transporter).all()
+@app.get(
+    "/rice-rst-number-do-number/{rice_mill_id}",
+    response_model=RiceMillRstNumber,
+    status_code=status.HTTP_200_OK,
+)
+async def rice_mill_rst_number(rice_mill_id: int, db: db_dependency):
+    rice_mill_data = (
+        db.query(models.Add_Rice_Mill).filter_by(rice_mill_id=rice_mill_id).all()
+    )
+    rst_data = db.query(models.Dhan_Awak).filter_by(rice_mill_id=rice_mill_id).all()
+    do_number_data = (
+        db.query(models.Add_Do).filter_by(select_mill_id=rice_mill_id).all()
+    )
+    rice_mill_rst_number = {
+        "rice_mill_data": [AddRiceMillBase(**row.__dict__) for row in rice_mill_data],
+        "do_number_data": [AdddoBase(**row.__dict__) for row in do_number_data],
+        "rst_data": [DhanAwakBase(**row.__dict__) for row in rst_data],
+    }
+    return rice_mill_rst_number
 
-#     dhan_transporting_data = {
-#         "rice_mill_data": [AddRiceMillBase(**row.__dict__) for row in rice_mill_data],
-#         "rst_data": [DhanAwakBase(**row.__dict__) for row in rst_data],
-#         "do_number_data": [AdddoBase(**row.__dict__) for row in do_number_data],
-#         "truck_data": [TruckBase(**row.__dict__) for row in truck_data],
-#         "society_data": [SocietyBase(**row.__dict__) for row in society_data],
-#         "transporter_data": [
-#             TransporterBase(**row.__dict__) for row in transporter_data
-#         ],
-#     }
-#     return dhan_transporting_data
 
+# Dhan Transporting
+@app.post("/dhan-transporting/", status_code=status.HTTP_201_CREATED)
+async def dhan_transporting(dhantransporting: DhanTransportingBase, db: db_dependency):
+    db_dhan_transporting = models.Dhan_transporting(**dhantransporting.dict())
+    db.add(db_dhan_transporting)
+    db.commit()
+
+
+@app.get(
+    "/dhan-transporting-data/",
+    response_model=List[DhanTransportingBase],
+    status_code=status.HTTP_200_OK,
+)
+async def dhan_transporting_data(db: db_dependency):
+    db_dhan_transporting_data = db.query(models.Dhan_transporting).distinct().all()
+    return db_dhan_transporting_data
+
+
+# ________________________________________________________
+# Other Jawak
+@app.post("/other-jawak/", status_code=status.HTTP_201_CREATED)
+async def add_other_jawak(otherjawak: OtherJawakBase, db: db_dependency):
+    db_add_other_jawak = models.other_jawak(**otherjawak.dict())
+    db.add(db_add_other_jawak)
+    db.commit()
+
+
+@app.get(
+    "/other-jawak-data/",
+    response_model=List[OtherJawakBase],
+    status_code=status.HTTP_200_OK,
+)
+async def get_other_jawak_data(db: db_dependency):
+    db_get_other_jawak_data = db.query(models.other_jawak).distinct().all()
+    return db_get_other_jawak_data
+
+
+# ________________________________________________________
+# Broken Jawak
+@app.post("/broken-jawak/", status_code=status.HTTP_201_CREATED)
+async def add_broken_jawak(brokenjawak: BrokenJawak, db: db_dependency):
+    db_add_broken_jawak = models.broken_jawak(**brokenjawak.dict())
+    db.add(db_add_broken_jawak)
+    db.commit()
+
+
+@app.get(
+    "/other-broken-jawak-data/",
+    response_model=List[BrokenJawak],
+    status_code=status.HTTP_200_OK,
+)
+async def get_other_broken_jawak_data(db: db_dependency):
+    db_get_other_broken_jawak_data = db.query(models.broken_jawak).distinct().all()
+    return db_get_other_broken_jawak_data
+
+
+# ________________________________________________________
+
+
+# Husk Jawak
+@app.post("/husk-jawak/", status_code=status.HTTP_201_CREATED)
+async def add_husk_jawak(huskjawak: HuskJawakBase, db: db_dependency):
+    db_add_husk_jawak = models.husk_jawak(**huskjawak.dict())
+    db.add(db_add_husk_jawak)
+    db.commit()
+
+
+@app.get(
+    "/other-husk-jawak-data/",
+    response_model=List[HuskJawakBase],
+    status_code=status.HTTP_200_OK,
+)
+async def get_other_husk_jawak_data(db: db_dependency):
+    db_get_other_husk_jawak_data = db.query(models.husk_jawak).distinct().all()
+    return db_get_other_husk_jawak_data
+
+
+# ________________________________________________________
+
+
+# nakkhi_jawak
+@app.post("/nakkhi-jawak/", status_code=status.HTTP_201_CREATED)
+async def add_nakkhi_jawak(nakkhijawak: NakkhiJawakBase, db: db_dependency):
+    db_add_nakkhi_jawak = models.nakkhi_jawak(**nakkhijawak.dict())
+    db.add(db_add_nakkhi_jawak)
+    db.commit()
+
+
+@app.get(
+    "/other-nakkhi-jawak-data/",
+    response_model=List[NakkhiJawakBase],
+    status_code=status.HTTP_200_OK,
+)
+async def get_other_nakkhi_jawak_data(db: db_dependency):
+    db_get_other_nakkhi_jawak_data = db.query(models.nakkhi_jawak).distinct().all()
+    return db_get_other_nakkhi_jawak_data
+
+
+# ________________________________________________________
+
+
+# bran jawak
+@app.post("/bran-jawak/", status_code=status.HTTP_201_CREATED)
+async def add_bran_jawak(branjawak: BranJawakBase, db: db_dependency):
+    db_add_bran_jawak = models.bran_jawak(**branjawak.dict())
+    db.add(db_add_bran_jawak)
+    db.commit()
+
+
+@app.get(
+    "/other-bran-jawak-data/",
+    response_model=List[BranJawakBase],
+    status_code=status.HTTP_200_OK,
+)
+async def get_other_bran_jawak_data(db: db_dependency):
+    db_get_other_bran_jawak_data = db.query(models.bran_jawak).distinct().all()
+    return db_get_other_bran_jawak_data
+
+
+# ________________________________________________________
+
+
+# Bhushi
+@app.post("/bhushi/", status_code=status.HTTP_201_CREATED)
+async def add_bhushi(bhushi: BhushiBase, db: db_dependency):
+    db_add_bhushi = models.bhushi(**bhushi.dict())
+    db.add(db_add_bhushi)
+    db.commit()
+
+
+@app.get(
+    "/other-bhushi-data/",
+    response_model=List[BhushiBase],
+    status_code=status.HTTP_200_OK,
+)
+async def get_other_bhushi_data(db: db_dependency):
+    db_get_other_bhushi_data = db.query(models.bhushi).distinct().all()
+    return db_get_other_bhushi_data
+
+
+# ________________________________________________________
 
 # # Society
 # # @app.get(
@@ -1113,27 +1332,6 @@ async def do_panding_data(db: db_dependency):
 
 #     response_data = {"transporting_rate": society_data.transporting_rate}
 #     return response_data
-
-
-# @app.get(
-#     "/rice-rst-number-do-number/{rice_mill_id}",
-#     response_model=RiceMillRstNumber,
-#     status_code=status.HTTP_200_OK,
-# )
-# async def rice_mill_rst_number(rice_mill_id: int, db: db_dependency):
-#     rice_mill_data = (
-#         db.query(models.Add_Rice_Mill).filter_by(rice_mill_id=rice_mill_id).all()
-#     )
-#     rst_data = db.query(models.Dhan_Awak).filter_by(rice_mill_id=rice_mill_id).all()
-#     do_number_data = (
-#         db.query(models.Add_Do).filter_by(select_mill_id=rice_mill_id).all()
-#     )
-#     rice_mill_rst_number = {
-#         "rice_mill_data": [AddRiceMillBase(**row.__dict__) for row in rice_mill_data],
-#         "do_number_data": [AdddoBase(**row.__dict__) for row in do_number_data],
-#         "rst_data": [DhanAwakBase(**row.__dict__) for row in rst_data],
-#     }
-#     return rice_mill_rst_number
 
 
 # # paddy sale
@@ -1213,24 +1411,6 @@ async def do_panding_data(db: db_dependency):
 #     return db_mohan_food_paddy_data
 
 
-# # Dhan Transporting
-# @app.post("/dhan-transporting/", status_code=status.HTTP_201_CREATED)
-# async def dhan_transporting(dhantransporting: DhanTransportingBase, db: db_dependency):
-#     db_dhan_transporting = models.Dhan_transporting(**dhantransporting.dict())
-#     db.add(db_dhan_transporting)
-#     db.commit()
-
-
-# @app.get(
-#     "/dhan-transporting-data/",
-#     response_model=List[DhanTransportingBase],
-#     status_code=status.HTTP_200_OK,
-# )
-# async def dhan_transporting_data(db: db_dependency):
-#     db_dhan_transporting_data = db.query(models.Dhan_transporting).distinct().all()
-#     return db_dhan_transporting_data
-
-
 # # Transporter master
 # @app.post("/transporter-master/", status_code=status.HTTP_201_CREATED)
 # async def transporter_master(
@@ -1281,95 +1461,3 @@ async def do_panding_data(db: db_dependency):
 # #     db_agreement = models.Agreement(**agreement.dict())
 # #     db.add(db_agreement)
 # #     db.commit()
-
-
-# # Party
-# @app.post("/party/", status_code=status.HTTP_201_CREATED)
-# async def add_party(party: partyBase, db: db_dependency):
-#     db_add_party = models.party(**party.dict())
-#     db.add(db_add_party)
-#     db.commit()
-
-
-# @app.get(
-#     "/party-data/",
-#     response_model=List[partyBase],
-#     status_code=status.HTTP_200_OK,
-# )
-# async def get_party_data(db: db_dependency):
-#     db_party_data = db.query(models.party).distinct().all()
-#     return db_party_data
-
-
-# # broker
-# @app.post("/broker/", status_code=status.HTTP_201_CREATED)
-# async def add_broker(broker: brokenBase, db: db_dependency):
-#     db_add_broker = models.brokers(**broker.dict())
-#     db.add(db_add_broker)
-#     db.commit()
-
-
-# @app.get(
-#     "/broker-data/",
-#     response_model=List[brokenBase],
-#     status_code=status.HTTP_200_OK,
-# )
-# async def get_broker_data(db: db_dependency):
-#     db_broker_data = db.query(models.brokers).distinct().all()
-#     return db_broker_data
-
-
-# # Broken Jawak
-# @app.post("/broken-jawak/", status_code=status.HTTP_201_CREATED)
-# async def add_broken_jawak(brokenjawak: BrokenJawak, db: db_dependency):
-#     db_add_broken_jawak = models.broken_jawak(**brokenjawak.dict())
-#     db.add(db_add_broken_jawak)
-#     db.commit()
-
-
-# # nakkhi_jawak
-# @app.post("/nakkhi-jawak/", status_code=status.HTTP_201_CREATED)
-# async def add_nakkhi_jawak(nakkhijawak: NakkhiJawakBase, db: db_dependency):
-#     db_add_nakkhi_jawak = models.nakkhi_jawak(**nakkhijawak.dict())
-#     db.add(db_add_nakkhi_jawak)
-#     db.commit()
-
-
-# # bran jawak
-# @app.post("/bran-jawak/", status_code=status.HTTP_201_CREATED)
-# async def add_bran_jawak(branjawak: BranJawakBase, db: db_dependency):
-#     db_add_bran_jawak = models.bran_jawak(**branjawak.dict())
-#     db.add(db_add_bran_jawak)
-#     db.commit()
-
-
-# # Husk Jawak
-# @app.post("/husk-jawak/", status_code=status.HTTP_201_CREATED)
-# async def add_husk_jawak(huskjawak: HuskJawakBase, db: db_dependency):
-#     db_add_husk_jawak = models.husk_jawak(**huskjawak.dict())
-#     db.add(db_add_husk_jawak)
-#     db.commit()
-
-
-# # Bhushi
-# @app.post("/bhushi/", status_code=status.HTTP_201_CREATED)
-# async def add_bhushi(bhushi: BhushiBase, db: db_dependency):
-#     db_add_bhushi = models.bhushi(**bhushi.dict())
-#     db.add(db_add_bhushi)
-#     db.commit()
-
-
-# # Other Awak
-# @app.post("/other-awak/", status_code=status.HTTP_201_CREATED)
-# async def add_other_awak(otherawak: OtherAwakBase, db: db_dependency):
-#     db_add_other_awak = models.other_awak(**otherawak.dict())
-#     db.add(db_add_other_awak)
-#     db.commit()
-
-
-# # Other Jawak
-# @app.post("/other-jawak/", status_code=status.HTTP_201_CREATED)
-# async def add_other_jawak(otherjawak: OtherJawakBase, db: db_dependency):
-#     db_add_other_jawak = models.other_jawak(**otherjawak.dict())
-#     db.add(db_add_other_jawak)
-#     db.commit()
