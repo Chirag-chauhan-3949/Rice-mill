@@ -57,3 +57,27 @@ def lot_number(x, y):
 
 
 lot_number(250, 300)
+
+
+truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
+transporter_name_id = Column(Integer, ForeignKey("transporter.transporter_id"))
+transporting_rate = Column(Integer)
+transporting_total = Column(Integer)
+jama_jute_22_23 = Column(Integer)
+ek_bharti_21_22 = Column(Integer)
+pds = Column(Integer)
+miller_purana = Column(Integer)
+kisan = Column(Integer)
+bardana_society = Column(Integer)
+hdpe_22_23 = Column(Integer)
+hdpe_21_22 = Column(Integer)
+hdpe_21_22_one_use = Column(Integer)
+total_bag_weight = Column(Float)
+type_of_paddy = Column(String(50))
+actual_paddy = Column(String(50))
+mill_weight_quintals = Column(Integer)
+shortage = Column(Float)
+bags_put_in_hopper = Column(Integer)
+bags_put_in_stack = Column(Integer)
+hopper_rice_mill_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+stack_location = Column(String(50))

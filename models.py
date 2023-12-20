@@ -11,6 +11,7 @@ from sqlalchemy import (
     DATE,
 )
 from database import Base
+from sqlalchemy.orm import relationship
 
 
 class Add_Rice_Mill(Base):
@@ -23,6 +24,13 @@ class Add_Rice_Mill(Base):
     phone_number = Column(BigInteger)
     rice_mill_capacity = Column(Float)
     created_at = Column(DateTime, default=func.now())
+    agreement = relationship("Agreement", back_populates="addricemill")
+    kochia = relationship("Kochia", back_populates="addricemill")
+    add_do = relationship("Add_Do", back_populates="addricemill")
+    frk = relationship("Frk", back_populates="addricemill")
+    other_awaks = relationship("Other_awak", back_populates="addricemill")
+    other_jawak = relationship("Other_jawak", back_populates="addricemill")
+    ricedeposite = relationship("Rice_deposite", back_populates="addricemill")
 
 
 class Transporter(Base):
@@ -33,6 +41,8 @@ class Transporter(Base):
     transporter_name = Column(String(50))
     transporter_phone_number = Column(BigInteger)
     created_at = Column(DateTime, default=func.now())
+    trucks = relationship("Truck", back_populates="transporter")
+    ricedeposite = relationship("Rice_deposite", back_populates="transporter")
 
 
 class Truck(Base):
@@ -41,7 +51,14 @@ class Truck(Base):
     truck_id = Column(Integer, primary_key=True, index=True)
     truck_number = Column(VARCHAR(50))
     transport_id = Column(Integer, ForeignKey("transporter.transporter_id"))
+    transporter = relationship("Transporter", back_populates="trucks")
     created_at = Column(DateTime, default=func.now())
+    add_do = relationship("Add_Do", back_populates="trucks")
+    frk = relationship("Frk", back_populates="trucks")
+    other_awaks = relationship("Other_awak", back_populates="trucks")
+    other_jawak = relationship("Other_jawak", back_populates="trucks")
+    ricedeposite = relationship("Rice_deposite", back_populates="trucks")
+    saudapatrak = relationship("Sauda_patrak", back_populates="trucks")
 
 
 class Society(Base):
@@ -54,6 +71,7 @@ class Society(Base):
     transporting_rate = Column(Integer)
     actual_distance = Column(Integer)
     created_at = Column(DateTime, default=func.now())
+    add_do = relationship("Add_Do", back_populates="society")
 
 
 class Agreement(Base):
@@ -66,6 +84,8 @@ class Agreement(Base):
     lot_from = Column(Integer)
     lot_to = Column(Integer)
     created_at = Column(DateTime, default=func.now())
+    addricemill = relationship("Add_Rice_Mill", back_populates="agreement")
+    add_do = relationship("Add_Do", back_populates="agreement")
 
 
 class ware_house_transporting(Base):
@@ -76,6 +96,7 @@ class ware_house_transporting(Base):
     ware_house_transporting_rate = Column(Integer)
     hamalirate = Column(Integer)
     created_at = Column(DateTime, default=func.now())
+    ricedeposite = relationship("Rice_deposite", back_populates="warehousetransporting")
 
 
 class Kochia(Base):
@@ -84,15 +105,18 @@ class Kochia(Base):
     kochia_id = Column(Integer, primary_key=True, index=True)
     rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
     kochia_name = Column(String(50))
+    addricemill = relationship("Add_Rice_Mill", back_populates="kochia")
     kochia_phone_number = Column(Integer)
 
 
-class party(Base):
+class Party(Base):
     __tablename__ = "party"
 
     party_id = Column(Integer, primary_key=True, index=True)
     party_name = Column(String(50))
     party_phone_number = Column(Integer)
+    other_awaks = relationship("Other_awak", back_populates="party")
+    other_jawak = relationship("Other_jawak", back_populates="party")
 
 
 class brokers(Base):
@@ -122,6 +146,10 @@ class Add_Do(Base):
     society_name_id = Column(Integer, ForeignKey("society.society_id"))
     truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
     created_at = Column(DateTime, default=func.now())
+    addricemill = relationship("Add_Rice_Mill", back_populates="add_do")
+    agreement = relationship("Agreement", back_populates="add_do")
+    society = relationship("Society", back_populates="add_do")
+    trucks = relationship("Truck", back_populates="add_do")
 
 
 class Dhan_Awak(Base):
@@ -160,20 +188,23 @@ class Dhan_Awak(Base):
     created_at = Column(DateTime, default=func.now())
 
 
-class other_awak(Base):
+class Other_awak(Base):
     __tablename__ = "otherawak"
 
     other_awak_id = Column(Integer, primary_key=True, index=True)
     rst_number = Column(Integer)
     date = Column(DATE)
-    party = Column(Integer, ForeignKey("party.party_id"))
-    truck_number = Column(Integer, ForeignKey("trucks.truck_id"))
+    party_id = Column(Integer, ForeignKey("party.party_id"))
+    truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
     material = Column(String(50))
     nos = Column(Integer)
     reason = Column(String(50))
     weight = Column(Float)
     rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
     created_at = Column(DateTime, default=func.now())
+    party = relationship("Party", back_populates="other_awaks")
+    trucks = relationship("Truck", back_populates="other_awaks")
+    addricemill = relationship("Add_Rice_Mill", back_populates="other_awaks")
 
 
 class Rice_deposite(Base):
@@ -204,6 +235,12 @@ class Rice_deposite(Base):
     status = Column(String(50))
     hamali = Column(Integer)
     created_at = Column(DateTime, default=func.now())
+    addricemill = relationship("Add_Rice_Mill", back_populates="ricedeposite")
+    warehousetransporting = relationship(
+        "ware_house_transporting", back_populates="ricedeposite"
+    )
+    trucks = relationship("Truck", back_populates="ricedeposite")
+    transporter = relationship("Transporter", back_populates="ricedeposite")
 
 
 class Dalali_dhaan(Base):
@@ -252,6 +289,8 @@ class Frk(Base):
     rate = Column(Float)
     batch_number = Column(Integer)
     created_at = Column(DateTime, default=func.now())
+    addricemill = relationship("Add_Rice_Mill", back_populates="frk")
+    trucks = relationship("Truck", back_populates="frk")
 
 
 class Sauda_patrak(Base):
@@ -267,6 +306,7 @@ class Sauda_patrak(Base):
     rate = Column(Integer)
     amount = Column(Integer)
     created_at = Column(DateTime, default=func.now())
+    trucks = relationship("Truck", back_populates="saudapatrak")
 
 
 class Do_panding(Base):
@@ -304,20 +344,23 @@ class Dhan_transporting(Base):
     created_at = Column(DateTime, default=func.now())
 
 
-class other_jawak(Base):
+class Other_jawak(Base):
     __tablename__ = "other_jawak"
 
     other_jawak_id = Column(Integer, primary_key=True, index=True)
     rst_number = Column(Integer)
     date = Column(DATE)
-    party = Column(Integer, ForeignKey("party.party_id"))
-    truck_number = Column(Integer, ForeignKey("trucks.truck_id"))
+    party_id = Column(Integer, ForeignKey("party.party_id"))
+    truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
     material = Column(String(50))
     nos = Column(Integer)
     reason = Column(String(50))
     weight = Column(Float)
     rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
     created_at = Column(DateTime, default=func.now())
+    party = relationship("Party", back_populates="other_jawak")
+    trucks = relationship("Truck", back_populates="other_jawak")
+    addricemill = relationship("Add_Rice_Mill", back_populates="other_jawak")
 
 
 class broken_jawak(Base):

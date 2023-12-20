@@ -48,6 +48,13 @@ class TruckBase(BaseModel):
     truck_id: Optional[int] = None
 
 
+class TruckWithTransporter(BaseModel):
+    truck_number: str
+    transporter_name: str
+    truck_id: int
+    transport_id: int
+
+
 class SocietyBase(BaseModel):
     society_name: str
     distance_from_mill: int
@@ -64,6 +71,15 @@ class AgreementBase(BaseModel):
     lot_from: int
     lot_to: int
     agremennt_id: Optional[int] = None
+
+
+class RiceMillWithAgreement(BaseModel):
+    rice_mill_id: int
+    agreement_number: str
+    type_of_agreement: str
+    lot_from: int
+    lot_to: int
+    rice_mill_name: str
 
 
 class WareHouseTransporting(BaseModel):
@@ -95,6 +111,13 @@ class KochiaBase(BaseModel):
     kochia_id: Optional[int] = None
 
 
+class KochiaWithRiceMill(BaseModel):
+    rice_mill_name_id: int
+    kochia_name: str
+    kochia_phone_number: int
+    rice_mill_name: str
+
+
 class partyBase(BaseModel):
     party_name: str
     party_phone_number: int
@@ -123,6 +146,27 @@ class AdddoBase(BaseModel):
     society_name_id: int
     truck_number_id: int
     do_id: Optional[int] = None
+
+
+class AddDoWithAddRiceMillAgreementSocietyTruck(BaseModel):
+    select_mill_id: int
+    date: date
+    do_number: str
+    select_argeement_id: int
+    moto_weight: float
+    mota_Bardana: float
+    patla_weight: float
+    patla_bardana: float
+    sarna_weight: float
+    sarna_bardana: float
+    total_weight: float
+    total_bardana: float
+    society_name_id: int
+    truck_number_id: int
+    rice_mill_name: str
+    agreement_number: str
+    society_name: str
+    truck_number: str
 
 
 # ___________________________________________________________
@@ -188,13 +232,28 @@ class OtherAwakBase(BaseModel):
     rst_number: int
     date: date
     rice_mill_name_id: int
-    party: int
-    truck_number: int
+    party_id: int
+    truck_number_id: int
     material: str
     nos: int
     reason: str
     weight: float
     other_awak_id: Optional[int] = None
+
+
+class OtherAwakWithPartyRiceTruck(BaseModel):
+    rst_number: int
+    date: date
+    rice_mill_name_id: int
+    party_id: int
+    truck_number_id: int
+    material: str
+    nos: int
+    reason: str
+    weight: float
+    party_name: str
+    rice_mill_name: str
+    truck_number: str
 
 
 # ___________________________________________________________
@@ -235,6 +294,36 @@ class RiceDepositeBase(BaseModel):
     status: str
     hamali: int
     rice_depostie_id: Optional[int] = None
+
+
+class RiceDepositWithRiceWareTruckTransporter(BaseModel):
+    rst_number: int
+    date: date
+    lot_number: int
+    ware_house_id: int
+    rice_mill_name_id: int
+    weight: int
+    truck_number_id: int
+    bags: int
+    transporting_total: int
+    transporter_name_id: int
+    transporting_type: str
+    transporting_status: str
+    rate: int
+    variety: str
+    halting: int
+    rrga_wt: int
+    data_2022_23: int
+    data_2021_22: int
+    pds: int
+    old: int
+    amount: int
+    status: str
+    hamali: int
+    rice_mill_name: str
+    truck_number: str
+    ware_houes_name: str
+    transporter_name: str
 
 
 # ___________________________________________________________
@@ -284,6 +373,20 @@ class FrkBase(BaseModel):
     frk_id: Optional[int] = None
 
 
+class FrkWithRiceTruck(BaseModel):
+    date: date
+    party: str
+    bags: int
+    weight: int
+    truck_number_id: int
+    rice_mill_name_id: int
+    bill_number: int
+    rate: float
+    batch_number: int
+    rice_mill_name: str
+    truck_number: str
+
+
 class SaudaPatrakBase(BaseModel):
     name: str
     address: str
@@ -294,6 +397,18 @@ class SaudaPatrakBase(BaseModel):
     rate: int
     amount: int
     sauda_patrak_id: Optional[int] = None
+
+
+class SaudaPatrakWithTruckNumber(BaseModel):
+    name: str
+    address: str
+    vechicle_number_id: int
+    paddy: str
+    bags: int
+    weight: int
+    rate: int
+    amount: int
+    truck_number: str
 
 
 # ___________________________________________________________
@@ -348,14 +463,29 @@ class DhanTransportingBase(BaseModel):
 class OtherJawakBase(BaseModel):
     rst_number: int
     date: date
-    party: int
-    truck_number: int
+    party_id: int
+    truck_number_id: int
     material: str
     nos: int
     reason: str
     weight: float
     rice_mill_name_id: int
     other_jawak_id: Optional[int] = None
+
+
+class OtherJawakWithPatyTrucksRice(BaseModel):
+    rst_number: int
+    date: date
+    party_id: int
+    truck_number_id: int
+    material: str
+    nos: int
+    reason: str
+    weight: float
+    rice_mill_name_id: int
+    party_name: str
+    rice_mill_name: str
+    truck_number: str
 
 
 class BrokenJawak(BaseModel):
@@ -627,10 +757,32 @@ async def add_new_truck(truck: TruckBase, db: db_dependency):
 
 
 # Get Truck Data
-@app.get("/trucks/", response_model=List[TruckBase], status_code=status.HTTP_200_OK)
-async def get_all_truck_data(db: db_dependency):
-    trucks = db.query(models.Truck).distinct().all()
-    return trucks
+# @app.get("/trucks/", response_model=List[TruckBase], status_code=status.HTTP_200_OK)
+# async def get_all_truck_data(db: db_dependency):
+#     trucks = db.query(models.Truck).distinct().all()
+#     return trucks
+
+
+@app.get(
+    "/trucks/",
+    response_model=List[TruckWithTransporter],
+    status_code=status.HTTP_200_OK,
+)
+async def get_all_truck_data(db: Session = Depends(get_db)):
+    trucks = db.query(models.Truck).options(joinedload(models.Truck.transporter)).all()
+
+    result = []
+    for truck in trucks:
+        result.append(
+            TruckWithTransporter(
+                truck_number=truck.truck_number,
+                transporter_name=truck.transporter.transporter_name,
+                truck_id=truck.truck_id,
+                transport_id=truck.transport_id,
+            )
+        )
+
+    return result
 
 
 # Get all truck numbers for dropdown options
@@ -699,12 +851,40 @@ async def add_agreement(addagreement: AgreementBase, db: db_dependency):
 
 
 # Get Agreement Data
+# @app.get(
+#     "/agreements/", response_model=List[AgreementBase], status_code=status.HTTP_200_OK
+# )
+# async def get_all_agreement_data(db: db_dependency):
+#     agreements = db.query(models.Agreement).distinct().all()
+#     return agreements
+
+
 @app.get(
-    "/agreements/", response_model=List[AgreementBase], status_code=status.HTTP_200_OK
+    "/agreements/",
+    response_model=List[RiceMillWithAgreement],
+    status_code=status.HTTP_200_OK,
 )
-async def get_all_agreement_data(db: db_dependency):
-    agreements = db.query(models.Agreement).distinct().all()
-    return agreements
+async def get_all_agreements_data(db: Session = Depends(get_db)):
+    agreements = (
+        db.query(models.Agreement)
+        .options(joinedload(models.Agreement.addricemill))
+        .all()
+    )
+
+    result = []
+    for agreement in agreements:
+        result.append(
+            RiceMillWithAgreement(
+                rice_mill_id=agreement.rice_mill_id,
+                agreement_number=agreement.agreement_number,
+                type_of_agreement=agreement.type_of_agreement,
+                lot_from=agreement.lot_from,
+                lot_to=agreement.lot_to,
+                rice_mill_name=agreement.addricemill.rice_mill_name,
+            )
+        )
+
+    return result
 
 
 # Get all agreements number for dropdown options
@@ -742,18 +922,42 @@ async def add_kochia(addkochia: KochiaBase, db: db_dependency):
     db.commit()
 
 
+# @app.get(
+#     "/kochia-data/", response_model=List[KochiaBase], status_code=status.HTTP_200_OK
+# )
+# async def kochia_data(db: db_dependency):
+#     db_kochia_data = db.query(models.Kochia).distinct().all()
+#     return db_kochia_data
+
+
 @app.get(
-    "/kochia-data/", response_model=List[KochiaBase], status_code=status.HTTP_200_OK
+    "/kochia-data/",
+    response_model=List[KochiaWithRiceMill],
+    status_code=status.HTTP_200_OK,
 )
-async def kochia_data(db: db_dependency):
-    db_kochia_data = db.query(models.Kochia).distinct().all()
-    return db_kochia_data
+async def get_all_kochia_data(db: Session = Depends(get_db)):
+    kochias = (
+        db.query(models.Kochia).options(joinedload(models.Kochia.addricemill)).all()
+    )
+
+    result = []
+    for kochia in kochias:
+        result.append(
+            KochiaWithRiceMill(
+                rice_mill_name_id=kochia.rice_mill_name_id,
+                kochia_name=kochia.kochia_name,
+                kochia_phone_number=kochia.kochia_phone_number,
+                rice_mill_name=kochia.addricemill.rice_mill_name,
+            )
+        )
+
+    return result
 
 
 # Party
 @app.post("/party/", status_code=status.HTTP_201_CREATED)
 async def add_party(party: partyBase, db: db_dependency):
-    db_add_party = models.party(**party.dict())
+    db_add_party = models.Party(**party.dict())
     db.add(db_add_party)
     db.commit()
 
@@ -764,7 +968,7 @@ async def add_party(party: partyBase, db: db_dependency):
     status_code=status.HTTP_200_OK,
 )
 async def get_party_data(db: db_dependency):
-    db_party_data = db.query(models.party).distinct().all()
+    db_party_data = db.query(models.Party).distinct().all()
     return db_party_data
 
 
@@ -841,12 +1045,57 @@ async def add_do(adddo: AdddoBase, db: db_dependency):
     db.commit()
 
 
+# @app.get(
+#     "/add-do-data/", response_model=List[AdddoBase], status_code=status.HTTP_200_OK
+# )
+# async def get_all_add_do_data(db: db_dependency):
+#     add_do = db.query(models.Add_Do).distinct().all()
+#     return add_do
+
+
 @app.get(
-    "/add-do-data/", response_model=List[AdddoBase], status_code=status.HTTP_200_OK
+    "/add-do-data/",
+    response_model=List[AddDoWithAddRiceMillAgreementSocietyTruck],
+    status_code=status.HTTP_200_OK,
 )
-async def get_all_add_do_data(db: db_dependency):
-    add_do = db.query(models.Add_Do).distinct().all()
-    return add_do
+async def get_all_add_do_data(db: Session = Depends(get_db)):
+    Add_Dos = (
+        db.query(models.Add_Do)
+        .options(
+            joinedload(models.Add_Do.addricemill),
+            joinedload(models.Add_Do.agreement),
+            joinedload(models.Add_Do.society),
+            joinedload(models.Add_Do.trucks),
+        )
+        .all()
+    )
+
+    result = []
+    for Add_Do in Add_Dos:
+        result.append(
+            AddDoWithAddRiceMillAgreementSocietyTruck(
+                select_mill_id=Add_Do.select_mill_id,
+                date=Add_Do.date,
+                do_number=Add_Do.do_number,
+                select_argeement_id=Add_Do.select_argeement_id,
+                moto_weight=Add_Do.moto_weight,
+                mota_Bardana=Add_Do.mota_Bardana,
+                patla_weight=Add_Do.patla_weight,
+                patla_bardana=Add_Do.patla_bardana,
+                sarna_weight=Add_Do.sarna_weight,
+                sarna_bardana=Add_Do.sarna_bardana,
+                total_weight=Add_Do.total_weight,
+                total_bardana=Add_Do.total_bardana,
+                society_name_id=Add_Do.society_name_id,
+                truck_number_id=Add_Do.truck_number_id,
+                rice_mill_name=Add_Do.addricemill.rice_mill_name,
+                agreement_number=Add_Do.agreement.agreement_number,
+                society_name=Add_Do.society.society_name,
+                truck_number=Add_Do.trucks.truck_number,
+            )
+        )
+
+    return result
 
 
 # ________________________________________________________
@@ -942,7 +1191,7 @@ async def get_dhan_awak(db: db_dependency):
 async def broken_data(db: db_dependency):
     rice_mill_data = db.query(models.Add_Rice_Mill).all()
     truck_data = db.query(models.Truck).all()
-    party_data = db.query(models.party).all()
+    party_data = db.query(models.Party).all()
     brokers_data = db.query(models.brokers).all()
 
     broken_data = {
@@ -957,19 +1206,57 @@ async def broken_data(db: db_dependency):
 # Other Awak
 @app.post("/other-awak/", status_code=status.HTTP_201_CREATED)
 async def add_other_awak(otherawak: OtherAwakBase, db: db_dependency):
-    db_add_other_awak = models.other_awak(**otherawak.dict())
+    db_add_other_awak = models.Other_awak(**otherawak.dict())
     db.add(db_add_other_awak)
     db.commit()
 
 
+# @app.get(
+#     "/other-awak-data/",
+#     response_model=List[OtherAwakBase],
+#     status_code=status.HTTP_200_OK,
+# )
+# async def get_other_awak_data(db: db_dependency):
+#     db_get_other_awak_data = db.query(models.other_awak).distinct().all()
+#     return db_get_other_awak_data
+
+
 @app.get(
     "/other-awak-data/",
-    response_model=List[OtherAwakBase],
+    response_model=List[OtherAwakWithPartyRiceTruck],
     status_code=status.HTTP_200_OK,
 )
-async def get_other_awak_data(db: db_dependency):
-    db_get_other_awak_data = db.query(models.other_awak).distinct().all()
-    return db_get_other_awak_data
+async def get_all_other_awak_data(db: Session = Depends(get_db)):
+    other_awaks = (
+        db.query(models.Other_awak)
+        .options(
+            joinedload(models.Other_awak.addricemill),
+            joinedload(models.Other_awak.trucks),
+            joinedload(models.Other_awak.party),
+        )
+        .all()
+    )
+
+    result = []
+    for other_awak in other_awaks:
+        result.append(
+            OtherAwakWithPartyRiceTruck(
+                rst_number=other_awak.rst_number,
+                date=other_awak.date,
+                rice_mill_name_id=other_awak.rice_mill_name_id,
+                party_id=other_awak.party_id,
+                truck_number_id=other_awak.truck_number_id,
+                material=other_awak.material,
+                nos=other_awak.nos,
+                reason=other_awak.reason,
+                weight=other_awak.weight,
+                party_name=other_awak.party.party_name,
+                rice_mill_name=other_awak.addricemill.rice_mill_name,
+                truck_number=other_awak.trucks.truck_number,
+            )
+        )
+
+    return result
 
 
 # ________________________________________________________
@@ -1028,14 +1315,68 @@ async def rice_deposite(ricedeposite: RiceDepositeBase, db: db_dependency):
     db.commit()
 
 
+# @app.get(
+#     "/rice-deposite-data/",
+#     response_model=List[RiceDepositeBase],
+#     status_code=status.HTTP_200_OK,
+# )
+# async def rice_deposite_data(db: db_dependency):
+#     db_rice_deposite_data = db.query(models.Rice_deposite).distinct().all()
+#     return db_rice_deposite_data
+
+
 @app.get(
     "/rice-deposite-data/",
-    response_model=List[RiceDepositeBase],
+    response_model=List[RiceDepositWithRiceWareTruckTransporter],
     status_code=status.HTTP_200_OK,
 )
-async def rice_deposite_data(db: db_dependency):
-    db_rice_deposite_data = db.query(models.Rice_deposite).distinct().all()
-    return db_rice_deposite_data
+async def get_all_rice_deposite_data(db: Session = Depends(get_db)):
+    rices_deposite = (
+        db.query(models.Rice_deposite)
+        .options(
+            joinedload(models.Rice_deposite.addricemill),
+            joinedload(models.Rice_deposite.warehousetransporting),
+            joinedload(models.Rice_deposite.trucks),
+            joinedload(models.Rice_deposite.transporter),
+        )
+        .all()
+    )
+
+    result = []
+    for rice_deposite in rices_deposite:
+        result.append(
+            RiceDepositWithRiceWareTruckTransporter(
+                rst_number=rice_deposite.rst_number,
+                date=rice_deposite.date,
+                lot_number=rice_deposite.lot_number,
+                ware_house_id=rice_deposite.ware_house_id,
+                rice_mill_name_id=rice_deposite.rice_mill_name_id,
+                weight=rice_deposite.weight,
+                truck_number_id=rice_deposite.truck_number_id,
+                bags=rice_deposite.bags,
+                transporting_total=rice_deposite.transporting_total,
+                transporter_name_id=rice_deposite.transporter_name_id,
+                transporting_type=rice_deposite.transporting_type,
+                transporting_status=rice_deposite.transporting_status,
+                rate=rice_deposite.rate,
+                variety=rice_deposite.variety,
+                halting=rice_deposite.halting,
+                rrga_wt=rice_deposite.rrga_wt,
+                data_2022_23=rice_deposite.data_2022_23,
+                data_2021_22=rice_deposite.data_2021_22,
+                pds=rice_deposite.pds,
+                old=rice_deposite.old,
+                amount=rice_deposite.amount,
+                status=rice_deposite.status,
+                hamali=rice_deposite.hamali,
+                rice_mill_name=rice_deposite.addricemill.rice_mill_name,
+                truck_number=rice_deposite.trucks.truck_number,
+                ware_houes_name=rice_deposite.warehousetransporting.ware_houes_name,
+                transporter_name=rice_deposite.transporter.transporter_name,
+            )
+        )
+
+    return result
 
 
 # ________________________________________________________
@@ -1068,10 +1409,46 @@ async def frk(frk: FrkBase, db: db_dependency):
     db.commit()
 
 
-@app.get("/frk-data/", response_model=List[FrkBase], status_code=status.HTTP_200_OK)
-async def frk_data(db: db_dependency):
-    db_frk_data = db.query(models.Frk).distinct().all()
-    return db_frk_data
+# @app.get("/frk-data/", response_model=List[FrkBase], status_code=status.HTTP_200_OK)
+# async def frk_data(db: db_dependency):
+#     db_frk_data = db.query(models.Frk).distinct().all()
+#     return db_frk_data
+
+
+@app.get(
+    "/frk-data/",
+    response_model=List[FrkWithRiceTruck],
+    status_code=status.HTTP_200_OK,
+)
+async def get_all_add_do_data(db: Session = Depends(get_db)):
+    frks = (
+        db.query(models.Frk)
+        .options(
+            joinedload(models.Frk.addricemill),
+            joinedload(models.Frk.trucks),
+        )
+        .all()
+    )
+
+    result = []
+    for frk in frks:
+        result.append(
+            FrkWithRiceTruck(
+                date=frk.date,
+                party=frk.party,
+                bags=frk.bags,
+                weight=frk.weight,
+                truck_number_id=frk.truck_number_id,
+                rice_mill_name_id=frk.rice_mill_name_id,
+                bill_number=frk.bill_number,
+                rate=frk.rate,
+                batch_number=frk.batch_number,
+                rice_mill_name=frk.addricemill.rice_mill_name,
+                truck_number=frk.trucks.truck_number,
+            )
+        )
+
+    return result
 
 
 # ________________________________________________________
@@ -1085,14 +1462,47 @@ async def sauda_patrak(saudapatrak: SaudaPatrakBase, db: db_dependency):
     db.commit()
 
 
+# @app.get(
+#     "/sauda-patrak-data/",
+#     response_model=List[SaudaPatrakBase],
+#     status_code=status.HTTP_200_OK,
+# )
+# async def sauda_patrak_data(db: db_dependency):
+#     db_sauda_patrak_data = db.query(models.Sauda_patrak).distinct().all()
+#     return db_sauda_patrak_data
+
+
 @app.get(
     "/sauda-patrak-data/",
-    response_model=List[SaudaPatrakBase],
+    response_model=List[SaudaPatrakWithTruckNumber],
     status_code=status.HTTP_200_OK,
 )
-async def sauda_patrak_data(db: db_dependency):
-    db_sauda_patrak_data = db.query(models.Sauda_patrak).distinct().all()
-    return db_sauda_patrak_data
+async def get_all_sauda_patrak_data(db: Session = Depends(get_db)):
+    saudas_patrak = (
+        db.query(models.Sauda_patrak)
+        .options(
+            joinedload(models.Sauda_patrak.trucks),
+        )
+        .all()
+    )
+
+    result = []
+    for sauda_patrak in saudas_patrak:
+        result.append(
+            SaudaPatrakWithTruckNumber(
+                name=sauda_patrak.name,
+                address=sauda_patrak.address,
+                vechicle_number_id=sauda_patrak.vechicle_number_id,
+                paddy=sauda_patrak.paddy,
+                bags=sauda_patrak.bags,
+                weight=sauda_patrak.weight,
+                rate=sauda_patrak.rate,
+                amount=sauda_patrak.amount,
+                truck_number=sauda_patrak.trucks.truck_number,
+            )
+        )
+
+    return result
 
 
 # ________________________________________________________
@@ -1185,19 +1595,57 @@ async def dhan_transporting_data(db: db_dependency):
 # Other Jawak
 @app.post("/other-jawak/", status_code=status.HTTP_201_CREATED)
 async def add_other_jawak(otherjawak: OtherJawakBase, db: db_dependency):
-    db_add_other_jawak = models.other_jawak(**otherjawak.dict())
+    db_add_other_jawak = models.Other_jawak(**otherjawak.dict())
     db.add(db_add_other_jawak)
     db.commit()
 
 
+# @app.get(
+#     "/other-jawak-data/",
+#     response_model=List[OtherJawakBase],
+#     status_code=status.HTTP_200_OK,
+# )
+# async def get_other_jawak_data(db: db_dependency):
+#     db_get_other_jawak_data = db.query(models.Other_jawak).distinct().all()
+#     return db_get_other_jawak_data
+
+
 @app.get(
     "/other-jawak-data/",
-    response_model=List[OtherJawakBase],
+    response_model=List[OtherJawakWithPatyTrucksRice],
     status_code=status.HTTP_200_OK,
 )
-async def get_other_jawak_data(db: db_dependency):
-    db_get_other_jawak_data = db.query(models.other_jawak).distinct().all()
-    return db_get_other_jawak_data
+async def get_all_other_jawak_data(db: Session = Depends(get_db)):
+    other_jawaks = (
+        db.query(models.Other_jawak)
+        .options(
+            joinedload(models.Other_jawak.addricemill),
+            joinedload(models.Other_jawak.trucks),
+            joinedload(models.Other_jawak.party),
+        )
+        .all()
+    )
+
+    result = []
+    for other_jawak in other_jawaks:
+        result.append(
+            OtherJawakWithPatyTrucksRice(
+                rst_number=other_jawak.rst_number,
+                date=other_jawak.date,
+                rice_mill_name_id=other_jawak.rice_mill_name_id,
+                party_id=other_jawak.party_id,
+                truck_number_id=other_jawak.truck_number_id,
+                material=other_jawak.material,
+                nos=other_jawak.nos,
+                reason=other_jawak.reason,
+                weight=other_jawak.weight,
+                party_name=other_jawak.party.party_name,
+                rice_mill_name=other_jawak.addricemill.rice_mill_name,
+                truck_number=other_jawak.trucks.truck_number,
+            )
+        )
+
+    return result
 
 
 # ________________________________________________________
