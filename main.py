@@ -51,8 +51,8 @@ class TruckBase(BaseModel):
 class TruckWithTransporter(BaseModel):
     truck_number: str
     transporter_name: str
-    truck_id: int
     transport_id: int
+    truck_id: Optional[int] = None
 
 
 class SocietyBase(BaseModel):
@@ -80,6 +80,7 @@ class RiceMillWithAgreement(BaseModel):
     lot_from: int
     lot_to: int
     rice_mill_name: str
+    agremennt_id: Optional[int] = None
 
 
 class WareHouseTransporting(BaseModel):
@@ -116,6 +117,7 @@ class KochiaWithRiceMill(BaseModel):
     kochia_name: str
     kochia_phone_number: int
     rice_mill_name: str
+    kochia_id: Optional[int] = None
 
 
 class partyBase(BaseModel):
@@ -167,6 +169,7 @@ class AddDoWithAddRiceMillAgreementSocietyTruck(BaseModel):
     agreement_number: str
     society_name: str
     truck_number: str
+    do_id: Optional[int] = None
 
 
 # ___________________________________________________________
@@ -254,6 +257,7 @@ class OtherAwakWithPartyRiceTruck(BaseModel):
     party_name: str
     rice_mill_name: str
     truck_number: str
+    other_awak_id: Optional[int] = None
 
 
 # ___________________________________________________________
@@ -324,6 +328,7 @@ class RiceDepositWithRiceWareTruckTransporter(BaseModel):
     truck_number: str
     ware_houes_name: str
     transporter_name: str
+    rice_depostie_id: Optional[int] = None
 
 
 # ___________________________________________________________
@@ -357,6 +362,36 @@ class DalaliDhaanBase(BaseModel):
     dalali_dhaan_id: Optional[int] = None
 
 
+class DalaliDhaanWithKochia(BaseModel):
+    rst_number: int
+    date: date
+    kochia_id: int
+    vehicale_number_id: int
+    white_sarna_bags: int
+    white_sarna_weight: int
+    ir_bags: int
+    ir_weight: int
+    rb_gold_bags: int
+    rb_gold_weight: int
+    sarna_bags: int
+    sarna_weight: int
+    sambha_new_bags: int
+    sambha_new_weight: int
+    paddy_type: str
+    total_bags: int
+    total_weight: int
+    hamali: int
+    plastic_bag: int
+    jute_bag: int
+    weight_less_kata_difference: float
+    net_weight: float
+    rate: int
+    ammount: float
+    kochia_name: str
+    truck_number: str
+    dalali_dhaan_id: Optional[int] = None
+
+
 # ___________________________________________________________
 
 
@@ -385,6 +420,7 @@ class FrkWithRiceTruck(BaseModel):
     batch_number: int
     rice_mill_name: str
     truck_number: str
+    frk_id: Optional[int] = None
 
 
 class SaudaPatrakBase(BaseModel):
@@ -409,6 +445,7 @@ class SaudaPatrakWithTruckNumber(BaseModel):
     rate: int
     amount: int
     truck_number: str
+    sauda_patrak_id: Optional[int] = None
 
 
 # ___________________________________________________________
@@ -422,6 +459,19 @@ class DoPandingBase(BaseModel):
     patla: str
     sarna: str
     Total: int
+    do_panding_id: Optional[int] = None
+
+
+class DoPandingWithRiceAddDo(BaseModel):
+    rice_mill_id: int
+    do_number_id: int
+    date: date
+    mota: str
+    patla: str
+    sarna: str
+    Total: int
+    rice_mill_name: str
+    do_number: str
     do_panding_id: Optional[int] = None
 
 
@@ -459,6 +509,30 @@ class DhanTransportingBase(BaseModel):
     Dhan_transporting_id: Optional[int] = None
 
 
+class DhanTransportingWithRiceDoTruckTransport(BaseModel):
+    rst_number_id: int
+    date: date
+    do_number_id: int
+    society_name_id: int
+    rice_mill_name_id: int
+    dm_weight: int
+    truck_number_id: int
+    transporting_rate: int
+    numbers_of_bags: int
+    transporting_total: int
+    transporter_name_id: int
+    status: str
+    total_pending: int
+    total_paid: int
+    rst_number: int
+    rice_mill_name: str
+    society_name: str
+    do_number: str
+    truck_number: str
+    transporter_name: str
+    Dhan_transporting_id: Optional[int] = None
+
+
 # ___________________________________________________________
 class OtherJawakBase(BaseModel):
     rst_number: int
@@ -486,19 +560,20 @@ class OtherJawakWithPatyTrucksRice(BaseModel):
     party_name: str
     rice_mill_name: str
     truck_number: str
+    other_jawak_id: Optional[int] = None
 
 
 class BrokenJawak(BaseModel):
     rst_number: int
     date: date
-    party: int
+    party_id: int
     rice_mill_name_id: int
     broker: int
     brokerage_percentage: float
     weight: float
     rate: int
     number_of_bags: int
-    truck_number: int
+    truck_number_id: int
     total: int
     brokerage: float
     net_recievable: float
@@ -511,10 +586,37 @@ class BrokenJawak(BaseModel):
     broken_jawak_id: Optional[int] = None
 
 
+class BrokernJawakWithRicePartyBrokerTruck(BaseModel):
+    rst_number: int
+    date: date
+    party_id: int
+    rice_mill_name_id: int
+    broker: int
+    brokerage_percentage: float
+    weight: float
+    rate: int
+    number_of_bags: int
+    truck_number_id: int
+    total: int
+    brokerage: float
+    net_recievable: float
+    loading_date: date
+    recieved_date: date
+    payment_recieved: int
+    number_of_days: int
+    payment_difference: float
+    remarks: str
+    party_name: str
+    rice_mill_name: str
+    broker_name: str
+    truck_number: str
+    broken_jawak_id: Optional[int] = None
+
+
 class HuskJawakBase(BaseModel):
     rst_number: int
     date: date
-    party: int
+    party_id: int
     rice_mill_name_id: int
     remarks: str
     broker: int
@@ -522,7 +624,7 @@ class HuskJawakBase(BaseModel):
     weight: float
     rate: int
     number_of_bags: int
-    truck_number: int
+    truck_number_id: int
     total: int
     brokerage: float
     net_receivable: float
@@ -531,6 +633,33 @@ class HuskJawakBase(BaseModel):
     payment_received: int
     number_of_days: int
     payment_difference: float
+    husk_jawak_id: Optional[int] = None
+
+
+class HuskJawakWithPartyRiceBrokerTruck(BaseModel):
+    rst_number: int
+    date: date
+    party_id: int
+    rice_mill_name_id: int
+    remarks: str
+    broker: int
+    brokerage_percentage: float
+    weight: float
+    rate: int
+    number_of_bags: int
+    truck_number_id: int
+    total: int
+    brokerage: float
+    net_receivable: float
+    received_date: date
+    loading_date: date
+    payment_received: int
+    number_of_days: int
+    payment_difference: float
+    party_name: str
+    rice_mill_name: str
+    broker_name: str
+    truck_number: str
     husk_jawak_id: Optional[int] = None
 
 
@@ -777,8 +906,8 @@ async def get_all_truck_data(db: Session = Depends(get_db)):
             TruckWithTransporter(
                 truck_number=truck.truck_number,
                 transporter_name=truck.transporter.transporter_name,
-                truck_id=truck.truck_id,
                 transport_id=truck.transport_id,
+                truck_id=truck.truck_id,
             )
         )
 
@@ -880,6 +1009,7 @@ async def get_all_agreements_data(db: Session = Depends(get_db)):
                 type_of_agreement=agreement.type_of_agreement,
                 lot_from=agreement.lot_from,
                 lot_to=agreement.lot_to,
+                agremennt_id=agreement.agremennt_id,
                 rice_mill_name=agreement.addricemill.rice_mill_name,
             )
         )
@@ -947,6 +1077,7 @@ async def get_all_kochia_data(db: Session = Depends(get_db)):
                 rice_mill_name_id=kochia.rice_mill_name_id,
                 kochia_name=kochia.kochia_name,
                 kochia_phone_number=kochia.kochia_phone_number,
+                kochia_id=kochia.kochia_id,
                 rice_mill_name=kochia.addricemill.rice_mill_name,
             )
         )
@@ -1092,6 +1223,7 @@ async def get_all_add_do_data(db: Session = Depends(get_db)):
                 agreement_number=Add_Do.agreement.agreement_number,
                 society_name=Add_Do.society.society_name,
                 truck_number=Add_Do.trucks.truck_number,
+                do_id=Add_Do.do_id,
             )
         )
 
@@ -1253,6 +1385,7 @@ async def get_all_other_awak_data(db: Session = Depends(get_db)):
                 party_name=other_awak.party.party_name,
                 rice_mill_name=other_awak.addricemill.rice_mill_name,
                 truck_number=other_awak.trucks.truck_number,
+                other_awak_id=other_awak.other_awak_id,
             )
         )
 
@@ -1373,6 +1506,7 @@ async def get_all_rice_deposite_data(db: Session = Depends(get_db)):
                 truck_number=rice_deposite.trucks.truck_number,
                 ware_houes_name=rice_deposite.warehousetransporting.ware_houes_name,
                 transporter_name=rice_deposite.transporter.transporter_name,
+                rice_depostie_id=rice_deposite.rice_depostie_id,
             )
         )
 
@@ -1388,14 +1522,66 @@ async def dalali_dhaan(dalalidhaan: DalaliDhaanBase, db: db_dependency):
     db.commit()
 
 
+# @app.get(
+#     "/dalali-dhaan-data/",
+#     response_model=List[DalaliDhaanBase],
+#     status_code=status.HTTP_200_OK,
+# )
+# async def dalali_dhaan_data_data(db: db_dependency):
+#     db_dalali_dhaan_data_data = db.query(models.Dalali_dhaan).distinct().all()
+#     return db_dalali_dhaan_data_data
+
+
 @app.get(
     "/dalali-dhaan-data/",
-    response_model=List[DalaliDhaanBase],
+    response_model=List[DalaliDhaanWithKochia],
     status_code=status.HTTP_200_OK,
 )
-async def dalali_dhaan_data_data(db: db_dependency):
-    db_dalali_dhaan_data_data = db.query(models.Dalali_dhaan).distinct().all()
-    return db_dalali_dhaan_data_data
+async def get_all_dalali_dhaan_data(db: Session = Depends(get_db)):
+    Dalali_dhaans = (
+        db.query(models.Dalali_dhaan)
+        .options(
+            joinedload(models.Dalali_dhaan.kochia),
+            joinedload(models.Dalali_dhaan.trucks),
+        )
+        .all()
+    )
+
+    result = []
+    for Dalali_dhaan in Dalali_dhaans:
+        result.append(
+            DalaliDhaanWithKochia(
+                rst_number=Dalali_dhaan.rst_number,
+                date=Dalali_dhaan.date,
+                kochia_id=Dalali_dhaan.kochia_id,
+                vehicale_number_id=Dalali_dhaan.vehicale_number_id,
+                white_sarna_bags=Dalali_dhaan.white_sarna_bags,
+                white_sarna_weight=Dalali_dhaan.white_sarna_weight,
+                ir_bags=Dalali_dhaan.ir_bags,
+                ir_weight=Dalali_dhaan.ir_weight,
+                rb_gold_bags=Dalali_dhaan.rb_gold_bags,
+                rb_gold_weight=Dalali_dhaan.rb_gold_weight,
+                sarna_bags=Dalali_dhaan.sarna_bags,
+                sarna_weight=Dalali_dhaan.sarna_weight,
+                sambha_new_bags=Dalali_dhaan.sambha_new_bags,
+                sambha_new_weight=Dalali_dhaan.sambha_new_weight,
+                paddy_type=Dalali_dhaan.paddy_type,
+                total_bags=Dalali_dhaan.total_bags,
+                total_weight=Dalali_dhaan.total_weight,
+                hamali=Dalali_dhaan.hamali,
+                plastic_bag=Dalali_dhaan.plastic_bag,
+                jute_bag=Dalali_dhaan.jute_bag,
+                weight_less_kata_difference=Dalali_dhaan.weight_less_kata_difference,
+                net_weight=Dalali_dhaan.net_weight,
+                rate=Dalali_dhaan.rate,
+                ammount=Dalali_dhaan.ammount,
+                kochia_name=Dalali_dhaan.kochia.kochia_name,
+                truck_number=Dalali_dhaan.trucks.truck_number,
+                dalali_dhaan_id=Dalali_dhaan.dalali_dhaan_id,
+            )
+        )
+
+    return result
 
 
 # ________________________________________________________
@@ -1445,6 +1631,7 @@ async def get_all_add_do_data(db: Session = Depends(get_db)):
                 batch_number=frk.batch_number,
                 rice_mill_name=frk.addricemill.rice_mill_name,
                 truck_number=frk.trucks.truck_number,
+                frk_id=frk.frk_id,
             )
         )
 
@@ -1499,6 +1686,7 @@ async def get_all_sauda_patrak_data(db: Session = Depends(get_db)):
                 rate=sauda_patrak.rate,
                 amount=sauda_patrak.amount,
                 truck_number=sauda_patrak.trucks.truck_number,
+                sauda_patrak_id=sauda_patrak.sauda_patrak_id,
             )
         )
 
@@ -1514,14 +1702,49 @@ async def do_panding(dopanding: DoPandingBase, db: db_dependency):
     db.commit()
 
 
+# @app.get(
+#     "/do-panding-data/",
+#     response_model=List[DoPandingBase],
+#     status_code=status.HTTP_200_OK,
+# )
+# async def do_panding_data(db: db_dependency):
+#     db_do_panding_data = db.query(models.Do_panding).distinct().all()
+#     return db_do_panding_data
+
+
 @app.get(
     "/do-panding-data/",
-    response_model=List[DoPandingBase],
+    response_model=List[DoPandingWithRiceAddDo],
     status_code=status.HTTP_200_OK,
 )
-async def do_panding_data(db: db_dependency):
-    db_do_panding_data = db.query(models.Do_panding).distinct().all()
-    return db_do_panding_data
+async def get_all_sauda_patrak_data(db: Session = Depends(get_db)):
+    dos_pending = (
+        db.query(models.Do_panding)
+        .options(
+            joinedload(models.Do_panding.addricemill),
+            joinedload(models.Do_panding.add_do),
+        )
+        .all()
+    )
+
+    result = []
+    for do_pending in dos_pending:
+        result.append(
+            DoPandingWithRiceAddDo(
+                rice_mill_id=do_pending.rice_mill_id,
+                do_number_id=do_pending.do_number_id,
+                date=do_pending.date,
+                mota=do_pending.mota,
+                patla=do_pending.patla,
+                sarna=do_pending.sarna,
+                Total=do_pending.Total,
+                rice_mill_name=do_pending.addricemill.rice_mill_name,
+                do_number=do_pending.add_do.do_number,
+                do_panding_id=do_pending.do_panding_id,
+            )
+        )
+
+    return result
 
 
 # ________________________________________________________
@@ -1581,14 +1804,64 @@ async def dhan_transporting(dhantransporting: DhanTransportingBase, db: db_depen
     db.commit()
 
 
+# @app.get(
+#     "/dhan-transporting-data/",
+#     response_model=List[DhanTransportingBase],
+#     status_code=status.HTTP_200_OK,
+# )
+# async def dhan_transporting_data(db: db_dependency):
+#     db_dhan_transporting_data = db.query(models.Dhan_transporting).distinct().all()
+#     return db_dhan_transporting_data
+
+
 @app.get(
     "/dhan-transporting-data/",
-    response_model=List[DhanTransportingBase],
+    response_model=List[DhanTransportingWithRiceDoTruckTransport],
     status_code=status.HTTP_200_OK,
 )
-async def dhan_transporting_data(db: db_dependency):
-    db_dhan_transporting_data = db.query(models.Dhan_transporting).distinct().all()
-    return db_dhan_transporting_data
+async def get_all_sauda_patrak_data(db: Session = Depends(get_db)):
+    dhans_transporting = (
+        db.query(models.Dhan_transporting)
+        .options(
+            joinedload(models.Dhan_transporting.addricemill),
+            joinedload(models.Dhan_transporting.society),
+            joinedload(models.Dhan_transporting.add_do),
+            joinedload(models.Dhan_transporting.trucks),
+            joinedload(models.Dhan_transporting.transporter),
+            joinedload(models.Dhan_transporting.dhanawak),
+        )
+        .all()
+    )
+
+    result = []
+    for dhan_transporting in dhans_transporting:
+        result.append(
+            DhanTransportingWithRiceDoTruckTransport(
+                rst_number_id=dhan_transporting.rst_number_id,
+                date=dhan_transporting.date,
+                do_number_id=dhan_transporting.do_number_id,
+                society_name_id=dhan_transporting.society_name_id,
+                rice_mill_name_id=dhan_transporting.rice_mill_name_id,
+                dm_weight=dhan_transporting.dm_weight,
+                truck_number_id=dhan_transporting.truck_number_id,
+                transporting_rate=dhan_transporting.transporting_rate,
+                numbers_of_bags=dhan_transporting.numbers_of_bags,
+                transporting_total=dhan_transporting.transporting_total,
+                transporter_name_id=dhan_transporting.transporter_name_id,
+                status=dhan_transporting.status,
+                total_pending=dhan_transporting.total_pending,
+                total_paid=dhan_transporting.total_paid,
+                rst_number=dhan_transporting.dhanawak.rst_number,
+                rice_mill_name=dhan_transporting.addricemill.rice_mill_name,
+                society_name=dhan_transporting.society.society_name,
+                do_number=dhan_transporting.add_do.do_number,
+                truck_number=dhan_transporting.trucks.truck_number,
+                transporter_name=dhan_transporting.transporter.transporter_name,
+                Dhan_transporting_id=dhan_transporting.Dhan_transporting_id,
+            )
+        )
+
+    return result
 
 
 # ________________________________________________________
@@ -1642,6 +1915,7 @@ async def get_all_other_jawak_data(db: Session = Depends(get_db)):
                 party_name=other_jawak.party.party_name,
                 rice_mill_name=other_jawak.addricemill.rice_mill_name,
                 truck_number=other_jawak.trucks.truck_number,
+                other_jawak_id=other_jawak.other_jawak_id,
             )
         )
 
@@ -1657,14 +1931,65 @@ async def add_broken_jawak(brokenjawak: BrokenJawak, db: db_dependency):
     db.commit()
 
 
+# @app.get(
+#     "/other-broken-jawak-data/",
+#     response_model=List[BrokenJawak],
+#     status_code=status.HTTP_200_OK,
+# )
+# async def get_other_broken_jawak_data(db: db_dependency):
+#     db_get_other_broken_jawak_data = db.query(models.broken_jawak).distinct().all()
+#     return db_get_other_broken_jawak_data
+
+
 @app.get(
     "/other-broken-jawak-data/",
-    response_model=List[BrokenJawak],
+    response_model=List[BrokernJawakWithRicePartyBrokerTruck],
     status_code=status.HTTP_200_OK,
 )
-async def get_other_broken_jawak_data(db: db_dependency):
-    db_get_other_broken_jawak_data = db.query(models.broken_jawak).distinct().all()
-    return db_get_other_broken_jawak_data
+async def get_all_other_jawak_data(db: Session = Depends(get_db)):
+    brokens_jawak = (
+        db.query(models.broken_jawak)
+        .options(
+            joinedload(models.broken_jawak.addricemill),
+            joinedload(models.broken_jawak.trucks),
+            joinedload(models.broken_jawak.party),
+            joinedload(models.broken_jawak.brokers),
+        )
+        .all()
+    )
+
+    result = []
+    for broken_jawak in brokens_jawak:
+        result.append(
+            BrokernJawakWithRicePartyBrokerTruck(
+                rst_number=broken_jawak.rst_number,
+                date=broken_jawak.date,
+                party_id=broken_jawak.party_id,
+                rice_mill_name_id=broken_jawak.rice_mill_name_id,
+                broker=broken_jawak.broker,
+                brokerage_percentage=broken_jawak.brokerage_percentage,
+                weight=broken_jawak.weight,
+                rate=broken_jawak.rate,
+                number_of_bags=broken_jawak.number_of_bags,
+                truck_number_id=broken_jawak.truck_number_id,
+                total=broken_jawak.total,
+                brokerage=broken_jawak.brokerage,
+                net_recievable=broken_jawak.net_recievable,
+                loading_date=broken_jawak.loading_date,
+                recieved_date=broken_jawak.recieved_date,
+                payment_recieved=broken_jawak.payment_recieved,
+                number_of_days=broken_jawak.number_of_days,
+                payment_difference=broken_jawak.payment_difference,
+                remarks=broken_jawak.remarks,
+                broken_jawak_id=broken_jawak.broken_jawak_id,
+                party_name=broken_jawak.party.party_name,
+                rice_mill_name=broken_jawak.addricemill.rice_mill_name,
+                broker_name=broken_jawak.brokers.broker_name,
+                truck_number=broken_jawak.trucks.truck_number,
+            )
+        )
+
+    return result
 
 
 # ________________________________________________________
@@ -1678,14 +2003,65 @@ async def add_husk_jawak(huskjawak: HuskJawakBase, db: db_dependency):
     db.commit()
 
 
+# @app.get(
+#     "/other-husk-jawak-data/",
+#     response_model=List[HuskJawakBase],
+#     status_code=status.HTTP_200_OK,
+# )
+# async def get_other_husk_jawak_data(db: db_dependency):
+#     db_get_other_husk_jawak_data = db.query(models.husk_jawak).distinct().all()
+#     return db_get_other_husk_jawak_data
+
+
 @app.get(
     "/other-husk-jawak-data/",
-    response_model=List[HuskJawakBase],
+    response_model=List[HuskJawakWithPartyRiceBrokerTruck],
     status_code=status.HTTP_200_OK,
 )
-async def get_other_husk_jawak_data(db: db_dependency):
-    db_get_other_husk_jawak_data = db.query(models.husk_jawak).distinct().all()
-    return db_get_other_husk_jawak_data
+async def get_all_husk_jawak_data(db: Session = Depends(get_db)):
+    husks_jawak = (
+        db.query(models.husk_jawak)
+        .options(
+            joinedload(models.husk_jawak.addricemill),
+            joinedload(models.husk_jawak.trucks),
+            joinedload(models.husk_jawak.party),
+            joinedload(models.husk_jawak.brokers),
+        )
+        .all()
+    )
+
+    result = []
+    for husk_jawak in husks_jawak:
+        result.append(
+            HuskJawakWithPartyRiceBrokerTruck(
+                rst_number=husk_jawak.rst_number,
+                date=husk_jawak.date,
+                party_id=husk_jawak.party_id,
+                rice_mill_name_id=husk_jawak.rice_mill_name_id,
+                remarks=husk_jawak.remarks,
+                broker=husk_jawak.broker,
+                brokerage_percentage=husk_jawak.brokerage_percentage,
+                weight=husk_jawak.weight,
+                rate=husk_jawak.rate,
+                number_of_bags=husk_jawak.number_of_bags,
+                truck_number_id=husk_jawak.truck_number_id,
+                total=husk_jawak.total,
+                brokerage=husk_jawak.brokerage,
+                net_receivable=husk_jawak.net_receivable,
+                received_date=husk_jawak.received_date,
+                loading_date=husk_jawak.loading_date,
+                payment_received=husk_jawak.payment_received,
+                number_of_days=husk_jawak.number_of_days,
+                payment_difference=husk_jawak.payment_difference,
+                party_name=husk_jawak.party.party_name,
+                rice_mill_name=husk_jawak.addricemill.rice_mill_name,
+                broker_name=husk_jawak.brokers.broker_name,
+                truck_number=husk_jawak.trucks.truck_number,
+                husk_jawak_id=husk_jawak.husk_jawak_id,
+            )
+        )
+
+    return result
 
 
 # ________________________________________________________

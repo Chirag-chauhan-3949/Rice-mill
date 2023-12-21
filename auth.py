@@ -51,33 +51,22 @@
 #     db.commit()
 
 
-def lot_number(x, y):
-    for i in range(x, y):
-        print(i)
+# def lot_number(x, y):
+#     for i in range(x, y):
+#         print(i)
 
 
-lot_number(250, 300)
+# lot_number(250, 300)
 
+import re
 
-truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
-transporter_name_id = Column(Integer, ForeignKey("transporter.transporter_id"))
-transporting_rate = Column(Integer)
-transporting_total = Column(Integer)
-jama_jute_22_23 = Column(Integer)
-ek_bharti_21_22 = Column(Integer)
-pds = Column(Integer)
-miller_purana = Column(Integer)
-kisan = Column(Integer)
-bardana_society = Column(Integer)
-hdpe_22_23 = Column(Integer)
-hdpe_21_22 = Column(Integer)
-hdpe_21_22_one_use = Column(Integer)
-total_bag_weight = Column(Float)
-type_of_paddy = Column(String(50))
-actual_paddy = Column(String(50))
-mill_weight_quintals = Column(Integer)
-shortage = Column(Float)
-bags_put_in_hopper = Column(Integer)
-bags_put_in_stack = Column(Integer)
-hopper_rice_mill_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
-stack_location = Column(String(50))
+character = input("Enter the Character:\n")
+lower = re.search(r"[a-z]", character)
+upper = re.search(r"[A-Z]", character)
+
+if lower != None:
+    print(1)
+elif upper != None:
+    print(0)
+else:
+    print(-1)
