@@ -35,6 +35,9 @@ class Add_Rice_Mill(Base):
     dhantransporting = relationship("Dhan_transporting", back_populates="addricemill")
     brokenjawak = relationship("broken_jawak", back_populates="addricemill")
     huskjawak = relationship("husk_jawak", back_populates="addricemill")
+    nakkhijawak = relationship("nakkhi_jawak", back_populates="addricemill")
+    branjawak = relationship("bran_jawak", back_populates="addricemill")
+    bhushi = relationship("bhushi", back_populates="addricemill")
 
 
 class Transporter(Base):
@@ -68,6 +71,9 @@ class Truck(Base):
     dalalidhaan = relationship("Dalali_dhaan", back_populates="trucks")
     brokenjawak = relationship("broken_jawak", back_populates="trucks")
     huskjawak = relationship("husk_jawak", back_populates="trucks")
+    nakkhijawak = relationship("nakkhi_jawak", back_populates="trucks")
+    branjawak = relationship("bran_jawak", back_populates="trucks")
+    bhushi = relationship("bhushi", back_populates="trucks")
 
 
 class Society(Base):
@@ -130,6 +136,9 @@ class Party(Base):
     other_jawak = relationship("Other_jawak", back_populates="party")
     brokenjawak = relationship("broken_jawak", back_populates="party")
     huskjawak = relationship("husk_jawak", back_populates="party")
+    nakkhijawak = relationship("nakkhi_jawak", back_populates="party")
+    branjawak = relationship("bran_jawak", back_populates="party")
+    bhushi = relationship("bhushi", back_populates="party")
 
 
 class brokers(Base):
@@ -140,6 +149,8 @@ class brokers(Base):
     broker_phone_number = Column(Integer)
     brokenjawak = relationship("broken_jawak", back_populates="brokers")
     huskjawak = relationship("husk_jawak", back_populates="brokers")
+    nakkhijawak = relationship("nakkhi_jawak", back_populates="brokers")
+    branjawak = relationship("bran_jawak", back_populates="brokers")
 
 
 class Add_Do(Base):
@@ -458,14 +469,14 @@ class nakkhi_jawak(Base):
     nakkhi_jawak_id = Column(Integer, primary_key=True, index=True)
     rst_number = Column(Integer)
     date = Column(DATE)
-    party = Column(Integer, ForeignKey("party.party_id"))
+    party_id = Column(Integer, ForeignKey("party.party_id"))
     rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
     broker = Column(Integer, ForeignKey("brokers.broker_id"))
     brokerage_percent = Column(Integer)
     weight = Column(Float)
     rate = Column(Integer)
     number_of_bags = Column(Integer)
-    truck_number = Column(Integer, ForeignKey("trucks.truck_id"))
+    truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
     brokerage = Column(Float)
     total = Column(Integer)
     net_recievable = Column(Float)
@@ -489,14 +500,14 @@ class bran_jawak(Base):
     bran_jawak_id = Column(Integer, primary_key=True, index=True)
     rst_number = Column(Integer)
     date = Column(DATE)
-    party = Column(Integer, ForeignKey("party.party_id"))
+    party_id = Column(Integer, ForeignKey("party.party_id"))
     rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
     broker = Column(Integer, ForeignKey("brokers.broker_id"))
     brokerage_percentage = Column(Float)
     weight = Column(Float)
     rate = Column(Integer)
     number_of_bags = Column(Integer)
-    truck_number = Column(Integer, ForeignKey("trucks.truck_id"))
+    truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
     total = Column(Integer)
     brokerage = Column(Float)
     net_receivable = Column(Float)
@@ -506,6 +517,11 @@ class bran_jawak(Base):
     oil = Column(Integer)
     created_at = Column(DateTime, default=func.now())
 
+    party = relationship("Party", back_populates="branjawak")
+    addricemill = relationship("Add_Rice_Mill", back_populates="branjawak")
+    brokers = relationship("brokers", back_populates="branjawak")
+    trucks = relationship("Truck", back_populates="branjawak")
+
 
 class bhushi(Base):
     __tablename__ = "bhushi"
@@ -513,14 +529,18 @@ class bhushi(Base):
     bhushi_id = Column(Integer, primary_key=True, index=True)
     rst_number = Column(Integer)
     date = Column(DATE)
-    party = Column(Integer, ForeignKey("party.party_id"))
+    party_id = Column(Integer, ForeignKey("party.party_id"))
     rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
     number_of_bags = Column(Integer)
     weight = Column(Float)
-    truck_number = Column(Integer, ForeignKey("trucks.truck_id"))
+    truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
     rate = Column(Integer)
     amount = Column(Integer)
     created_at = Column(DateTime, default=func.now())
+
+    party = relationship("Party", back_populates="bhushi")
+    addricemill = relationship("Add_Rice_Mill", back_populates="bhushi")
+    trucks = relationship("Truck", back_populates="bhushi")
 
 
 # ___________________________________________________________

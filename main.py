@@ -666,14 +666,14 @@ class HuskJawakWithPartyRiceBrokerTruck(BaseModel):
 class NakkhiJawakBase(BaseModel):
     rst_number: int
     date: date
-    party: int
+    party_id: int
     rice_mill_name_id: int
     broker: int
     brokerage_percent: int
     weight: float
     rate: int
     number_of_bags: int
-    truck_number: int
+    truck_number_id: int
     brokerage: float
     total: int
     net_recievable: float
@@ -686,17 +686,44 @@ class NakkhiJawakBase(BaseModel):
     nakkhi_jawak_id: Optional[int] = None
 
 
+class NakkhiWithRicePartyBrokerTruck(BaseModel):
+    rst_number: int
+    date: date
+    party_id: int
+    rice_mill_name_id: int
+    broker: int
+    brokerage_percent: int
+    weight: float
+    rate: int
+    number_of_bags: int
+    truck_number_id: int
+    brokerage: float
+    total: int
+    net_recievable: float
+    loading_date: date
+    recieved_date: date
+    payment_recieved: int
+    number_of_days: int
+    payment_difference: int
+    remarks: str
+    nakkhi_jawak_id: Optional[int] = None
+    party_name: str
+    rice_mill_name: str
+    broker_name: str
+    truck_number: str
+
+
 class BranJawakBase(BaseModel):
     rst_number: int
     date: date
-    party: int
+    party_id: int
     rice_mill_name_id: int
     broker: int
     brokerage_percentage: float
     weight: float
     rate: int
     number_of_bags: int
-    truck_number: int
+    truck_number_id: int
     total: int
     brokerage: float
     net_receivable: float
@@ -707,17 +734,58 @@ class BranJawakBase(BaseModel):
     bran_jawak_id: Optional[int] = None
 
 
+class BranJawakWithRicePatryBrokerTruck(BaseModel):
+    rst_number: int
+    date: date
+    party_id: int
+    rice_mill_name_id: int
+    broker: int
+    brokerage_percentage: float
+    weight: float
+    rate: int
+    number_of_bags: int
+    truck_number_id: int
+    total: int
+    brokerage: float
+    net_receivable: float
+    payment_received: int
+    payment_difference: int
+    remarks: str
+    oil: int
+    bran_jawak_id: Optional[int] = None
+    party_name: str
+    rice_mill_name: str
+    broker_name: str
+    truck_number: str
+
+
 class BhushiBase(BaseModel):
     rst_number: int
     date: date
-    party: int
+    party_id: int
     rice_mill_name_id: int
     number_of_bags: int
     weight: float
-    truck_number: int
+    truck_number_id: int
     rate: int
     amount: int
     bhushi_id: Optional[int] = None
+
+
+class BhushiWithPartyRiceTruck(BaseModel):
+    rst_number: int
+    date: date
+    party_id: int
+    rice_mill_name_id: int
+    number_of_bags: int
+    weight: float
+    truck_number_id: int
+    rate: int
+    amount: int
+    bhushi_id: Optional[int] = None
+    party_name: str
+    rice_mill_name: str
+    truck_number: str
 
 
 # class SocietyBase(BaseModel):
@@ -2075,14 +2143,65 @@ async def add_nakkhi_jawak(nakkhijawak: NakkhiJawakBase, db: db_dependency):
     db.commit()
 
 
+# @app.get(
+#     "/other-nakkhi-jawak-data/",
+#     response_model=List[NakkhiJawakBase],
+#     status_code=status.HTTP_200_OK,
+# )
+# async def get_other_nakkhi_jawak_data(db: db_dependency):
+#     db_get_other_nakkhi_jawak_data = db.query(models.nakkhi_jawak).distinct().all()
+#     return db_get_other_nakkhi_jawak_data
+
+
 @app.get(
     "/other-nakkhi-jawak-data/",
-    response_model=List[NakkhiJawakBase],
+    response_model=List[NakkhiWithRicePartyBrokerTruck],
     status_code=status.HTTP_200_OK,
 )
-async def get_other_nakkhi_jawak_data(db: db_dependency):
-    db_get_other_nakkhi_jawak_data = db.query(models.nakkhi_jawak).distinct().all()
-    return db_get_other_nakkhi_jawak_data
+async def get_all_nakkhi_jawak_data(db: Session = Depends(get_db)):
+    nakkhis_jawak = (
+        db.query(models.nakkhi_jawak)
+        .options(
+            joinedload(models.nakkhi_jawak.addricemill),
+            joinedload(models.nakkhi_jawak.trucks),
+            joinedload(models.nakkhi_jawak.party),
+            joinedload(models.nakkhi_jawak.brokers),
+        )
+        .all()
+    )
+
+    result = []
+    for nakkhi_jawak in nakkhis_jawak:
+        result.append(
+            NakkhiWithRicePartyBrokerTruck(
+                rst_number=nakkhi_jawak.rst_number,
+                date=nakkhi_jawak.date,
+                party_id=nakkhi_jawak.party_id,
+                rice_mill_name_id=nakkhi_jawak.rice_mill_name_id,
+                broker=nakkhi_jawak.broker,
+                brokerage_percent=nakkhi_jawak.brokerage_percent,
+                weight=nakkhi_jawak.weight,
+                rate=nakkhi_jawak.rate,
+                number_of_bags=nakkhi_jawak.number_of_bags,
+                truck_number_id=nakkhi_jawak.truck_number_id,
+                brokerage=nakkhi_jawak.brokerage,
+                total=nakkhi_jawak.total,
+                net_recievable=nakkhi_jawak.net_recievable,
+                loading_date=nakkhi_jawak.loading_date,
+                recieved_date=nakkhi_jawak.recieved_date,
+                payment_recieved=nakkhi_jawak.payment_recieved,
+                number_of_days=nakkhi_jawak.number_of_days,
+                payment_difference=nakkhi_jawak.payment_difference,
+                remarks=nakkhi_jawak.remarks,
+                nakkhi_jawak_id=nakkhi_jawak.nakkhi_jawak_id,
+                party_name=nakkhi_jawak.party.party_name,
+                rice_mill_name=nakkhi_jawak.addricemill.rice_mill_name,
+                broker_name=nakkhi_jawak.brokers.broker_name,
+                truck_number=nakkhi_jawak.trucks.truck_number,
+            )
+        )
+
+    return result
 
 
 # ________________________________________________________
@@ -2096,14 +2215,63 @@ async def add_bran_jawak(branjawak: BranJawakBase, db: db_dependency):
     db.commit()
 
 
+# @app.get(
+#     "/other-bran-jawak-data/",
+#     response_model=List[BranJawakBase],
+#     status_code=status.HTTP_200_OK,
+# )
+# async def get_other_bran_jawak_data(db: db_dependency):
+#     db_get_other_bran_jawak_data = db.query(models.bran_jawak).distinct().all()
+#     return db_get_other_bran_jawak_data
+
+
 @app.get(
     "/other-bran-jawak-data/",
-    response_model=List[BranJawakBase],
+    response_model=List[BranJawakWithRicePatryBrokerTruck],
     status_code=status.HTTP_200_OK,
 )
-async def get_other_bran_jawak_data(db: db_dependency):
-    db_get_other_bran_jawak_data = db.query(models.bran_jawak).distinct().all()
-    return db_get_other_bran_jawak_data
+async def get_all_bran_jawak_data(db: Session = Depends(get_db)):
+    brans_jawak = (
+        db.query(models.bran_jawak)
+        .options(
+            joinedload(models.bran_jawak.addricemill),
+            joinedload(models.bran_jawak.trucks),
+            joinedload(models.bran_jawak.party),
+            joinedload(models.bran_jawak.brokers),
+        )
+        .all()
+    )
+
+    result = []
+    for bran_jawak in brans_jawak:
+        result.append(
+            BranJawakWithRicePatryBrokerTruck(
+                rst_number=bran_jawak.rst_number,
+                date=bran_jawak.date,
+                party_id=bran_jawak.party_id,
+                rice_mill_name_id=bran_jawak.rice_mill_name_id,
+                broker=bran_jawak.broker,
+                brokerage_percentage=bran_jawak.brokerage_percentage,
+                weight=bran_jawak.weight,
+                rate=bran_jawak.rate,
+                number_of_bags=bran_jawak.number_of_bags,
+                truck_number_id=bran_jawak.truck_number_id,
+                total=bran_jawak.total,
+                brokerage=bran_jawak.brokerage,
+                net_receivable=bran_jawak.net_receivable,
+                payment_received=bran_jawak.payment_received,
+                payment_difference=bran_jawak.payment_difference,
+                remarks=bran_jawak.remarks,
+                oil=bran_jawak.oil,
+                bran_jawak_id=bran_jawak.bran_jawak_id,
+                party_name=bran_jawak.party.party_name,
+                rice_mill_name=bran_jawak.addricemill.rice_mill_name,
+                broker_name=bran_jawak.brokers.broker_name,
+                truck_number=bran_jawak.trucks.truck_number,
+            )
+        )
+
+    return result
 
 
 # ________________________________________________________
@@ -2117,14 +2285,53 @@ async def add_bhushi(bhushi: BhushiBase, db: db_dependency):
     db.commit()
 
 
+# @app.get(
+#     "/other-bhushi-data/",
+#     response_model=List[BhushiBase],
+#     status_code=status.HTTP_200_OK,
+# )
+# async def get_other_bhushi_data(db: db_dependency):
+#     db_get_other_bhushi_data = db.query(models.bhushi).distinct().all()
+#     return db_get_other_bhushi_data
+
+
 @app.get(
     "/other-bhushi-data/",
-    response_model=List[BhushiBase],
+    response_model=List[BhushiWithPartyRiceTruck],
     status_code=status.HTTP_200_OK,
 )
-async def get_other_bhushi_data(db: db_dependency):
-    db_get_other_bhushi_data = db.query(models.bhushi).distinct().all()
-    return db_get_other_bhushi_data
+async def get_all_bhushi_jawak_data(db: Session = Depends(get_db)):
+    bhushiii = (
+        db.query(models.bhushi)
+        .options(
+            joinedload(models.bhushi.addricemill),
+            joinedload(models.bhushi.trucks),
+            joinedload(models.bhushi.party),
+        )
+        .all()
+    )
+
+    result = []
+    for bhushi in bhushiii:
+        result.append(
+            BhushiWithPartyRiceTruck(
+                rst_number=bhushi.rst_number,
+                date=bhushi.date,
+                party_id=bhushi.party_id,
+                rice_mill_name_id=bhushi.rice_mill_name_id,
+                number_of_bags=bhushi.number_of_bags,
+                weight=bhushi.weight,
+                truck_number_id=bhushi.truck_number_id,
+                rate=bhushi.rate,
+                amount=bhushi.amount,
+                bhushi_id=bhushi.bhushi_id,
+                party_name=bhushi.party.party_name,
+                rice_mill_name=bhushi.addricemill.rice_mill_name,
+                truck_number=bhushi.trucks.truck_number,
+            )
+        )
+
+    return result
 
 
 # ________________________________________________________
