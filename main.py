@@ -5,7 +5,7 @@ from typing import Annotated, List, Optional
 import models
 from database import engine, sessionlocal
 from sqlalchemy.orm import Session, joinedload, relationship
-from datetime import date
+from datetime import date, datetime
 
 
 app = FastAPI()
@@ -170,6 +170,7 @@ class AddDoWithAddRiceMillAgreementSocietyTruck(BaseModel):
     society_name: str
     truck_number: str
     do_id: Optional[int] = None
+    created_at: Optional[datetime] = None
 
 
 # ___________________________________________________________
@@ -788,6 +789,11 @@ class BhushiWithPartyRiceTruck(BaseModel):
     truck_number: str
 
 
+class DhanAwakDalaliDhan(BaseModel):
+    DhanAwak_Data: List[DhanAwakBase]
+    DalaliDhan_Data: List[DalaliDhaanBase]
+
+
 # class SocietyBase(BaseModel):
 #     society_name: str
 #     society_id: Optional[int] = None
@@ -948,6 +954,16 @@ async def get_all_transporters(db: db_dependency):
 # Add New Truck
 @app.post("/truck/", status_code=status.HTTP_201_CREATED)
 async def add_new_truck(truck: TruckBase, db: db_dependency):
+    existing_truck = (
+        db.query(models.Truck)
+        .filter(models.Truck.truck_number == truck.truck_number)
+        .first()
+    )
+    if existing_truck:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Truck with this Number already exists",
+        )
     db_truck = models.Truck(**truck.dict())
     db.add(db_truck)
     db.commit()
@@ -1287,6 +1303,7 @@ async def get_all_add_do_data(db: Session = Depends(get_db)):
                 total_bardana=Add_Do.total_bardana,
                 society_name_id=Add_Do.society_name_id,
                 truck_number_id=Add_Do.truck_number_id,
+                created_at=Add_Do.created_at,
                 rice_mill_name=Add_Do.addricemill.rice_mill_name,
                 agreement_number=Add_Do.agreement.agreement_number,
                 society_name=Add_Do.society.society_name,
@@ -2492,3 +2509,22 @@ async def get_all_bhushi_jawak_data(db: Session = Depends(get_db)):
 # #     db_agreement = models.Agreement(**agreement.dict())
 # #     db.add(db_agreement)
 # #     db.commit()
+
+
+@app.get(
+    "/paddy-data/",
+    response_model=DhanAwakDalaliDhan,
+    status_code=status.HTTP_200_OK,
+)
+async def get_data(db: db_dependency):
+    # Fetch data from different tables
+    DhanAwak_Data = db.query(models.Dhan_Awak).all()
+    DalaliDhan_Data = db.query(models.Dalali_dhaan).all()
+
+    # Return the result as a custom response model
+    response_data = {
+        "DhanAwak_Data": [DhanAwakBase(**row.__dict__) for row in DhanAwak_Data],
+        "DalaliDhan_Data": [DalaliDhaanBase(**row.__dict__) for row in DalaliDhan_Data],
+    }
+
+    return response_data

@@ -58,15 +58,22 @@
 
 # lot_number(250, 300)
 
-import re
 
-character = input("Enter the Character:\n")
-lower = re.search(r"[a-z]", character)
-upper = re.search(r"[A-Z]", character)
+# @app.post("/add-rice-mill/", status_code=status.HTTP_201_CREATED)
+# async def add_rice_mill(addricemill: AddRiceMillBase, db: db_dependency):
+#     existing_rice_mill = (
+#         db.query(models.Add_Rice_Mill)
+#         .filter(models.Add_Rice_Mill.rice_mill_name == addricemill.rice_mill_name)
+#         .first()
+#     )
+#     if existing_rice_mill:
+#         raise HTTPException(
+#             status_code=status.HTTP_400_BAD_REQUEST,
+#             detail="Rice Mill with this name already exists",
+#         )
+#     db_about_rice_mill = models.Add_Rice_Mill(**addricemill.dict())
+#     db.add(db_about_rice_mill)
+#     db.commit()
+#     db.refresh(db_about_rice_mill)
 
-if lower != None:
-    print(1)
-elif upper != None:
-    print(0)
-else:
-    print(-1)
+#     return db_about_rice_mill
