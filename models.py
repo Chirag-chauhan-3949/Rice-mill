@@ -38,6 +38,7 @@ class Add_Rice_Mill(Base):
     nakkhijawak = relationship("nakkhi_jawak", back_populates="addricemill")
     branjawak = relationship("bran_jawak", back_populates="addricemill")
     bhushi = relationship("bhushi", back_populates="addricemill")
+    paddysale = relationship("Paddy_sale", back_populates="addricemill")
 
 
 class Transporter(Base):
@@ -74,6 +75,7 @@ class Truck(Base):
     nakkhijawak = relationship("nakkhi_jawak", back_populates="trucks")
     branjawak = relationship("bran_jawak", back_populates="trucks")
     bhushi = relationship("bhushi", back_populates="trucks")
+    paddysale = relationship("Paddy_sale", back_populates="trucks")
 
 
 class Society(Base):
@@ -139,6 +141,7 @@ class Party(Base):
     nakkhijawak = relationship("nakkhi_jawak", back_populates="party")
     branjawak = relationship("bran_jawak", back_populates="party")
     bhushi = relationship("bhushi", back_populates="party")
+    paddysale = relationship("Paddy_sale", back_populates="party")
 
 
 class brokers(Base):
@@ -151,6 +154,7 @@ class brokers(Base):
     huskjawak = relationship("husk_jawak", back_populates="brokers")
     nakkhijawak = relationship("nakkhi_jawak", back_populates="brokers")
     branjawak = relationship("bran_jawak", back_populates="brokers")
+    paddysale = relationship("Paddy_sale", back_populates="brokers")
 
 
 class Add_Do(Base):
@@ -215,6 +219,7 @@ class Dhan_Awak(Base):
     stack_location = Column(String(50))
     created_at = Column(DateTime, default=func.now())
     dhantransporting = relationship("Dhan_transporting", back_populates="dhanawak")
+    paddysale = relationship("Paddy_sale", back_populates="dhanawak")
 
 
 class Other_awak(Base):
@@ -543,6 +548,37 @@ class bhushi(Base):
     trucks = relationship("Truck", back_populates="bhushi")
 
 
+class Paddy_sale(Base):
+    __tablename__ = "paddysale"
+
+    paddy_sale_id = Column(Integer, primary_key=True, index=True)
+    rst_number_id = Column(Integer, ForeignKey("dhanawak.dhan_awak_id"))
+    rice_mill_name_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    date = Column(DATE)
+    party_id = Column(Integer, ForeignKey("party.party_id"))
+    broker = Column(Integer, ForeignKey("brokers.broker_id"))
+    loading_form_address = Column(String(50))
+    truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
+    paddy_name = Column(String(50))
+    weight = Column(Integer)
+    party_weight = Column(Integer)
+    bags = Column(Integer)
+    rate = Column(Integer)
+    ammount = Column(Integer)
+    plastic = Column(Integer)
+    joot_old = Column(Integer)
+    joot_23_24 = Column(Integer)
+    joot_22_23 = Column(Integer)
+    average_bag_wt = Column(Float)
+    created_at = Column(DateTime, default=func.now())
+
+    dhanawak = relationship("Dhan_Awak", back_populates="paddysale")
+    party = relationship("Party", back_populates="paddysale")
+    brokers = relationship("brokers", back_populates="paddysale")
+    trucks = relationship("Truck", back_populates="paddysale")
+    addricemill = relationship("Add_Rice_Mill", back_populates="paddysale")
+
+
 # ___________________________________________________________
 
 # class Society_Name(Base):
@@ -568,29 +604,6 @@ class bhushi(Base):
 # #     distance = Column(Float)
 # #     new = Column(Integer)
 # #     created_at = Column(DateTime, default=func.now())
-
-
-# class Paddy_sale(Base):
-#     __tablename__ = "paddysale"
-
-#     paddy_sale_id = Column(Integer, primary_key=True, index=True)
-#     rst_number_id = Column(Integer, ForeignKey("dhanawak.dhan_awak_id"))
-#     date = Column(DATE)
-#     party = Column(String(50))
-#     broker = Column(String(50))
-#     loading_form_address = Column(String(50))
-#     vehicle_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
-#     paddy_name = Column(String(50))
-#     weight = Column(Integer)
-#     party_weight = Column(Integer)
-#     rate = Column(Integer)
-#     ammount = Column(Integer)
-#     plastic = Column(Integer)
-#     joot_old = Column(Integer)
-#     joot_23_24 = Column(Integer)
-#     joot_22_23 = Column(Integer)
-#     average_bag_wt = Column(Float)
-#     created_at = Column(DateTime, default=func.now())
 
 
 # class Mohan_food_paddy(Base):

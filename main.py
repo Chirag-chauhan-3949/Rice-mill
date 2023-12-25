@@ -789,34 +789,64 @@ class BhushiWithPartyRiceTruck(BaseModel):
     truck_number: str
 
 
+class PaddySaleBase(BaseModel):
+    rst_number_id: int
+    rice_mill_name_id: int
+    date: date
+    party_id: int
+    broker: int
+    loading_form_address: str
+    truck_number_id: int
+    paddy_name: str
+    weight: int
+    party_weight: int
+    bags: int
+    rate: int
+    ammount: int
+    plastic: int
+    joot_old: int
+    joot_23_24: int
+    joot_22_23: int
+    average_bag_wt: float
+    paddy_sale_id: Optional[int] = None
+
+
+class PaddySalesWithDhanawakPartyBrokerTruck(BaseModel):
+    rst_number_id: int
+    rice_mill_name_id: int
+    date: date
+    party_id: int
+    broker: int
+    loading_form_address: str
+    truck_number_id: int
+    paddy_name: str
+    weight: int
+    party_weight: int
+    bags: int
+    rate: int
+    ammount: int
+    plastic: int
+    joot_old: int
+    joot_23_24: int
+    joot_22_23: int
+    average_bag_wt: float
+    paddy_sale_id: Optional[int] = None
+    rst_number: int
+    party_name: str
+    broker_name: str
+    truck_number: str
+    rice_mill_name: str
+
+
 class DhanAwakDalaliDhan(BaseModel):
-    DhanAwak_Data: List[DhanAwakBase]
-    DalaliDhan_Data: List[DalaliDhaanBase]
+    total_weight: List[int]  # Dalali Dhan
+    Dhan_data: List[DhanAwakBase]  # Dhan Awak
+    Paddy_sale_data: List[PaddySaleBase]  # paddy sale
 
 
 # class SocietyBase(BaseModel):
 #     society_name: str
 #     society_id: Optional[int] = None
-
-
-# class PaddySaleBase(BaseModel):
-#     rst_number_id: int
-#     date: date
-#     party: str
-#     broker: str
-#     loading_form_address: str
-#     vehicle_number_id: int
-#     paddy_name: str
-#     weight: int
-#     party_weight: int
-#     rate: int
-#     ammount: int
-#     plastic: int
-#     joot_old: int
-#     joot_23_24: int
-#     joot_22_23: int
-#     average_bag_wt: float
-#     paddy_sale_id: Optional[int] = None
 
 
 # # class DhanRiceSocietiesRateBase(BaseModel):
@@ -2353,6 +2383,80 @@ async def get_all_bhushi_jawak_data(db: Session = Depends(get_db)):
 
 # ________________________________________________________
 
+
+# paddy sale
+@app.post("/paddy-sale/", status_code=status.HTTP_201_CREATED)
+async def paddy_sale(paddysale: PaddySaleBase, db: db_dependency):
+    db_paddy_sale = models.Paddy_sale(**paddysale.dict())
+    db.add(db_paddy_sale)
+    db.commit()
+
+
+# @app.get(
+#     "/paddy-sale-data/",
+#     response_model=List[PaddySaleBase],
+#     status_code=status.HTTP_200_OK,
+# )
+# async def paddy_sale_data(db: db_dependency):
+#     db_paddy_sale_data = db.query(models.Paddy_sale).distinct().all()
+#     return db_paddy_sale_data
+
+
+@app.get(
+    "/paddy-sale-data/",
+    response_model=List[PaddySalesWithDhanawakPartyBrokerTruck],
+    status_code=status.HTTP_200_OK,
+)
+async def get_all_paddy_sale_data(db: Session = Depends(get_db)):
+    paddy_sales = (
+        db.query(models.Paddy_sale)
+        .options(
+            joinedload(models.Paddy_sale.dhanawak),
+            joinedload(models.Paddy_sale.brokers),
+            joinedload(models.Paddy_sale.trucks),
+            joinedload(models.Paddy_sale.party),
+            joinedload(models.Paddy_sale.addricemill),
+        )
+        .all()
+    )
+
+    result = []
+    for paddy_sale in paddy_sales:
+        result.append(
+            PaddySalesWithDhanawakPartyBrokerTruck(
+                rst_number_id=paddy_sale.rst_number_id,
+                rice_mill_name_id=paddy_sale.rice_mill_name_id,
+                date=paddy_sale.date,
+                party_id=paddy_sale.party_id,
+                broker=paddy_sale.broker,
+                loading_form_address=paddy_sale.loading_form_address,
+                truck_number_id=paddy_sale.truck_number_id,
+                paddy_name=paddy_sale.paddy_name,
+                weight=paddy_sale.weight,
+                party_weight=paddy_sale.party_weight,
+                bags=paddy_sale.bags,
+                rate=paddy_sale.rate,
+                ammount=paddy_sale.ammount,
+                plastic=paddy_sale.plastic,
+                joot_old=paddy_sale.joot_old,
+                joot_23_24=paddy_sale.joot_23_24,
+                joot_22_23=paddy_sale.joot_22_23,
+                average_bag_wt=paddy_sale.average_bag_wt,
+                paddy_sale_id=paddy_sale.paddy_sale_id,
+                rst_number=paddy_sale.dhanawak.rst_number,
+                party_name=paddy_sale.party.party_name,
+                broker_name=paddy_sale.brokers.broker_name,
+                truck_number=paddy_sale.trucks.truck_number,
+                rice_mill_name=paddy_sale.addricemill.rice_mill_name,
+            )
+        )
+
+    return result
+
+
+# ________________________________________________________
+
+
 # # Society
 # # @app.get(
 # #     "/society-data/{society_id}",
@@ -2380,24 +2484,6 @@ async def get_all_bhushi_jawak_data(db: Session = Depends(get_db)):
 
 #     response_data = {"transporting_rate": society_data.transporting_rate}
 #     return response_data
-
-
-# # paddy sale
-# @app.post("/paddy-sale/", status_code=status.HTTP_201_CREATED)
-# async def paddy_sale(paddysale: PaddySaleBase, db: db_dependency):
-#     db_paddy_sale = models.Paddy_sale(**paddysale.dict())
-#     db.add(db_paddy_sale)
-#     db.commit()
-
-
-# @app.get(
-#     "/paddy-sale-data/",
-#     response_model=List[PaddySaleBase],
-#     status_code=status.HTTP_200_OK,
-# )
-# async def paddy_sale_data(db: db_dependency):
-#     db_paddy_sale_data = db.query(models.Paddy_sale).distinct().all()
-#     return db_paddy_sale_data
 
 
 #     # Dhan rice societies rate
@@ -2511,20 +2597,87 @@ async def get_all_bhushi_jawak_data(db: Session = Depends(get_db)):
 # #     db.commit()
 
 
+# class DhanAwakDalaliDhan(BaseModel):
+#     total_weight: List[int]
+#     dm_weight: List[int]
+#     weight: List[int]
+#     miller_purana: List[int]
+
+
+# @app.get(
+#     "/rice-rst-number-do-number/{rice_mill_id}",
+#     response_model=RiceMillRstNumber,
+#     status_code=status.HTTP_200_OK,
+# )
+# async def rice_mill_rst_number(rice_mill_id: int, db: db_dependency):
+#     rice_mill_data = (
+#         db.query(models.Add_Rice_Mill).filter_by(rice_mill_id=rice_mill_id).all()
+#     )
+#     rst_data = db.query(models.Dhan_Awak).filter_by(rice_mill_id=rice_mill_id).all()
+#     do_number_data = (
+#         db.query(models.Add_Do).filter_by(select_mill_id=rice_mill_id).all()
+#     )
+#     rice_mill_rst_number = {
+#         "rice_mill_data": [AddRiceMillBase(**row.__dict__) for row in rice_mill_data],
+#         "do_number_data": [AdddoBase(**row.__dict__) for row in do_number_data],
+#         "rst_data": [DhanAwakBase(**row.__dict__) for row in rst_data],
+#     }
+#     return rice_mill_rst_number
+
+
+# @app.get(
+#     "/paddy-data/{rice_mill_id}",
+#     response_model=DhanAwakDalaliDhan,
+#     status_code=status.HTTP_200_OK,
+# )
+# async def get_data(rice_mill_id: int, db: db_dependency):
+#     # Fetch data from different tables
+#     total_weight = (
+#         db.query(models.Dalali_dhaan).filter_by(rice_mill_id=rice_mill_id).all()
+#     )
+#     dm_weight = db.query(models.Dhan_Awak).filter_by(rice_mill_id=rice_mill_id).all()
+#     weight = db.query(models.Paddy_sale).filter_by(rice_mill_id=rice_mill_id).all()
+#     miller_purana = (
+#         db.query(models.Dhan_Awak).filter_by(rice_mill_id=rice_mill_id).all()
+#     )
+
+#     # Return the result as a custom response model
+#     response_data = {
+#         "total_weight": [row.total_weight for row in total_weight],
+#         "dm_weight": [row.dm_weight for row in dm_weight],
+#         "weight": [row.weight for row in weight],
+#         "miller_purana": [row.miller_purana for row in miller_purana],
+#     }
+
+#     return response_data
+
+
 @app.get(
-    "/paddy-data/",
+    "/paddy-data/{rice_mill_id}",
     response_model=DhanAwakDalaliDhan,
     status_code=status.HTTP_200_OK,
 )
-async def get_data(db: db_dependency):
+async def get_data(rice_mill_id: int, db: db_dependency):
     # Fetch data from different tables
-    DhanAwak_Data = db.query(models.Dhan_Awak).all()
-    DalaliDhan_Data = db.query(models.Dalali_dhaan).all()
+    total_weight = db.query(models.Dalali_dhaan).all()
+    dm_weight = db.query(models.Dhan_Awak).filter_by(rice_mill_id=rice_mill_id).all()
+    weight = db.query(models.Paddy_sale).filter_by(rice_mill_name_id=rice_mill_id).all()
+    miller_purana = (
+        db.query(models.Dhan_Awak).filter_by(rice_mill_id=rice_mill_id).all()
+    )
+    Paddy_deposite_data = (
+        db.query(models.Rice_deposite).filter_by(rice_mill_name_id=rice_mill_id).all()
+    )
 
     # Return the result as a custom response model
     response_data = {
-        "DhanAwak_Data": [DhanAwakBase(**row.__dict__) for row in DhanAwak_Data],
-        "DalaliDhan_Data": [DalaliDhaanBase(**row.__dict__) for row in DalaliDhan_Data],
+        "total_weight": [row.total_weight for row in total_weight],
+        "Dhan_data": [DhanAwakBase(**row.__dict__) for row in dm_weight],
+        "Paddy_sale_data": [PaddySaleBase(**row.__dict__) for row in weight],
+        "miller_purana": [DhanAwakBase(**row.__dict__) for row in miller_purana],
+        "Paddy_deposite_data": [
+            RiceDepositeBase(**row.__dict__) for row in Paddy_deposite_data
+        ],
     }
 
-    return response_data
+    return DhanAwakDalaliDhan(**response_data)
