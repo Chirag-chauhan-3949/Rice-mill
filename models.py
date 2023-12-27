@@ -39,6 +39,8 @@ class Add_Rice_Mill(Base):
     branjawak = relationship("bran_jawak", back_populates="addricemill")
     bhushi = relationship("bhushi", back_populates="addricemill")
     paddysale = relationship("Paddy_sale", back_populates="addricemill")
+    ricepurchase = relationship("Rice_Purchase", back_populates="addricemill")
+    dhanawak = relationship("Dhan_Awak", back_populates="addricemill")
 
 
 class Transporter(Base):
@@ -52,6 +54,7 @@ class Transporter(Base):
     trucks = relationship("Truck", back_populates="transporter")
     ricedeposite = relationship("Rice_deposite", back_populates="transporter")
     dhantransporting = relationship("Dhan_transporting", back_populates="transporter")
+    dhanawak = relationship("Dhan_Awak", back_populates="transporter")
 
 
 class Truck(Base):
@@ -76,6 +79,8 @@ class Truck(Base):
     branjawak = relationship("bran_jawak", back_populates="trucks")
     bhushi = relationship("bhushi", back_populates="trucks")
     paddysale = relationship("Paddy_sale", back_populates="trucks")
+    ricepurchase = relationship("Rice_Purchase", back_populates="trucks")
+    dhanawak = relationship("Dhan_Awak", back_populates="trucks")
 
 
 class Society(Base):
@@ -90,6 +95,7 @@ class Society(Base):
     created_at = Column(DateTime, default=func.now())
     add_do = relationship("Add_Do", back_populates="society")
     dhantransporting = relationship("Dhan_transporting", back_populates="society")
+    dhanawak = relationship("Dhan_Awak", back_populates="society")
 
 
 class Agreement(Base):
@@ -142,6 +148,7 @@ class Party(Base):
     branjawak = relationship("bran_jawak", back_populates="party")
     bhushi = relationship("bhushi", back_populates="party")
     paddysale = relationship("Paddy_sale", back_populates="party")
+    ricepurchase = relationship("Rice_Purchase", back_populates="party")
 
 
 class brokers(Base):
@@ -155,6 +162,7 @@ class brokers(Base):
     nakkhijawak = relationship("nakkhi_jawak", back_populates="brokers")
     branjawak = relationship("bran_jawak", back_populates="brokers")
     paddysale = relationship("Paddy_sale", back_populates="brokers")
+    ricepurchase = relationship("Rice_Purchase", back_populates="brokers")
 
 
 class Add_Do(Base):
@@ -182,6 +190,7 @@ class Add_Do(Base):
     trucks = relationship("Truck", back_populates="add_do")
     dopanding = relationship("Do_panding", back_populates="add_do")
     dhantransporting = relationship("Dhan_transporting", back_populates="add_do")
+    dhanawak = relationship("Dhan_Awak", back_populates="add_do")
 
 
 class Dhan_Awak(Base):
@@ -215,9 +224,14 @@ class Dhan_Awak(Base):
     shortage = Column(Float)
     bags_put_in_hopper = Column(Integer)
     bags_put_in_stack = Column(Integer)
-    hopper_rice_mill_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    hopper_rice_mill_id = Column(String(100))
     stack_location = Column(String(50))
     created_at = Column(DateTime, default=func.now())
+    addricemill = relationship("Add_Rice_Mill", back_populates="dhanawak")
+    add_do = relationship("Add_Do", back_populates="dhanawak")
+    society = relationship("Society", back_populates="dhanawak")
+    trucks = relationship("Truck", back_populates="dhanawak")
+    transporter = relationship("Transporter", back_populates="dhanawak")
     dhantransporting = relationship("Dhan_transporting", back_populates="dhanawak")
     paddysale = relationship("Paddy_sale", back_populates="dhanawak")
 
@@ -580,6 +594,38 @@ class Paddy_sale(Base):
 
 
 # ___________________________________________________________
+
+
+class Rice_Purchase(Base):
+    __tablename__ = "ricepurchase"
+
+    rice_purchase_id = Column(Integer, primary_key=True, index=True)
+    rst_number = Column(Integer)
+    date = Column(DATE)
+    broker_id = Column(Integer, ForeignKey("brokers.broker_id"))
+    truck_number_id = Column(Integer, ForeignKey("trucks.truck_id"))
+    bags = Column(Integer)
+    mill_weight = Column(Float)
+    party_weight = Column(Float)
+    bill_to_rice_mill = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
+    party_id = Column(Integer, ForeignKey("party.party_id"))
+    created_at = Column(DateTime, default=func.now())
+    brokers = relationship("brokers", back_populates="ricepurchase")
+    trucks = relationship("Truck", back_populates="ricepurchase")
+    addricemill = relationship("Add_Rice_Mill", back_populates="ricepurchase")
+    party = relationship("Party", back_populates="ricepurchase")
+
+
+class CashInCashOut(Base):
+    __tablename__ = "cashincashout"
+
+    cash_detail = Column(Integer, primary_key=True, index=True)
+    cash_in = Column(Float)
+    cash_out = Column(Float)
+    in_hand = Column(Float)
+    in_out = Column(Float)
+    created_at = Column(DateTime, default=func.now())
+
 
 # class Society_Name(Base):
 #     __tablename__ = "societyName"

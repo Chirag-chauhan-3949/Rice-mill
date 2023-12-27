@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException, Depends, status, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Annotated, List, Optional
@@ -7,15 +7,14 @@ from database import engine, sessionlocal
 from sqlalchemy.orm import Session, joinedload, relationship
 from datetime import date, datetime
 
-
 app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
 
 # CORS (Cross-Origin Resource Sharing) middleware configuration
-origins = [
-    # "http://localhost:5173",
-    # "http://localhost:5174",  # Update this with the origin of your React app
-]
+# origins = [
+#     "http://localhost:5173",
+#     # "http://localhost:5174",  # Update this with the origin of your React app
+# ]
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,6 +24,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+API_KEY = "your_secret_api_key"
+
+
+# Dependency to check API key
+async def api_key_header(api_key: Optional[str] = Header(default=None)):
+    if api_key is None or api_key != API_KEY:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid API key",
+        )
+    return api_key
 
 
 class AddRiceMillBase(BaseModel):
@@ -220,9 +232,47 @@ class DhanAwakBase(BaseModel):
     shortage: float
     bags_put_in_hopper: int
     bags_put_in_stack: int
-    hopper_rice_mill_id: int
+    hopper_rice_mill_id: str
     stack_location: str
     dhan_awak_id: Optional[int] = None
+
+
+class DhanAwakWithRiceDoSocietytrucktransport(BaseModel):
+    rst_number: int
+    rice_mill_id: int
+    date: date
+    do_id: int
+    society_id: int
+    dm_weight: int
+    number_of_bags: int
+    truck_number_id: int
+    transporter_name_id: int
+    transporting_rate: int
+    transporting_total: int
+    jama_jute_22_23: int
+    ek_bharti_21_22: int
+    pds: int
+    miller_purana: int
+    kisan: int
+    bardana_society: int
+    hdpe_22_23: int
+    hdpe_21_22: int
+    hdpe_21_22_one_use: int
+    total_bag_weight: float
+    type_of_paddy: str
+    actual_paddy: str
+    mill_weight_quintals: int
+    shortage: float
+    bags_put_in_hopper: int
+    bags_put_in_stack: int
+    hopper_rice_mill_id: str
+    stack_location: str
+    dhan_awak_id: Optional[int] = None
+    rice_mill_name: str
+    do_number: str
+    society_name: str
+    truck_number: str
+    transporter_name: str
 
 
 class RiceMillTruckNumberPartyBrokers(BaseModel):
@@ -838,10 +888,57 @@ class PaddySalesWithDhanawakPartyBrokerTruck(BaseModel):
     rice_mill_name: str
 
 
+class CashInCashOutBase(BaseModel):
+    cash_in: float
+    cash_out: float
+    in_hand: float
+    in_out: float
+    cash_detail: Optional[int] = None
+
+
 class DhanAwakDalaliDhan(BaseModel):
     total_weight: List[int]  # Dalali Dhan
     Dhan_data: List[DhanAwakBase]  # Dhan Awak
     Paddy_sale_data: List[PaddySaleBase]  # paddy sale
+
+
+class RicePurchaseBase(BaseModel):
+    rst_number: int
+    date: date
+    party_id: int
+    broker_id: int
+    truck_number_id: int
+    bags: int
+    mill_weight: float
+    party_weight: float
+    bill_to_rice_mill: int
+    rice_purchase_id: Optional[int] = None
+
+
+class RicePurchaseWithRiceTruckParty(BaseModel):
+    rst_number: int
+    date: date
+    party_id: int
+    broker_id: int
+    truck_number_id: int
+    bags: int
+    mill_weight: float
+    party_weight: float
+    bill_to_rice_mill: int
+    rice_purchase_id: Optional[int] = None
+    party_name: str
+    broker_name: str
+    truck_number: str
+    rice_mill_name: str
+
+
+class inventoryData(BaseModel):
+    mill_weight: List[float]
+    rice_deposide_data: List[RiceDepositeBase]
+    broken_data: List[BrokenJawak]
+    bran_data: List[BranJawakBase]
+    nakkhi_data: List[NakkhiJawakBase]
+    husk_data: List[HuskJawakBase]
 
 
 # class SocietyBase(BaseModel):
@@ -911,12 +1008,17 @@ def get_db():
         db.close()
 
 
-db_dependency = Annotated[Session, Depends(get_db)]
+# db_dependency = Annotated[Session, Depends(get_db)]
+# api_key_dependency = Depends(api_key_header)
 
 
 # Add Rice Mill
-@app.post("/add-rice-mill/", status_code=status.HTTP_201_CREATED)
-async def add_rice_mill(addricemill: AddRiceMillBase, db: db_dependency):
+@app.post(
+    "/add-rice-mill/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def add_rice_mill(addricemill: AddRiceMillBase, db: Session = Depends(get_db)):
     existing_rice_mill = (
         db.query(models.Add_Rice_Mill)
         .filter(models.Add_Rice_Mill.rice_mill_name == addricemill.rice_mill_name)
@@ -940,8 +1042,9 @@ async def add_rice_mill(addricemill: AddRiceMillBase, db: db_dependency):
     "/rice-mill/",
     response_model=List[AddRiceMillBase],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
-async def rice_mill_data(db: db_dependency):
+async def rice_mill_data(db: Session = Depends(get_db)):
     db_rice_mill_data = db.query(models.Add_Rice_Mill).distinct().all()
     return db_rice_mill_data
 
@@ -950,8 +1053,11 @@ async def rice_mill_data(db: db_dependency):
 @app.post(
     "/transporter/",
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
 )
-async def add_new_trasporter(transporters: TransporterBase, db: db_dependency):
+async def add_new_trasporter(
+    transporters: TransporterBase, db: Session = Depends(get_db)
+):
     existing_transporter = (
         db.query(models.Transporter)
         .filter(models.Transporter.transporter_name == transporters.transporter_name)
@@ -975,15 +1081,20 @@ async def add_new_trasporter(transporters: TransporterBase, db: db_dependency):
     "/transporters/",
     response_model=List[TransporterBase],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
-async def get_all_transporters(db: db_dependency):
+async def get_all_transporters(db: Session = Depends(get_db)):
     transporters = db.query(models.Transporter).distinct().all()
     return transporters
 
 
 # Add New Truck
-@app.post("/truck/", status_code=status.HTTP_201_CREATED)
-async def add_new_truck(truck: TruckBase, db: db_dependency):
+@app.post(
+    "/truck/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def add_new_truck(truck: TruckBase, db: Session = Depends(get_db)):
     existing_truck = (
         db.query(models.Truck)
         .filter(models.Truck.truck_number == truck.truck_number)
@@ -1001,7 +1112,7 @@ async def add_new_truck(truck: TruckBase, db: db_dependency):
 
 # Get Truck Data
 # @app.get("/trucks/", response_model=List[TruckBase], status_code=status.HTTP_200_OK)
-# async def get_all_truck_data(db: db_dependency):
+# async def get_all_truck_data(db: Session = Depends(get_db)):
 #     trucks = db.query(models.Truck).distinct().all()
 #     return trucks
 
@@ -1010,6 +1121,7 @@ async def add_new_truck(truck: TruckBase, db: db_dependency):
     "/trucks/",
     response_model=List[TruckWithTransporter],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
 async def get_all_truck_data(db: Session = Depends(get_db)):
     trucks = db.query(models.Truck).options(joinedload(models.Truck.transporter)).all()
@@ -1029,15 +1141,24 @@ async def get_all_truck_data(db: Session = Depends(get_db)):
 
 
 # Get all truck numbers for dropdown options
-@app.get("/truck-numbers/", response_model=List[str], status_code=status.HTTP_200_OK)
-async def get_truck_numbers(db: db_dependency):
+@app.get(
+    "/truck-numbers/",
+    response_model=List[str],
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
+)
+async def get_truck_numbers(db: Session = Depends(get_db)):
     db_truck_numbers = db.query(models.Truck.truck_number).distinct().all()
     return [truck_number[0] for truck_number in db_truck_numbers]
 
 
 # Add Society
-@app.post("/society/", status_code=status.HTTP_201_CREATED)
-async def add_society(addsociety: SocietyBase, db: db_dependency):
+@app.post(
+    "/society/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def add_society(addsociety: SocietyBase, db: Session = Depends(get_db)):
     existing_society = (
         db.query(models.Society)
         .filter(models.Society.society_name == addsociety.society_name)
@@ -1058,23 +1179,35 @@ async def add_society(addsociety: SocietyBase, db: db_dependency):
 
 # Get Society Data
 @app.get(
-    "/societies/", response_model=List[SocietyBase], status_code=status.HTTP_200_OK
+    "/societies/",
+    response_model=List[SocietyBase],
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
-async def get_all_society_data(db: db_dependency):
+async def get_all_society_data(db: Session = Depends(get_db)):
     societys = db.query(models.Society).distinct().all()
     return societys
 
 
 # Get all society name for dropdown options
-@app.get("/societies-names/", response_model=List[str], status_code=status.HTTP_200_OK)
-async def get_all_societyes_names(db: db_dependency):
+@app.get(
+    "/societies-names/",
+    response_model=List[str],
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
+)
+async def get_all_societyes_names(db: Session = Depends(get_db)):
     db_get_all_societyes_names = db.query(models.Society.society_name).distinct().all()
     return [all_society_name[0] for all_society_name in db_get_all_societyes_names]
 
 
 # Add Agreement
-@app.post("/agreement/", status_code=status.HTTP_201_CREATED)
-async def add_agreement(addagreement: AgreementBase, db: db_dependency):
+@app.post(
+    "/agreement/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def add_agreement(addagreement: AgreementBase, db: Session = Depends(get_db)):
     existing_agreement = (
         db.query(models.Agreement)
         .filter(models.Agreement.agreement_number == addagreement.agreement_number)
@@ -1097,7 +1230,7 @@ async def add_agreement(addagreement: AgreementBase, db: db_dependency):
 # @app.get(
 #     "/agreements/", response_model=List[AgreementBase], status_code=status.HTTP_200_OK
 # )
-# async def get_all_agreement_data(db: db_dependency):
+# async def get_all_agreement_data(db: Session = Depends(get_db)):
 #     agreements = db.query(models.Agreement).distinct().all()
 #     return agreements
 
@@ -1106,6 +1239,7 @@ async def add_agreement(addagreement: AgreementBase, db: db_dependency):
     "/agreements/",
     response_model=List[RiceMillWithAgreement],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
 async def get_all_agreements_data(db: Session = Depends(get_db)):
     agreements = (
@@ -1133,16 +1267,25 @@ async def get_all_agreements_data(db: Session = Depends(get_db)):
 
 # Get all agreements number for dropdown options
 @app.get(
-    "/agreements-number/", response_model=List[int], status_code=status.HTTP_200_OK
+    "/agreements-number/",
+    response_model=List[int],
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
-async def get_all_agreements_number(db: db_dependency):
+async def get_all_agreements_number(db: Session = Depends(get_db)):
     db_agreements_number = db.query(models.Agreement.agreement_number).distinct().all()
     return [agreement_number[0] for agreement_number in db_agreements_number]
 
 
 # Whare House
-@app.post("/ware-house-transporting/", status_code=status.HTTP_201_CREATED)
-async def add_whare_house(warehouse: WareHouseTransporting, db: db_dependency):
+@app.post(
+    "/ware-house-transporting/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def add_whare_house(
+    warehouse: WareHouseTransporting, db: Session = Depends(get_db)
+):
     db_add_ware_house = models.ware_house_transporting(**warehouse.dict())
     db.add(db_add_ware_house)
     db.commit()
@@ -1152,15 +1295,20 @@ async def add_whare_house(warehouse: WareHouseTransporting, db: db_dependency):
     "/get-ware-house-data/",
     response_model=List[WareHouseTransporting],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
-async def get_all_ware_house_data(db: db_dependency):
+async def get_all_ware_house_data(db: Session = Depends(get_db)):
     ware_house_db = db.query(models.ware_house_transporting).distinct().all()
     return ware_house_db
 
 
 # Kochia
-@app.post("/kochia/", status_code=status.HTTP_201_CREATED)
-async def add_kochia(addkochia: KochiaBase, db: db_dependency):
+@app.post(
+    "/kochia/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def add_kochia(addkochia: KochiaBase, db: Session = Depends(get_db)):
     db_kochia = models.Kochia(**addkochia.dict())
     db.add(db_kochia)
     db.commit()
@@ -1169,7 +1317,7 @@ async def add_kochia(addkochia: KochiaBase, db: db_dependency):
 # @app.get(
 #     "/kochia-data/", response_model=List[KochiaBase], status_code=status.HTTP_200_OK
 # )
-# async def kochia_data(db: db_dependency):
+# async def kochia_data(db: Session = Depends(get_db)):
 #     db_kochia_data = db.query(models.Kochia).distinct().all()
 #     return db_kochia_data
 
@@ -1178,6 +1326,7 @@ async def add_kochia(addkochia: KochiaBase, db: db_dependency):
     "/kochia-data/",
     response_model=List[KochiaWithRiceMill],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
 async def get_all_kochia_data(db: Session = Depends(get_db)):
     kochias = (
@@ -1200,8 +1349,12 @@ async def get_all_kochia_data(db: Session = Depends(get_db)):
 
 
 # Party
-@app.post("/party/", status_code=status.HTTP_201_CREATED)
-async def add_party(party: partyBase, db: db_dependency):
+@app.post(
+    "/party/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def add_party(party: partyBase, db: Session = Depends(get_db)):
     db_add_party = models.Party(**party.dict())
     db.add(db_add_party)
     db.commit()
@@ -1211,15 +1364,20 @@ async def add_party(party: partyBase, db: db_dependency):
     "/party-data/",
     response_model=List[partyBase],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
-async def get_party_data(db: db_dependency):
+async def get_party_data(db: Session = Depends(get_db)):
     db_party_data = db.query(models.Party).distinct().all()
     return db_party_data
 
 
 # broker
-@app.post("/broker/", status_code=status.HTTP_201_CREATED)
-async def add_broker(broker: brokenBase, db: db_dependency):
+@app.post(
+    "/broker/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def add_broker(broker: brokenBase, db: Session = Depends(get_db)):
     db_add_broker = models.brokers(**broker.dict())
     db.add(db_add_broker)
     db.commit()
@@ -1229,8 +1387,9 @@ async def add_broker(broker: brokenBase, db: db_dependency):
     "/broker-data/",
     response_model=List[brokenBase],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
-async def get_broker_data(db: db_dependency):
+async def get_broker_data(db: Session = Depends(get_db)):
     db_broker_data = db.query(models.brokers).distinct().all()
     return db_broker_data
 
@@ -1240,8 +1399,9 @@ async def get_broker_data(db: db_dependency):
     "/rice-agreement-transporter-truck-society-data/",
     response_model=RiceMillData,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
-async def get_data(db: db_dependency):
+async def get_data(db: Session = Depends(get_db)):
     # Fetch data from different tables
     rice_mill_data = db.query(models.Add_Rice_Mill).all()
     agreement_data = db.query(models.Agreement).all()
@@ -1264,8 +1424,9 @@ async def get_data(db: db_dependency):
     "/rice-agreement-data/{rice_mill_id}",
     response_model=AddDoData,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
-async def adddodata(rice_mill_id: int, db: db_dependency):
+async def adddodata(rice_mill_id: int, db: Session = Depends(get_db)):
     rice_mill_data = (
         db.query(models.Add_Rice_Mill).filter_by(rice_mill_id=rice_mill_id).all()
     )
@@ -1283,8 +1444,12 @@ async def adddodata(rice_mill_id: int, db: db_dependency):
 
 
 # Add Do
-@app.post("/add-do/", status_code=status.HTTP_201_CREATED)
-async def add_do(adddo: AdddoBase, db: db_dependency):
+@app.post(
+    "/add-do/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def add_do(adddo: AdddoBase, db: Session = Depends(get_db)):
     db_add_do = models.Add_Do(**adddo.dict())
     db.add(db_add_do)
     db.commit()
@@ -1293,7 +1458,7 @@ async def add_do(adddo: AdddoBase, db: db_dependency):
 # @app.get(
 #     "/add-do-data/", response_model=List[AdddoBase], status_code=status.HTTP_200_OK
 # )
-# async def get_all_add_do_data(db: db_dependency):
+# async def get_all_add_do_data(db: Session = Depends(get_db)):
 #     add_do = db.query(models.Add_Do).distinct().all()
 #     return add_do
 
@@ -1302,6 +1467,7 @@ async def add_do(adddo: AdddoBase, db: db_dependency):
     "/add-do-data/",
     response_model=List[AddDoWithAddRiceMillAgreementSocietyTruck],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
 async def get_all_add_do_data(db: Session = Depends(get_db)):
     Add_Dos = (
@@ -1352,8 +1518,9 @@ async def get_all_add_do_data(db: Session = Depends(get_db)):
     "/rice-do-number/{rice_mill_id}",
     response_model=DhanAwakRiceDoNumber,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
-async def rice_do_number_data(rice_mill_id: int, db: db_dependency):
+async def rice_do_number_data(rice_mill_id: int, db: Session = Depends(get_db)):
     rice_mill_data = (
         db.query(models.Add_Rice_Mill).filter_by(rice_mill_id=rice_mill_id).all()
     )
@@ -1371,8 +1538,9 @@ async def rice_do_number_data(rice_mill_id: int, db: db_dependency):
     "/rice-do-society-truck-transporter/",
     response_model=DhanAwakRiceDoSocietyTruckTransporter,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
-async def Dhan_awak_data(db: db_dependency):
+async def Dhan_awak_data(db: Session = Depends(get_db)):
     rice_mill_data = db.query(models.Add_Rice_Mill).all()
     do_number_data = db.query(models.Add_Do).all()
     society_data = db.query(models.Society).all()
@@ -1396,8 +1564,9 @@ async def Dhan_awak_data(db: db_dependency):
     "/truck-transporter/{transport_id}",  # Here will go my truck ID
     response_model=DhanAwakTruckTransporter,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
-async def truck_transporter_data(transport_id: int, db: db_dependency):
+async def truck_transporter_data(transport_id: int, db: Session = Depends(get_db)):
     truck_data = db.query(models.Truck).filter_by(transport_id=transport_id).all()
     transporter_data = (
         db.query(models.Transporter).filter_by(transporter_id=transport_id).all()
@@ -1412,21 +1581,89 @@ async def truck_transporter_data(transport_id: int, db: db_dependency):
 
 
 # Dhan Awak
-@app.post("/dhan-awak/", status_code=status.HTTP_201_CREATED)
-async def add_dhan_awak(dhanawak: DhanAwakBase, db: db_dependency):
+@app.post(
+    "/dhan-awak/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def add_dhan_awak(dhanawak: DhanAwakBase, db: Session = Depends(get_db)):
     db_dhan_awak = models.Dhan_Awak(**dhanawak.dict())
     db.add(db_dhan_awak)
     db.commit()
 
 
+# @app.get(
+#     "/dhan-awak-data/",
+#     response_model=List[DhanAwakBase],
+#     status_code=status.HTTP_200_OK,
+# )
+# async def get_dhan_awak(db: Session = Depends(get_db)):
+#     db_dhan_awak_data = db.query(models.Dhan_Awak).distinct().all()
+#     return db_dhan_awak_data
+
+
 @app.get(
     "/dhan-awak-data/",
-    response_model=List[DhanAwakBase],
+    response_model=List[DhanAwakWithRiceDoSocietytrucktransport],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
-async def get_dhan_awak(db: db_dependency):
-    db_dhan_awak_data = db.query(models.Dhan_Awak).distinct().all()
-    return db_dhan_awak_data
+async def get_all_dhan_awak_data(db: Session = Depends(get_db)):
+    dhan_awaks_data = (
+        db.query(models.Dhan_Awak)
+        .options(
+            joinedload(models.Dhan_Awak.addricemill),
+            joinedload(models.Dhan_Awak.add_do),
+            joinedload(models.Dhan_Awak.society),
+            joinedload(models.Dhan_Awak.trucks),
+            joinedload(models.Dhan_Awak.transporter),
+        )
+        .all()
+    )
+
+    result = []
+    for dhan_awaks in dhan_awaks_data:
+        result.append(
+            DhanAwakWithRiceDoSocietytrucktransport(
+                rst_number=dhan_awaks.rst_number,
+                rice_mill_id=dhan_awaks.rice_mill_id,
+                date=dhan_awaks.date,
+                do_id=dhan_awaks.do_id,
+                society_id=dhan_awaks.society_id,
+                dm_weight=dhan_awaks.dm_weight,
+                number_of_bags=dhan_awaks.number_of_bags,
+                truck_number_id=dhan_awaks.truck_number_id,
+                transporter_name_id=dhan_awaks.transporter_name_id,
+                transporting_rate=dhan_awaks.transporting_rate,
+                transporting_total=dhan_awaks.transporting_total,
+                jama_jute_22_23=dhan_awaks.jama_jute_22_23,
+                ek_bharti_21_22=dhan_awaks.ek_bharti_21_22,
+                pds=dhan_awaks.pds,
+                miller_purana=dhan_awaks.miller_purana,
+                kisan=dhan_awaks.kisan,
+                bardana_society=dhan_awaks.bardana_society,
+                hdpe_22_23=dhan_awaks.hdpe_22_23,
+                hdpe_21_22=dhan_awaks.hdpe_21_22,
+                hdpe_21_22_one_use=dhan_awaks.hdpe_21_22_one_use,
+                total_bag_weight=dhan_awaks.total_bag_weight,
+                type_of_paddy=dhan_awaks.type_of_paddy,
+                actual_paddy=dhan_awaks.actual_paddy,
+                mill_weight_quintals=dhan_awaks.mill_weight_quintals,
+                shortage=dhan_awaks.shortage,
+                bags_put_in_hopper=dhan_awaks.bags_put_in_hopper,
+                bags_put_in_stack=dhan_awaks.bags_put_in_stack,
+                hopper_rice_mill_id=dhan_awaks.hopper_rice_mill_id,
+                stack_location=dhan_awaks.stack_location,
+                dhan_awak_id=dhan_awaks.dhan_awak_id,
+                rice_mill_name=dhan_awaks.addricemill.rice_mill_name,
+                do_number=dhan_awaks.add_do.do_number,
+                society_name=dhan_awaks.society.society_name,
+                truck_number=dhan_awaks.trucks.truck_number,
+                transporter_name=dhan_awaks.transporter.transporter_name,
+            )
+        )
+
+    return result
 
 
 # ________________________________________________________
@@ -1434,8 +1671,9 @@ async def get_dhan_awak(db: db_dependency):
     "/rice-truck-party-brokers/",
     response_model=RiceMillTruckNumberPartyBrokers,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
-async def broken_data(db: db_dependency):
+async def broken_data(db: Session = Depends(get_db)):
     rice_mill_data = db.query(models.Add_Rice_Mill).all()
     truck_data = db.query(models.Truck).all()
     party_data = db.query(models.Party).all()
@@ -1451,8 +1689,12 @@ async def broken_data(db: db_dependency):
 
 
 # Other Awak
-@app.post("/other-awak/", status_code=status.HTTP_201_CREATED)
-async def add_other_awak(otherawak: OtherAwakBase, db: db_dependency):
+@app.post(
+    "/other-awak/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def add_other_awak(otherawak: OtherAwakBase, db: Session = Depends(get_db)):
     db_add_other_awak = models.Other_awak(**otherawak.dict())
     db.add(db_add_other_awak)
     db.commit()
@@ -1463,7 +1705,7 @@ async def add_other_awak(otherawak: OtherAwakBase, db: db_dependency):
 #     response_model=List[OtherAwakBase],
 #     status_code=status.HTTP_200_OK,
 # )
-# async def get_other_awak_data(db: db_dependency):
+# async def get_other_awak_data(db: Session = Depends(get_db)):
 #     db_get_other_awak_data = db.query(models.other_awak).distinct().all()
 #     return db_get_other_awak_data
 
@@ -1472,6 +1714,7 @@ async def add_other_awak(otherawak: OtherAwakBase, db: db_dependency):
     "/other-awak-data/",
     response_model=List[OtherAwakWithPartyRiceTruck],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
 async def get_all_other_awak_data(db: Session = Depends(get_db)):
     other_awaks = (
@@ -1512,8 +1755,9 @@ async def get_all_other_awak_data(db: Session = Depends(get_db)):
     "/ware-house-data/{warehouse_id}",  # Corrected the path parameter name
     response_model=wareHousetrasportingrate,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
-async def warehouse_data(warehouse_id: int, db: db_dependency):
+async def warehouse_data(warehouse_id: int, db: Session = Depends(get_db)):
     warehouse_data = (
         db.query(models.ware_house_transporting)
         .filter_by(ware_houes_id=warehouse_id)
@@ -1535,8 +1779,9 @@ async def warehouse_data(warehouse_id: int, db: db_dependency):
     "/rice-truck-transporter-ware-house/",
     response_model=RiceDepostiRiceTruckTransport,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
-async def rice_deposit_data(db: db_dependency):
+async def rice_deposit_data(db: Session = Depends(get_db)):
     rice_mill_data = db.query(models.Add_Rice_Mill).all()
     truck_data = db.query(models.Truck).all()
     transporter_data = db.query(models.Transporter).all()
@@ -1556,8 +1801,12 @@ async def rice_deposit_data(db: db_dependency):
 
 
 # Rice Deposite
-@app.post("/rice-deposite/", status_code=status.HTTP_201_CREATED)
-async def rice_deposite(ricedeposite: RiceDepositeBase, db: db_dependency):
+@app.post(
+    "/rice-deposite/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def rice_deposite(ricedeposite: RiceDepositeBase, db: Session = Depends(get_db)):
     db_rice_depostie = models.Rice_deposite(**ricedeposite.dict())
     db.add(db_rice_depostie)
     db.commit()
@@ -1568,7 +1817,7 @@ async def rice_deposite(ricedeposite: RiceDepositeBase, db: db_dependency):
 #     response_model=List[RiceDepositeBase],
 #     status_code=status.HTTP_200_OK,
 # )
-# async def rice_deposite_data(db: db_dependency):
+# async def rice_deposite_data(db: Session = Depends(get_db)):
 #     db_rice_deposite_data = db.query(models.Rice_deposite).distinct().all()
 #     return db_rice_deposite_data
 
@@ -1577,6 +1826,7 @@ async def rice_deposite(ricedeposite: RiceDepositeBase, db: db_dependency):
     "/rice-deposite-data/",
     response_model=List[RiceDepositWithRiceWareTruckTransporter],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
 async def get_all_rice_deposite_data(db: Session = Depends(get_db)):
     rices_deposite = (
@@ -1630,8 +1880,12 @@ async def get_all_rice_deposite_data(db: Session = Depends(get_db)):
 
 # ________________________________________________________
 # Dalali dhaan
-@app.post("/dalali-dhaan/", status_code=status.HTTP_201_CREATED)
-async def dalali_dhaan(dalalidhaan: DalaliDhaanBase, db: db_dependency):
+@app.post(
+    "/dalali-dhaan/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def dalali_dhaan(dalalidhaan: DalaliDhaanBase, db: Session = Depends(get_db)):
     db_dalali_dhaan = models.Dalali_dhaan(**dalalidhaan.dict())
     db.add(db_dalali_dhaan)
     db.commit()
@@ -1642,7 +1896,7 @@ async def dalali_dhaan(dalalidhaan: DalaliDhaanBase, db: db_dependency):
 #     response_model=List[DalaliDhaanBase],
 #     status_code=status.HTTP_200_OK,
 # )
-# async def dalali_dhaan_data_data(db: db_dependency):
+# async def dalali_dhaan_data_data(db: Session = Depends(get_db)):
 #     db_dalali_dhaan_data_data = db.query(models.Dalali_dhaan).distinct().all()
 #     return db_dalali_dhaan_data_data
 
@@ -1651,6 +1905,7 @@ async def dalali_dhaan(dalalidhaan: DalaliDhaanBase, db: db_dependency):
     "/dalali-dhaan-data/",
     response_model=List[DalaliDhaanWithKochia],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
 async def get_all_dalali_dhaan_data(db: Session = Depends(get_db)):
     Dalali_dhaans = (
@@ -1703,15 +1958,19 @@ async def get_all_dalali_dhaan_data(db: Session = Depends(get_db)):
 
 
 # FRk
-@app.post("/frk/", status_code=status.HTTP_201_CREATED)
-async def frk(frk: FrkBase, db: db_dependency):
+@app.post(
+    "/frk/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def frk(frk: FrkBase, db: Session = Depends(get_db)):
     db_frk = models.Frk(**frk.dict())
     db.add(db_frk)
     db.commit()
 
 
 # @app.get("/frk-data/", response_model=List[FrkBase], status_code=status.HTTP_200_OK)
-# async def frk_data(db: db_dependency):
+# async def frk_data(db: Session = Depends(get_db)):
 #     db_frk_data = db.query(models.Frk).distinct().all()
 #     return db_frk_data
 
@@ -1757,8 +2016,12 @@ async def get_all_add_do_data(db: Session = Depends(get_db)):
 
 
 # Sauda patrak
-@app.post("/sauda-patrak/", status_code=status.HTTP_201_CREATED)
-async def sauda_patrak(saudapatrak: SaudaPatrakBase, db: db_dependency):
+@app.post(
+    "/sauda-patrak/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def sauda_patrak(saudapatrak: SaudaPatrakBase, db: Session = Depends(get_db)):
     db_sauda_patrak = models.Sauda_patrak(**saudapatrak.dict())
     db.add(db_sauda_patrak)
     db.commit()
@@ -1769,7 +2032,7 @@ async def sauda_patrak(saudapatrak: SaudaPatrakBase, db: db_dependency):
 #     response_model=List[SaudaPatrakBase],
 #     status_code=status.HTTP_200_OK,
 # )
-# async def sauda_patrak_data(db: db_dependency):
+# async def sauda_patrak_data(db: Session = Depends(get_db)):
 #     db_sauda_patrak_data = db.query(models.Sauda_patrak).distinct().all()
 #     return db_sauda_patrak_data
 
@@ -1778,6 +2041,7 @@ async def sauda_patrak(saudapatrak: SaudaPatrakBase, db: db_dependency):
     "/sauda-patrak-data/",
     response_model=List[SaudaPatrakWithTruckNumber],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
 async def get_all_sauda_patrak_data(db: Session = Depends(get_db)):
     saudas_patrak = (
@@ -1810,8 +2074,12 @@ async def get_all_sauda_patrak_data(db: Session = Depends(get_db)):
 
 # ________________________________________________________
 # Do Panding
-@app.post("/do-panding/", status_code=status.HTTP_201_CREATED)
-async def do_panding(dopanding: DoPandingBase, db: db_dependency):
+@app.post(
+    "/do-panding/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def do_panding(dopanding: DoPandingBase, db: Session = Depends(get_db)):
     db_do_panding = models.Do_panding(**dopanding.dict())
     db.add(db_do_panding)
     db.commit()
@@ -1822,7 +2090,7 @@ async def do_panding(dopanding: DoPandingBase, db: db_dependency):
 #     response_model=List[DoPandingBase],
 #     status_code=status.HTTP_200_OK,
 # )
-# async def do_panding_data(db: db_dependency):
+# async def do_panding_data(db: Session = Depends(get_db)):
 #     db_do_panding_data = db.query(models.Do_panding).distinct().all()
 #     return db_do_panding_data
 
@@ -1831,6 +2099,7 @@ async def do_panding(dopanding: DoPandingBase, db: db_dependency):
     "/do-panding-data/",
     response_model=List[DoPandingWithRiceAddDo],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
 async def get_all_sauda_patrak_data(db: Session = Depends(get_db)):
     dos_pending = (
@@ -1868,8 +2137,9 @@ async def get_all_sauda_patrak_data(db: Session = Depends(get_db)):
     "/rice-rst-society-do-truck-transporter/",
     response_model=RiceRstSocietyDoTruckTransporter,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
-async def dhan_transporting_data(db: db_dependency):
+async def dhan_transporting_data(db: Session = Depends(get_db)):
     rice_mill_data = db.query(models.Add_Rice_Mill).all()
     rst_data = db.query(models.Dhan_Awak).all()
     do_number_data = db.query(models.Add_Do).all()
@@ -1894,8 +2164,9 @@ async def dhan_transporting_data(db: db_dependency):
     "/rice-rst-number-do-number/{rice_mill_id}",
     response_model=RiceMillRstNumber,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
-async def rice_mill_rst_number(rice_mill_id: int, db: db_dependency):
+async def rice_mill_rst_number(rice_mill_id: int, db: Session = Depends(get_db)):
     rice_mill_data = (
         db.query(models.Add_Rice_Mill).filter_by(rice_mill_id=rice_mill_id).all()
     )
@@ -1912,8 +2183,14 @@ async def rice_mill_rst_number(rice_mill_id: int, db: db_dependency):
 
 
 # Dhan Transporting
-@app.post("/dhan-transporting/", status_code=status.HTTP_201_CREATED)
-async def dhan_transporting(dhantransporting: DhanTransportingBase, db: db_dependency):
+@app.post(
+    "/dhan-transporting/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def dhan_transporting(
+    dhantransporting: DhanTransportingBase, db: Session = Depends(get_db)
+):
     db_dhan_transporting = models.Dhan_transporting(**dhantransporting.dict())
     db.add(db_dhan_transporting)
     db.commit()
@@ -1924,7 +2201,7 @@ async def dhan_transporting(dhantransporting: DhanTransportingBase, db: db_depen
 #     response_model=List[DhanTransportingBase],
 #     status_code=status.HTTP_200_OK,
 # )
-# async def dhan_transporting_data(db: db_dependency):
+# async def dhan_transporting_data(db: Session = Depends(get_db)):
 #     db_dhan_transporting_data = db.query(models.Dhan_transporting).distinct().all()
 #     return db_dhan_transporting_data
 
@@ -1933,6 +2210,7 @@ async def dhan_transporting(dhantransporting: DhanTransportingBase, db: db_depen
     "/dhan-transporting-data/",
     response_model=List[DhanTransportingWithRiceDoTruckTransport],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
 async def get_all_sauda_patrak_data(db: Session = Depends(get_db)):
     dhans_transporting = (
@@ -1981,8 +2259,12 @@ async def get_all_sauda_patrak_data(db: Session = Depends(get_db)):
 
 # ________________________________________________________
 # Other Jawak
-@app.post("/other-jawak/", status_code=status.HTTP_201_CREATED)
-async def add_other_jawak(otherjawak: OtherJawakBase, db: db_dependency):
+@app.post(
+    "/other-jawak/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def add_other_jawak(otherjawak: OtherJawakBase, db: Session = Depends(get_db)):
     db_add_other_jawak = models.Other_jawak(**otherjawak.dict())
     db.add(db_add_other_jawak)
     db.commit()
@@ -1993,7 +2275,7 @@ async def add_other_jawak(otherjawak: OtherJawakBase, db: db_dependency):
 #     response_model=List[OtherJawakBase],
 #     status_code=status.HTTP_200_OK,
 # )
-# async def get_other_jawak_data(db: db_dependency):
+# async def get_other_jawak_data(db: Session = Depends(get_db)):
 #     db_get_other_jawak_data = db.query(models.Other_jawak).distinct().all()
 #     return db_get_other_jawak_data
 
@@ -2002,6 +2284,7 @@ async def add_other_jawak(otherjawak: OtherJawakBase, db: db_dependency):
     "/other-jawak-data/",
     response_model=List[OtherJawakWithPatyTrucksRice],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
 async def get_all_other_jawak_data(db: Session = Depends(get_db)):
     other_jawaks = (
@@ -2039,8 +2322,12 @@ async def get_all_other_jawak_data(db: Session = Depends(get_db)):
 
 # ________________________________________________________
 # Broken Jawak
-@app.post("/broken-jawak/", status_code=status.HTTP_201_CREATED)
-async def add_broken_jawak(brokenjawak: BrokenJawak, db: db_dependency):
+@app.post(
+    "/broken-jawak/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def add_broken_jawak(brokenjawak: BrokenJawak, db: Session = Depends(get_db)):
     db_add_broken_jawak = models.broken_jawak(**brokenjawak.dict())
     db.add(db_add_broken_jawak)
     db.commit()
@@ -2051,7 +2338,7 @@ async def add_broken_jawak(brokenjawak: BrokenJawak, db: db_dependency):
 #     response_model=List[BrokenJawak],
 #     status_code=status.HTTP_200_OK,
 # )
-# async def get_other_broken_jawak_data(db: db_dependency):
+# async def get_other_broken_jawak_data(db: Session = Depends(get_db)):
 #     db_get_other_broken_jawak_data = db.query(models.broken_jawak).distinct().all()
 #     return db_get_other_broken_jawak_data
 
@@ -2060,6 +2347,7 @@ async def add_broken_jawak(brokenjawak: BrokenJawak, db: db_dependency):
     "/other-broken-jawak-data/",
     response_model=List[BrokernJawakWithRicePartyBrokerTruck],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
 async def get_all_other_jawak_data(db: Session = Depends(get_db)):
     brokens_jawak = (
@@ -2111,8 +2399,12 @@ async def get_all_other_jawak_data(db: Session = Depends(get_db)):
 
 
 # Husk Jawak
-@app.post("/husk-jawak/", status_code=status.HTTP_201_CREATED)
-async def add_husk_jawak(huskjawak: HuskJawakBase, db: db_dependency):
+@app.post(
+    "/husk-jawak/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def add_husk_jawak(huskjawak: HuskJawakBase, db: Session = Depends(get_db)):
     db_add_husk_jawak = models.husk_jawak(**huskjawak.dict())
     db.add(db_add_husk_jawak)
     db.commit()
@@ -2123,7 +2415,7 @@ async def add_husk_jawak(huskjawak: HuskJawakBase, db: db_dependency):
 #     response_model=List[HuskJawakBase],
 #     status_code=status.HTTP_200_OK,
 # )
-# async def get_other_husk_jawak_data(db: db_dependency):
+# async def get_other_husk_jawak_data(db: Session = Depends(get_db)):
 #     db_get_other_husk_jawak_data = db.query(models.husk_jawak).distinct().all()
 #     return db_get_other_husk_jawak_data
 
@@ -2132,6 +2424,7 @@ async def add_husk_jawak(huskjawak: HuskJawakBase, db: db_dependency):
     "/other-husk-jawak-data/",
     response_model=List[HuskJawakWithPartyRiceBrokerTruck],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
 async def get_all_husk_jawak_data(db: Session = Depends(get_db)):
     husks_jawak = (
@@ -2183,8 +2476,12 @@ async def get_all_husk_jawak_data(db: Session = Depends(get_db)):
 
 
 # nakkhi_jawak
-@app.post("/nakkhi-jawak/", status_code=status.HTTP_201_CREATED)
-async def add_nakkhi_jawak(nakkhijawak: NakkhiJawakBase, db: db_dependency):
+@app.post(
+    "/nakkhi-jawak/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def add_nakkhi_jawak(nakkhijawak: NakkhiJawakBase, db: Session = Depends(get_db)):
     db_add_nakkhi_jawak = models.nakkhi_jawak(**nakkhijawak.dict())
     db.add(db_add_nakkhi_jawak)
     db.commit()
@@ -2195,7 +2492,7 @@ async def add_nakkhi_jawak(nakkhijawak: NakkhiJawakBase, db: db_dependency):
 #     response_model=List[NakkhiJawakBase],
 #     status_code=status.HTTP_200_OK,
 # )
-# async def get_other_nakkhi_jawak_data(db: db_dependency):
+# async def get_other_nakkhi_jawak_data(db: Session = Depends(get_db)):
 #     db_get_other_nakkhi_jawak_data = db.query(models.nakkhi_jawak).distinct().all()
 #     return db_get_other_nakkhi_jawak_data
 
@@ -2204,6 +2501,7 @@ async def add_nakkhi_jawak(nakkhijawak: NakkhiJawakBase, db: db_dependency):
     "/other-nakkhi-jawak-data/",
     response_model=List[NakkhiWithRicePartyBrokerTruck],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
 async def get_all_nakkhi_jawak_data(db: Session = Depends(get_db)):
     nakkhis_jawak = (
@@ -2255,8 +2553,12 @@ async def get_all_nakkhi_jawak_data(db: Session = Depends(get_db)):
 
 
 # bran jawak
-@app.post("/bran-jawak/", status_code=status.HTTP_201_CREATED)
-async def add_bran_jawak(branjawak: BranJawakBase, db: db_dependency):
+@app.post(
+    "/bran-jawak/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def add_bran_jawak(branjawak: BranJawakBase, db: Session = Depends(get_db)):
     db_add_bran_jawak = models.bran_jawak(**branjawak.dict())
     db.add(db_add_bran_jawak)
     db.commit()
@@ -2267,7 +2569,7 @@ async def add_bran_jawak(branjawak: BranJawakBase, db: db_dependency):
 #     response_model=List[BranJawakBase],
 #     status_code=status.HTTP_200_OK,
 # )
-# async def get_other_bran_jawak_data(db: db_dependency):
+# async def get_other_bran_jawak_data(db: Session = Depends(get_db)):
 #     db_get_other_bran_jawak_data = db.query(models.bran_jawak).distinct().all()
 #     return db_get_other_bran_jawak_data
 
@@ -2276,6 +2578,7 @@ async def add_bran_jawak(branjawak: BranJawakBase, db: db_dependency):
     "/other-bran-jawak-data/",
     response_model=List[BranJawakWithRicePatryBrokerTruck],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
 async def get_all_bran_jawak_data(db: Session = Depends(get_db)):
     brans_jawak = (
@@ -2325,8 +2628,12 @@ async def get_all_bran_jawak_data(db: Session = Depends(get_db)):
 
 
 # Bhushi
-@app.post("/bhushi/", status_code=status.HTTP_201_CREATED)
-async def add_bhushi(bhushi: BhushiBase, db: db_dependency):
+@app.post(
+    "/bhushi/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def add_bhushi(bhushi: BhushiBase, db: Session = Depends(get_db)):
     db_add_bhushi = models.bhushi(**bhushi.dict())
     db.add(db_add_bhushi)
     db.commit()
@@ -2337,7 +2644,7 @@ async def add_bhushi(bhushi: BhushiBase, db: db_dependency):
 #     response_model=List[BhushiBase],
 #     status_code=status.HTTP_200_OK,
 # )
-# async def get_other_bhushi_data(db: db_dependency):
+# async def get_other_bhushi_data(db: Session = Depends(get_db)):
 #     db_get_other_bhushi_data = db.query(models.bhushi).distinct().all()
 #     return db_get_other_bhushi_data
 
@@ -2346,6 +2653,7 @@ async def add_bhushi(bhushi: BhushiBase, db: db_dependency):
     "/other-bhushi-data/",
     response_model=List[BhushiWithPartyRiceTruck],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
 async def get_all_bhushi_jawak_data(db: Session = Depends(get_db)):
     bhushiii = (
@@ -2385,8 +2693,12 @@ async def get_all_bhushi_jawak_data(db: Session = Depends(get_db)):
 
 
 # paddy sale
-@app.post("/paddy-sale/", status_code=status.HTTP_201_CREATED)
-async def paddy_sale(paddysale: PaddySaleBase, db: db_dependency):
+@app.post(
+    "/paddy-sale/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def paddy_sale(paddysale: PaddySaleBase, db: Session = Depends(get_db)):
     db_paddy_sale = models.Paddy_sale(**paddysale.dict())
     db.add(db_paddy_sale)
     db.commit()
@@ -2397,7 +2709,7 @@ async def paddy_sale(paddysale: PaddySaleBase, db: db_dependency):
 #     response_model=List[PaddySaleBase],
 #     status_code=status.HTTP_200_OK,
 # )
-# async def paddy_sale_data(db: db_dependency):
+# async def paddy_sale_data(db: Session = Depends(get_db)):
 #     db_paddy_sale_data = db.query(models.Paddy_sale).distinct().all()
 #     return db_paddy_sale_data
 
@@ -2406,6 +2718,7 @@ async def paddy_sale(paddysale: PaddySaleBase, db: db_dependency):
     "/paddy-sale-data/",
     response_model=List[PaddySalesWithDhanawakPartyBrokerTruck],
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
 async def get_all_paddy_sale_data(db: Session = Depends(get_db)):
     paddy_sales = (
@@ -2455,6 +2768,82 @@ async def get_all_paddy_sale_data(db: Session = Depends(get_db)):
 
 
 # ________________________________________________________
+# Rice Purchase
+@app.post(
+    "/rice-purchase/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def rice_purchase(ricepurchase: RicePurchaseBase, db: Session = Depends(get_db)):
+    db_rice_purchase = models.Rice_Purchase(**ricepurchase.dict())
+    db.add(db_rice_purchase)
+    db.commit()
+
+
+@app.get(
+    "/rice-purchase-data/",
+    response_model=List[RicePurchaseWithRiceTruckParty],
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
+)
+async def get_all_rice_purchase_data(db: Session = Depends(get_db)):
+    ricepurchases = (
+        db.query(models.Rice_Purchase)
+        .options(
+            joinedload(models.Rice_Purchase.brokers),
+            joinedload(models.Rice_Purchase.trucks),
+            joinedload(models.Rice_Purchase.party),
+            joinedload(models.Rice_Purchase.addricemill),
+        )
+        .all()
+    )
+
+    result = []
+    for ricepurchase in ricepurchases:
+        result.append(
+            RicePurchaseWithRiceTruckParty(
+                rst_number=ricepurchase.rst_number,
+                date=ricepurchase.date,
+                party_id=ricepurchase.party_id,
+                broker_id=ricepurchase.broker_id,
+                truck_number_id=ricepurchase.truck_number_id,
+                bags=ricepurchase.bags,
+                mill_weight=ricepurchase.mill_weight,
+                party_weight=ricepurchase.party_weight,
+                bill_to_rice_mill=ricepurchase.bill_to_rice_mill,
+                rice_purchase_id=ricepurchase.rice_purchase_id,
+                party_name=ricepurchase.party.party_name,
+                broker_name=ricepurchase.brokers.broker_name,
+                truck_number=ricepurchase.trucks.truck_number,
+                rice_mill_name=ricepurchase.addricemill.rice_mill_name,
+            )
+        )
+
+    return result
+
+
+# ________________________________________________________
+# Cash in and Cash out
+@app.post(
+    "/cash-in-out/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(api_key_header)],
+)
+async def cash_in_out(cash_in_out: CashInCashOutBase, db: Session = Depends(get_db)):
+    db_cash_in_out = models.CashInCashOut(**cash_in_out.dict())
+    db.add(db_cash_in_out)
+    db.commit()
+
+
+@app.get(
+    "/cash-in-out-data/",
+    response_model=List[CashInCashOutBase],
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
+)
+async def cash_in_out_data(db: Session = Depends(get_db)):
+    db_cash_in_out_data = db.query(models.CashInCashOut).distinct().all()
+    return db_cash_in_out_data
 
 
 # # Society
@@ -2463,7 +2852,7 @@ async def get_all_paddy_sale_data(db: Session = Depends(get_db)):
 # #     response_model=SocietyDistanceRate,
 # #     status_code=status.HTTP_200_OK,
 # # )
-# # async def society_data(society_id: int, db: db_dependency):
+# # async def society_data(society_id: int, db: Session = Depends(get_db)):
 # #     society_data = db.query(models.Society).filter_by(society_id=society_id).all()
 # #     society_db = {
 # #         "society_data": [SocietyBase(**row.__dict__) for row in society_data],
@@ -2476,7 +2865,7 @@ async def get_all_paddy_sale_data(db: Session = Depends(get_db)):
 #     response_model=SocietyDistanceRate,
 #     status_code=status.HTTP_200_OK,
 # )
-# async def society_data(society_id: int, db: db_dependency):
+# async def society_data(society_id: int, db: Session = Depends(get_db)):
 #     society_data = db.query(models.Society).filter_by(society_id=society_id).first()
 
 #     if society_data is None:
@@ -2489,7 +2878,7 @@ async def get_all_paddy_sale_data(db: Session = Depends(get_db)):
 #     # Dhan rice societies rate
 #     # @app.post("/dhan-rice-societies-rate/", status_code=status.HTTP_201_CREATED)
 #     # async def dhan_rice_societies_rate(
-#     #     dhansocietiesrate: DhanRiceSocietiesRateBase, db: db_dependency
+#     #     dhansocietiesrate: DhanRiceSocietiesRateBase, db: Session = Depends(get_db)
 #     # ):
 #     #     db_dhan_rice_societies_rate = models.Dhan_rice_societies_rate(
 #     #         **dhansocietiesrate.dict()
@@ -2502,7 +2891,7 @@ async def get_all_paddy_sale_data(db: Session = Depends(get_db)):
 #     #     response_model=List[DhanRiceSocietiesRateBase],
 #     #     status_code=status.HTTP_200_OK,
 #     # )
-#     # async def dhan_rice_societies_rate_data(db: db_dependency):
+#     # async def dhan_rice_societies_rate_data(db: Session = Depends(get_db)):
 #     #     db_dhan_rice_societies_rate = (
 #     #         db.query(models.Dhan_rice_societies_rate).distinct().all()
 #     #     )
@@ -2511,7 +2900,7 @@ async def get_all_paddy_sale_data(db: Session = Depends(get_db)):
 
 # # lot number master
 # @app.post("/lot-number-master/", status_code=status.HTTP_201_CREATED)
-# async def lot_number_master(lotnumbermaster: LotNumberMasterBase, db: db_dependency):
+# async def lot_number_master(lotnumbermaster: LotNumberMasterBase, db: Session = Depends(get_db)):
 #     db_lot_number_master = models.Lot_number_master(**lotnumbermaster.dict())
 #     db.add(db_lot_number_master)
 #     db.commit()
@@ -2522,25 +2911,24 @@ async def get_all_paddy_sale_data(db: Session = Depends(get_db)):
 #     response_model=List[LotNumberMasterBase],
 #     status_code=status.HTTP_200_OK,
 # )
-# async def lot_number_master_data(db: db_dependency):
+# async def lot_number_master_data(db: Session = Depends(get_db)):
 #     db_lot_number_master = db.query(models.Lot_number_master).distinct().all()
 #     return db_lot_number_master
 
 
 # # Mohan food paddy
 # @app.post("/mohan-food-paddy/", status_code=status.HTTP_201_CREATED)
-# async def mohan_food_paddy(mohanfoodpaddy: MohanFoodPaddyBase, db: db_dependency):
+# async def mohan_food_paddy(mohanfoodpaddy: MohanFoodPaddyBase, db: Session = Depends(get_db)):
 #     db_mohan_food_paddy = models.Mohan_food_paddy(**mohanfoodpaddy.dict())
 #     db.add(db_mohan_food_paddy)
 #     db.commit()
-
 
 # @app.get(
 #     "/mohan-food-paddy-data/",
 #     response_model=List[MohanFoodPaddyBase],
 #     status_code=status.HTTP_200_OK,
-# )
-# async def mohan_food_paddy_data(db: db_dependency):
+# )command:workbench.action.openSettings?%5B%22editor.formatOnSave%22%5D
+# async def mohan_food_paddy_data(db: Session = Depends(get_db)):
 #     db_mohan_food_paddy_data = db.query(models.Mohan_food_paddy).distinct().all()
 #     return db_mohan_food_paddy_data
 
@@ -2548,7 +2936,7 @@ async def get_all_paddy_sale_data(db: Session = Depends(get_db)):
 # # Transporter master
 # @app.post("/transporter-master/", status_code=status.HTTP_201_CREATED)
 # async def transporter_master(
-#     transportermaster: TransporterMasterBase, db: db_dependency
+#     transportermaster: TransporterMasterBase, db: Session = Depends(get_db)
 # ):
 #     db_transporter_master = models.Transporter_master(**transportermaster.dict())
 #     db.add(db_transporter_master)
@@ -2560,14 +2948,14 @@ async def get_all_paddy_sale_data(db: Session = Depends(get_db)):
 #     response_model=List[TransporterMasterBase],
 #     status_code=status.HTTP_200_OK,
 # )
-# async def transporter_master_data(db: db_dependency):
+# async def transporter_master_data(db: Session = Depends(get_db)):
 #     db_transporter_master_data = db.query(models.Transporter_master).distinct().all()
 #     return db_transporter_master_data
 
 
 # # About Rice Mill
 # # @app.post("/add-rice-mill/", status_code=status.HTTP_201_CREATED)
-# # async def add_rice_mill(addricemill: AddRiceMillBase, db: db_dependency):
+# # async def add_rice_mill(addricemill: AddRiceMillBase, db: Session = Depends(get_db)):
 # #     db_about_rice_mill = models.Add_Rice_Mill(**addricemill.dict())
 # #     db.add(db_about_rice_mill)
 # #     db.commit()
@@ -2575,7 +2963,7 @@ async def get_all_paddy_sale_data(db: Session = Depends(get_db)):
 
 # # Add New Transporters
 # # @app.post("/transporter/", status_code=status.HTTP_201_CREATED)
-# # async def add_new_trasporter(transporters: TransporterBase, db: db_dependency):
+# # async def add_new_trasporter(transporters: TransporterBase, db: Session = Depends(get_db)):
 # #     db_transporter = models.Transporter(**transporters.dict())
 # #     db.add(db_transporter)
 # #     db.commit()
@@ -2583,7 +2971,7 @@ async def get_all_paddy_sale_data(db: Session = Depends(get_db)):
 
 # # Add New Society
 # # @app.post("/society/", status_code=status.HTTP_201_CREATED)
-# # async def add_new_society(society: SocietyBase, db: db_dependency):
+# # async def add_new_society(society: SocietyBase, db: Session = Depends(get_db)):
 # #     db_society = models.Society(**society.dict())
 # #     db.add(db_society)
 # #     db.commit()
@@ -2591,7 +2979,7 @@ async def get_all_paddy_sale_data(db: Session = Depends(get_db)):
 
 # # Add New Agreement
 # # @app.post("/agreement/", status_code=status.HTTP_201_CREATED)
-# # async def add_agreement(agreement: AgreementBase, db: db_dependency):
+# # async def add_agreement(agreement: AgreementBase, db: Session = Depends(get_db)):
 # #     db_agreement = models.Agreement(**agreement.dict())
 # #     db.add(db_agreement)
 # #     db.commit()
@@ -2609,7 +2997,7 @@ async def get_all_paddy_sale_data(db: Session = Depends(get_db)):
 #     response_model=RiceMillRstNumber,
 #     status_code=status.HTTP_200_OK,
 # )
-# async def rice_mill_rst_number(rice_mill_id: int, db: db_dependency):
+# async def rice_mill_rst_number(rice_mill_id: int, db: Session = Depends(get_db)):
 #     rice_mill_data = (
 #         db.query(models.Add_Rice_Mill).filter_by(rice_mill_id=rice_mill_id).all()
 #     )
@@ -2630,7 +3018,7 @@ async def get_all_paddy_sale_data(db: Session = Depends(get_db)):
 #     response_model=DhanAwakDalaliDhan,
 #     status_code=status.HTTP_200_OK,
 # )
-# async def get_data(rice_mill_id: int, db: db_dependency):
+# async def get_data(rice_mill_id: int, db: Session = Depends(get_db)):
 #     # Fetch data from different tables
 #     total_weight = (
 #         db.query(models.Dalali_dhaan).filter_by(rice_mill_id=rice_mill_id).all()
@@ -2656,8 +3044,9 @@ async def get_all_paddy_sale_data(db: Session = Depends(get_db)):
     "/paddy-data/{rice_mill_id}",
     response_model=DhanAwakDalaliDhan,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
 )
-async def get_data(rice_mill_id: int, db: db_dependency):
+async def get_data(rice_mill_id: int, db: Session = Depends(get_db)):
     # Fetch data from different tables
     total_weight = db.query(models.Dalali_dhaan).all()
     dm_weight = db.query(models.Dhan_Awak).filter_by(rice_mill_id=rice_mill_id).all()
@@ -2681,3 +3070,64 @@ async def get_data(rice_mill_id: int, db: db_dependency):
     }
 
     return DhanAwakDalaliDhan(**response_data)
+
+
+@app.get(
+    "/rice-data/{rice_mill_id}",
+    response_model=inventoryData,
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
+)
+async def get_data(rice_mill_id: int, db: Session = Depends(get_db)):
+    mill_weight = db.query(models.Rice_Purchase).all()
+    rice_deposide_data = (
+        db.query(models.Rice_deposite).filter_by(rice_mill_name_id=rice_mill_id).all()
+    )
+    broken_data = (
+        db.query(models.broken_jawak).filter_by(rice_mill_name_id=rice_mill_id).all()
+    )
+    bran_data = (
+        db.query(models.bran_jawak).filter_by(rice_mill_name_id=rice_mill_id).all()
+    )
+    nakkhi_data = (
+        db.query(models.nakkhi_jawak).filter_by(rice_mill_name_id=rice_mill_id).all()
+    )
+    husk_data = (
+        db.query(models.husk_jawak).filter_by(rice_mill_name_id=rice_mill_id).all()
+    )
+
+    # Return the result as a custom response model
+    response_data = {
+        "mill_weight": [row.mill_weight for row in mill_weight],
+        "rice_deposide_data": [row.__dict__ for row in rice_deposide_data],
+        "broken_data": [row.__dict__ for row in broken_data],
+        "bran_data": [row.__dict__ for row in bran_data],
+        "nakkhi_data": [row.__dict__ for row in nakkhi_data],
+        "husk_data": [row.__dict__ for row in husk_data],
+    }
+
+    return inventoryData(**response_data)
+
+
+class BardanaDataDhanAwak(BaseModel):
+    Dhan_Awak_Data: List[DhanAwakBase]
+
+
+@app.get(
+    "/bardaha-data/{rice_mill_id}",
+    response_model=BardanaDataDhanAwak,
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
+)
+async def get_data(rice_mill_id: int, db: Session = Depends(get_db)):
+    # Fetch data from different tables
+    Dhan_Awak_Data = (
+        db.query(models.Dhan_Awak).filter_by(rice_mill_id=rice_mill_id).all()
+    )
+
+    # Return the result as a custom response model
+    response_data = {
+        "Dhan_Awak_Data": [DhanAwakBase(**row.__dict__) for row in Dhan_Awak_Data],
+    }
+
+    return BardanaDataDhanAwak(**response_data)
