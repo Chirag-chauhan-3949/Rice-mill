@@ -6,20 +6,23 @@ import models
 from database import engine, sessionlocal
 from sqlalchemy.orm import Session, joinedload, relationship
 from datetime import date, datetime
+import os
+import uvicorn
 
 app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
 
 # CORS (Cross-Origin Resource Sharing) middleware configuration
-# origins = [
-#     "http://localhost:5173",
-#     # "http://localhost:5174",  # Update this with the origin of your React app
-# ]
+origins = [
+    "https://mill.dappfolk.com",
+    # "http://localhost:5173",
+    # "http://localhost:5174",  # Update this with the origin of your React app
+]
 
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins=origins,
-    allow_origins=["*"],
+    allow_origins=origins,
+    # allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -149,7 +152,7 @@ class AdddoBase(BaseModel):
     date: date
     do_number: str
     select_argeement_id: int
-    moto_weight: float
+    mota_weight: float
     mota_Bardana: float
     patla_weight: float
     patla_bardana: float
@@ -167,7 +170,7 @@ class AddDoWithAddRiceMillAgreementSocietyTruck(BaseModel):
     date: date
     do_number: str
     select_argeement_id: int
-    moto_weight: float
+    mota_weight: float
     mota_Bardana: float
     patla_weight: float
     patla_bardana: float
@@ -409,7 +412,7 @@ class DalaliDhaanBase(BaseModel):
     weight_less_kata_difference: float
     net_weight: float
     rate: int
-    ammount: float
+    amount: float
     dalali_dhaan_id: Optional[int] = None
 
 
@@ -543,7 +546,7 @@ class RiceMillRstNumber(BaseModel):
 
 
 class DhanTransportingBase(BaseModel):
-    rst_number_id: int
+    rst_number: int
     date: date
     do_number_id: int
     society_name_id: int
@@ -561,7 +564,7 @@ class DhanTransportingBase(BaseModel):
 
 
 class DhanTransportingWithRiceDoTruckTransport(BaseModel):
-    rst_number_id: int
+    rst_number: int
     date: date
     do_number_id: int
     society_name_id: int
@@ -575,7 +578,6 @@ class DhanTransportingWithRiceDoTruckTransport(BaseModel):
     status: str
     total_pending: int
     total_paid: int
-    rst_number: int
     rice_mill_name: str
     society_name: str
     do_number: str
@@ -889,10 +891,21 @@ class PaddySalesWithDhanawakPartyBrokerTruck(BaseModel):
 
 
 class CashInCashOutBase(BaseModel):
-    cash_in: float
-    cash_out: float
-    in_hand: float
-    in_out: float
+    cash: str
+    paddy_purchase: float
+    paddy_in: float
+    paddy_sale: float
+    paddy_processed: float
+    paddy_stacked: float
+    rice_purchase: float
+    rice_depatched: float
+    broken_sold: float
+    bran_sold: float
+    nakkhi_sold: float
+    bhusa_sold: float
+    transporting_bill: float
+    bardana: float
+    total: float
     cash_detail: Optional[int] = None
 
 
@@ -1060,7 +1073,10 @@ async def add_new_trasporter(
 ):
     existing_transporter = (
         db.query(models.Transporter)
-        .filter(models.Transporter.transporter_name == transporters.transporter_name)
+        .filter(
+            models.Transporter.transporter_phone_number
+            == transporters.transporter_phone_number
+        )
         .first()
     )
     if existing_transporter:
@@ -1286,9 +1302,25 @@ async def get_all_agreements_number(db: Session = Depends(get_db)):
 async def add_whare_house(
     warehouse: WareHouseTransporting, db: Session = Depends(get_db)
 ):
+    existing_warehouse = (
+        db.query(models.ware_house_transporting)
+        .filter(
+            models.ware_house_transporting.ware_house_transporting_rate
+            == warehouse.ware_house_transporting_rate
+        )
+        .first()
+    )
+    if existing_warehouse:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Ware House with this transporting rate  already exists",
+        )
     db_add_ware_house = models.ware_house_transporting(**warehouse.dict())
     db.add(db_add_ware_house)
     db.commit()
+    db.refresh(db_add_ware_house)
+
+    return db_add_ware_house
 
 
 @app.get(
@@ -1309,9 +1341,22 @@ async def get_all_ware_house_data(db: Session = Depends(get_db)):
     dependencies=[Depends(api_key_header)],
 )
 async def add_kochia(addkochia: KochiaBase, db: Session = Depends(get_db)):
+    existing_kochia = (
+        db.query(models.Kochia)
+        .filter(models.Kochia.kochia_phone_number == addkochia.kochia_phone_number)
+        .first()
+    )
+    if existing_kochia:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Kochia With this Phone number already exists",
+        )
     db_kochia = models.Kochia(**addkochia.dict())
     db.add(db_kochia)
     db.commit()
+    db.refresh(db_kochia)
+
+    return db_kochia
 
 
 # @app.get(
@@ -1355,6 +1400,16 @@ async def get_all_kochia_data(db: Session = Depends(get_db)):
     dependencies=[Depends(api_key_header)],
 )
 async def add_party(party: partyBase, db: Session = Depends(get_db)):
+    existing_party = (
+        db.query(models.Party)
+        .filter(models.Party.party_phone_number == party.party_phone_number)
+        .first()
+    )
+    if existing_party:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Party with this phone number already exists",
+        )
     db_add_party = models.Party(**party.dict())
     db.add(db_add_party)
     db.commit()
@@ -1378,9 +1433,22 @@ async def get_party_data(db: Session = Depends(get_db)):
     dependencies=[Depends(api_key_header)],
 )
 async def add_broker(broker: brokenBase, db: Session = Depends(get_db)):
+    existing_broker = (
+        db.query(models.brokers)
+        .filter(models.brokers.broker_phone_number == broker.broker_phone_number)
+        .first()
+    )
+    if existing_broker:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Broker with this phone number already exists",
+        )
     db_add_broker = models.brokers(**broker.dict())
     db.add(db_add_broker)
     db.commit()
+    db.refresh(db_add_broker)
+
+    return db_add_broker
 
 
 @app.get(
@@ -1450,9 +1518,22 @@ async def adddodata(rice_mill_id: int, db: Session = Depends(get_db)):
     dependencies=[Depends(api_key_header)],
 )
 async def add_do(adddo: AdddoBase, db: Session = Depends(get_db)):
+    existing_adddo = (
+        db.query(models.Add_Do)
+        .filter(models.Add_Do.do_number == adddo.do_number)
+        .first()
+    )
+    if existing_adddo:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Do with this Number already exists",
+        )
     db_add_do = models.Add_Do(**adddo.dict())
     db.add(db_add_do)
     db.commit()
+    db.refresh(db_add_do)
+
+    return db_add_do
 
 
 # @app.get(
@@ -1944,7 +2025,7 @@ async def get_all_dalali_dhaan_data(db: Session = Depends(get_db)):
                 weight_less_kata_difference=Dalali_dhaan.weight_less_kata_difference,
                 net_weight=Dalali_dhaan.net_weight,
                 rate=Dalali_dhaan.rate,
-                ammount=Dalali_dhaan.ammount,
+                amount=Dalali_dhaan.amount,
                 kochia_name=Dalali_dhaan.kochia.kochia_name,
                 truck_number=Dalali_dhaan.trucks.truck_number,
                 dalali_dhaan_id=Dalali_dhaan.dalali_dhaan_id,
@@ -3131,3 +3212,7 @@ async def get_data(rice_mill_id: int, db: Session = Depends(get_db)):
     }
 
     return BardanaDataDhanAwak(**response_data)
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="139.84.133.223", port=3000)

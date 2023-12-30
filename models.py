@@ -173,7 +173,7 @@ class Add_Do(Base):
     date = Column(DATE)
     do_number = Column(String(15))
     select_argeement_id = Column(Integer, ForeignKey("agreement.agremennt_id"))
-    moto_weight = Column(Float)
+    mota_weight = Column(Float)
     mota_Bardana = Column(Float)
     patla_weight = Column(Float)
     patla_bardana = Column(Float)
@@ -232,7 +232,6 @@ class Dhan_Awak(Base):
     society = relationship("Society", back_populates="dhanawak")
     trucks = relationship("Truck", back_populates="dhanawak")
     transporter = relationship("Transporter", back_populates="dhanawak")
-    dhantransporting = relationship("Dhan_transporting", back_populates="dhanawak")
     paddysale = relationship("Paddy_sale", back_populates="dhanawak")
 
 
@@ -319,7 +318,7 @@ class Dalali_dhaan(Base):
     weight_less_kata_difference = Column(Float)
     net_weight = Column(Float)
     rate = Column(Integer)
-    ammount = Column(Float)
+    amount = Column(Float)
     created_at = Column(DateTime, default=func.now())
     kochia = relationship("Kochia", back_populates="dalalidhaan")
     trucks = relationship("Truck", back_populates="dalalidhaan")
@@ -365,7 +364,7 @@ class Do_panding(Base):
     do_panding_id = Column(Integer, primary_key=True, index=True)
     rice_mill_id = Column(Integer, ForeignKey("addricemill.rice_mill_id"))
     do_number_id = Column(Integer, ForeignKey("addDo.do_id"))
-    date = Column(DATE)  # Jis Din Jari hua Hai Us Din ka Date Ho Ga
+    date = Column(DATE)
     mota = Column(VARCHAR(50))
     patla = Column(VARCHAR(50))
     sarna = Column(VARCHAR(50))
@@ -379,7 +378,7 @@ class Dhan_transporting(Base):
     __tablename__ = "dhantransporting"
 
     Dhan_transporting_id = Column(Integer, primary_key=True, index=True)
-    rst_number_id = Column(Integer, ForeignKey("dhanawak.dhan_awak_id"))
+    rst_number = Column(Integer)
     date = Column(DATE)
     do_number_id = Column(Integer, ForeignKey("addDo.do_id"))
     society_name_id = Column(Integer, ForeignKey("society.society_id"))
@@ -394,7 +393,6 @@ class Dhan_transporting(Base):
     total_pending = Column(Integer)
     total_paid = Column(Integer)
     created_at = Column(DateTime, default=func.now())
-    dhanawak = relationship("Dhan_Awak", back_populates="dhantransporting")
     addricemill = relationship("Add_Rice_Mill", back_populates="dhantransporting")
     society = relationship("Society", back_populates="dhantransporting")
     add_do = relationship("Add_Do", back_populates="dhantransporting")
@@ -620,10 +618,21 @@ class CashInCashOut(Base):
     __tablename__ = "cashincashout"
 
     cash_detail = Column(Integer, primary_key=True, index=True)
-    cash_in = Column(Float)
-    cash_out = Column(Float)
-    in_hand = Column(Float)
-    in_out = Column(Float)
+    cash = Column(String(50))
+    paddy_purchase = Column(Float)
+    paddy_in = Column(Float)
+    paddy_sale = Column(Float)
+    paddy_processed = Column(Float)
+    paddy_stacked = Column(Float)
+    rice_purchase = Column(Float)
+    rice_depatched = Column(Float)
+    broken_sold = Column(Float)
+    bran_sold = Column(Float)
+    nakkhi_sold = Column(Float)
+    bhusa_sold = Column(Float)
+    transporting_bill = Column(Float)
+    bardana = Column(Float)
+    total = Column(Float)
     created_at = Column(DateTime, default=func.now())
 
 
