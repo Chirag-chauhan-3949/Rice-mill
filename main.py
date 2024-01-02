@@ -3215,4 +3215,12 @@ async def get_data(rice_mill_id: int, db: Session = Depends(get_db)):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="139.84.133.223", port=3000)
+    uvicorn.run(app, host="0.0.0.0", port=3000)
+# if __name__ == "__main__":
+#     uvicorn.run(
+#         app,
+#         host="0.0.0.0",
+#         port=3000,
+#         ssl_keyfile=" /etc/letsencrypt/live/mill.dappfolk.com-0001/privkey.pem",
+#         ssl_certfile=" /etc/letsencrypt/live/mill.dappfolk.com-0001/fullchain.pem",
+#     )
