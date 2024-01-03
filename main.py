@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, status, Header
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, parse_obj_as
 from typing import Annotated, List, Optional
 import models
 from database import engine, sessionlocal
@@ -13,16 +13,16 @@ app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
 
 # CORS (Cross-Origin Resource Sharing) middleware configuration
-origins = [
-    "https://mill.dappfolk.com",
-    # "http://localhost:5173",
-    # "http://localhost:5174",  # Update this with the origin of your React app
-]
+# origins = [
+#     # "https://mill.dappfolk.com",
+#     "http://localhost:5173",
+#     "http://localhost:5174",  # Update this with the origin of your React app
+# ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    # allow_origins=["*"],
+    # allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -99,10 +99,10 @@ class RiceMillWithAgreement(BaseModel):
 
 
 class WareHouseTransporting(BaseModel):
-    ware_houes_name: str
+    ware_house_name: str
     ware_house_transporting_rate: int
     hamalirate: int
-    ware_houes_id: Optional[int] = None
+    ware_house_id: Optional[int] = None
 
 
 # ___________________________________________________________
@@ -118,6 +118,10 @@ class RiceMillData(BaseModel):
 class AddDoData(BaseModel):
     rice_mill_data: List[AddRiceMillBase]
     agreement_data: List[AgreementBase]
+
+
+class SocietyTransportingRate(BaseModel):
+    society_transporting: List[SocietyBase]
 
 
 class KochiaBase(BaseModel):
@@ -213,7 +217,7 @@ class DhanAwakBase(BaseModel):
     date: date
     do_id: int
     society_id: int
-    dm_weight: int
+    dm_weight: float
     number_of_bags: int
     truck_number_id: int
     transporter_name_id: int
@@ -222,7 +226,7 @@ class DhanAwakBase(BaseModel):
     jama_jute_22_23: int
     ek_bharti_21_22: int
     pds: int
-    miller_purana: int
+    miller_purana: float
     kisan: int
     bardana_society: int
     hdpe_22_23: int
@@ -231,7 +235,7 @@ class DhanAwakBase(BaseModel):
     total_bag_weight: float
     type_of_paddy: str
     actual_paddy: str
-    mill_weight_quintals: int
+    mill_weight_quintals: float
     shortage: float
     bags_put_in_hopper: int
     bags_put_in_stack: int
@@ -380,7 +384,7 @@ class RiceDepositWithRiceWareTruckTransporter(BaseModel):
     hamali: int
     rice_mill_name: str
     truck_number: str
-    ware_houes_name: str
+    ware_house_name: str
     transporter_name: str
     rice_depostie_id: Optional[int] = None
 
@@ -1217,6 +1221,29 @@ async def get_all_societyes_names(db: Session = Depends(get_db)):
     return [all_society_name[0] for all_society_name in db_get_all_societyes_names]
 
 
+##################################
+@app.get(
+    "/society-transporting-rate/{society_id}",  # Here will go my truck ID
+    response_model=SocietyTransportingRate,
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(api_key_header)],
+)
+async def society_data(society_id: int, db: Session = Depends(get_db)):
+    society_transporting = (
+        db.query(models.Society).filter_by(society_id=society_id).all()
+    )
+
+    society_transporting_data = {
+        "society_transporting": [
+            SocietyBase(**row.__dict__) for row in society_transporting
+        ],
+    }
+    return society_transporting_data
+
+
+###################################
+
+
 # Add Agreement
 @app.post(
     "/agreement/",
@@ -1232,7 +1259,7 @@ async def add_agreement(addagreement: AgreementBase, db: Session = Depends(get_d
     if existing_agreement:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Society with this name already exists",
+            detail="Agreement with this name already exists",
         )
     db_agreement = models.Agreement(**addagreement.dict())
     db.add(db_agreement)
@@ -1294,33 +1321,46 @@ async def get_all_agreements_number(db: Session = Depends(get_db)):
 
 
 # Whare House
+# @app.post(
+#     "/ware-house-transporting/",
+#     status_code=status.HTTP_201_CREATED,
+#     dependencies=[Depends(api_key_header)],
+# )
+# async def add_ware_house(
+#     warehouse: WareHouseTransporting, db: Session = Depends(get_db)
+# ):
+#     existing_warehouse = (
+#         db.query(models.ware_house_transporting)
+#         .filter(
+#             models.ware_house_transporting.ware_house_transporting_rate
+#             == warehouse.ware_house_transporting_rate
+#         )
+#         .first()
+#     )
+#     if existing_warehouse:
+#         raise HTTPException(
+#             status_code=status.HTTP_400_BAD_REQUEST,
+#             detail="Ware House with this transporting rate already exists",
+#         )
+#     db_add_ware_house = models.ware_house_transporting(**warehouse.dict())
+#     db.add(db_add_ware_house)
+#     db.commit()
+#     db.refresh(db_add_ware_house)
+
+#     return db_add_ware_house
+
+
 @app.post(
     "/ware-house-transporting/",
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(api_key_header)],
 )
-async def add_whare_house(
+async def add_ware_house(
     warehouse: WareHouseTransporting, db: Session = Depends(get_db)
 ):
-    existing_warehouse = (
-        db.query(models.ware_house_transporting)
-        .filter(
-            models.ware_house_transporting.ware_house_transporting_rate
-            == warehouse.ware_house_transporting_rate
-        )
-        .first()
-    )
-    if existing_warehouse:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Ware House with this transporting rate  already exists",
-        )
     db_add_ware_house = models.ware_house_transporting(**warehouse.dict())
     db.add(db_add_ware_house)
     db.commit()
-    db.refresh(db_add_ware_house)
-
-    return db_add_ware_house
 
 
 @app.get(
@@ -1570,7 +1610,7 @@ async def get_all_add_do_data(db: Session = Depends(get_db)):
                 date=Add_Do.date,
                 do_number=Add_Do.do_number,
                 select_argeement_id=Add_Do.select_argeement_id,
-                moto_weight=Add_Do.moto_weight,
+                mota_weight=Add_Do.mota_weight,
                 mota_Bardana=Add_Do.mota_Bardana,
                 patla_weight=Add_Do.patla_weight,
                 patla_bardana=Add_Do.patla_bardana,
@@ -3214,8 +3254,8 @@ async def get_data(rice_mill_id: int, db: Session = Depends(get_db)):
     return BardanaDataDhanAwak(**response_data)
 
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=3000)
+# if __name__ == "__main__":
+#     uvicorn.run(app, host="0.0.0.0", port=3000)
 # if __name__ == "__main__":
 #     uvicorn.run(
 #         app,
